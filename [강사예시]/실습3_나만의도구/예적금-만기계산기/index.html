@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>예적금 만기 계산기</title>
+<style>
+  :root {
+    --bg: #f4f6f5;
+    --card: #ffffff;
+    --ink: #1c2b27;
+    --muted: #66746f;
+    --line: #dde4e1;
+    --accent: #0f7b6c;
+    --accent-soft: #e3f2ef;
+    --warn: #b42318;
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); }
+  .wrap { max-width: 880px; margin: 0 auto; display: grid; gap: 18px; }
+  header p { margin: 0 0 4px; color: var(--accent); font-size: 13px; font-weight: 800; letter-spacing: .14em; }
+  h1 { margin: 0; font-size: clamp(28px, 5vw, 38px); letter-spacing: -0.03em; }
+  .sub { margin: 6px 0 0; color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 18px; align-items: start; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 22px; min-width: 0; }
+  .card h2 { margin: 0 0 14px; font-size: 18px; }
+  .field { display: grid; gap: 6px; margin-bottom: 14px; }
+  .field label, .field legend { font-size: 14px; font-weight: 800; }
+  .field .hint { color: var(--muted); font-weight: 600; font-size: 12px; }
+  input[type="text"], input[type="date"] {
+    width: 100%; min-width: 0; padding: 12px 14px; font: inherit; font-size: 17px;
+    border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+  fieldset { border: 0; padding: 0; margin: 0 0 14px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--bg); border-radius: 12px; padding: 4px; margin-top: 6px; }
+  .seg input { position: absolute; opacity: 0; }
+  .seg label { text-align: center; padding: 9px 6px; border-radius: 9px; font-weight: 700; font-size: 15px; cursor: pointer; color: var(--muted); }
+  .seg input:checked + label { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgb(0 0 0 / 10%); }
+  .seg input:focus-visible + label { outline: 2px solid var(--accent); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .error { min-height: 20px; margin: 0; color: var(--warn); font-weight: 700; font-size: 14px; }
+  .big { margin: 0 0 4px; color: var(--muted); font-size: 14px; font-weight: 700; }
+  .total { margin: 0 0 16px; font-size: clamp(30px, 6vw, 40px); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  dl { margin: 0; display: grid; gap: 8px; }
+  dl div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+  dt { color: var(--muted); font-size: 15px; }
+  dd { margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .notice { margin-top: 18px; background: var(--accent-soft); border-radius: 14px; padding: 16px; }
+  .notice p { margin: 0 0 12px; line-height: 1.7; }
+  button.copy { width: 100%; padding: 12px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; }
+  button.copy:hover { filter: brightness(1.08); }
+  button.copy:disabled { background: #a9b7b2; cursor: not-allowed; }
+  .foot { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p>DEPOSIT · SAVINGS</p>
+    <h1>예적금 만기 계산기</h1>
+    <p class="sub">원금 · 금리 · 기간을 넣으면 세후 만기 금액과 고객 안내 문장이 나옵니다.</p>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="in-title">
+      <h2 id="in-title">입력</h2>
+
+      <fieldset>
+        <legend class="field">상품 종류</legend>
+        <div class="seg">
+          <input type="radio" name="kind" id="kind-deposit" value="deposit" checked><label for="kind-deposit">정기예금</label>
+          <input type="radio" name="kind" id="kind-saving" value="saving"><label for="kind-saving">정기적금</label>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label for="principal" id="principal-label">원금 (원)</label>
+        <input id="principal" type="text" inputmode="numeric" autocomplete="off" value="10,000,000">
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label for="rate">연 금리 (%)</label>
+          <input id="rate" type="text" inputmode="decimal" autocomplete="off" value="3.0">
+        </div>
+        <div class="field">
+          <label for="months">기간 (개월)</label>
+          <input id="months" type="text" inputmode="numeric" autocomplete="off" value="12">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="start">가입일</label>
+        <input id="start" type="date">
+      </div>
+
+      <fieldset>
+        <legend class="field">이자 계산 <span class="hint">있으면 좋은 기능 · 1차 완성 뒤 추가</span></legend>
+        <div class="seg">
+          <input type="radio" name="calc" id="calc-simple" value="simple" checked><label for="calc-simple">단리</label>
+          <input type="radio" name="calc" id="calc-compound" value="compound"><label for="calc-compound">월복리</label>
+        </div>
+      </fieldset>
+
+      <p id="error" class="error" role="alert"></p>
+    </section>
+
+    <section class="card" aria-labelledby="out-title" aria-live="polite">
+      <h2 id="out-title">결과</h2>
+      <p class="big">만기 수령액 (세후)</p>
+      <p class="total" id="total">-</p>
+      <dl>
+        <div><dt>원금 합계</dt><dd id="paid">-</dd></div>
+        <div><dt>세전 이자</dt><dd id="interest">-</dd></div>
+        <div><dt>이자소득세 (15.4%)</dt><dd id="tax">-</dd></div>
+        <div><dt>세후 이자</dt><dd id="net">-</dd></div>
+        <div><dt>만기일</dt><dd id="maturity">-</dd></div>
+      </dl>
+
+      <div class="notice">
+        <p id="message">입력값을 넣으면 안내 문장이 만들어집니다.</p>
+        <button type="button" class="copy" id="copy" disabled>안내 문장 복사</button>
+      </div>
+    </section>
+  </div>
+
+  <p class="foot">가상 금액으로 연습하는 계산기입니다. 이자소득세는 일반과세 15.4%(소득세 14% + 지방소득세 1.4%, 10원 미만 절사)로 계산했습니다. 실제 금액은 상품 약관과 은행 시스템 기준이며 몇 원 차이 날 수 있습니다.</p>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const won = (n) => `${n.toLocaleString("ko-KR")}원`;
+
+  // "10,000,000" "3.0" 같은 입력을 숫자로. 비어 있으면 null, 숫자가 아니면 NaN.
+  function toNumber(text) {
+    const cleaned = String(text).replace(/[,\s원%]/g, "");
+    if (cleaned === "") return null;
+    return /^-?\d+(\.\d+)?$/.test(cleaned) ? Number(cleaned) : NaN;
+  }
+
+  function addMonths(date, months) {
+    const d = new Date(date.getFullYear(), date.getMonth() + months, date.getDate());
+    if (d.getDate() !== date.getDate()) d.setDate(0); // 1월 31일 + 1개월 → 2월 말일
+    return d;
+  }
+
+  const fmtDate = (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+
+  // 세전 이자 (원 미만 버림)
+  function grossInterest(kind, calc, amount, ratePct, months) {
+    const r = ratePct / 100 / 12; // 월 이율
+    if (kind === "deposit") {
+      return calc === "simple"
+        ? Math.floor(amount * r * months)
+        : Math.floor(amount * (Math.pow(1 + r, months) - 1));
+    }
+    // 적금: 매월 같은 금액을 넣고, 첫 달 납입분은 months개월, 마지막 달 납입분은 1개월 이자를 받는다
+    if (calc === "simple") return Math.floor(amount * r * (months * (months + 1)) / 2);
+    let sum = 0;
+    for (let k = 1; k <= months; k += 1) sum += amount * (Math.pow(1 + r, k) - 1);
+    return Math.floor(sum);
+  }
+
+  // 이자소득세 14% + 지방소득세 1.4% (각각 10원 미만 버림)
+  function taxOf(interest) {
+    const income = Math.floor((interest * 0.14) / 10) * 10;
+    const local = Math.floor((income * 0.1) / 10) * 10;
+    return income + local;
+  }
+
+  function clearResult(msg) {
+    for (const id of ["total", "paid", "interest", "tax", "net", "maturity"]) $(id).textContent = "-";
+    $("message").textContent = "입력값을 넣으면 안내 문장이 만들어집니다.";
+    $("copy").disabled = true;
+    $("error").textContent = msg || "";
+  }
+
+  function calculate() {
+    const kind = document.querySelector('input[name="kind"]:checked').value;
+    const calc = document.querySelector('input[name="calc"]:checked').value;
+    $("principal-label").textContent = kind === "deposit" ? "원금 (원)" : "월 납입액 (원)";
+
+    const amount = toNumber($("principal").value);
+    const rate = toNumber($("rate").value);
+    const months = toNumber($("months").value);
+
+    if (amount === null || rate === null || months === null) return clearResult("");
+    if ([amount, rate, months].some(Number.isNaN)) return clearResult("숫자로 입력해 주세요. (콤마는 괜찮아요)");
+    if (amount <= 0) return clearResult(kind === "deposit" ? "원금은 0보다 크게 넣어 주세요." : "월 납입액은 0보다 크게 넣어 주세요.");
+    if (rate <= 0 || rate > 30) return clearResult("연 금리는 0보다 크고 30% 이하로 넣어 주세요.");
+    if (!Number.isInteger(months) || months < 1 || months > 120) return clearResult("기간은 1~120개월 사이의 정수로 넣어 주세요.");
+
+    const paid = kind === "deposit" ? amount : amount * months;
+    const interest = grossInterest(kind, calc, amount, rate, months);
+    const tax = taxOf(interest);
+    const net = interest - tax;
+    const total = paid + net;
+
+    const start = $("start").value ? new Date($("start").value + "T00:00:00") : new Date();
+    const maturity = addMonths(start, months);
+
+    $("error").textContent = "";
+    $("total").textContent = won(total);
+    $("paid").textContent = won(paid);
+    $("interest").textContent = won(interest);
+    $("tax").textContent = `- ${won(tax)}`;
+    $("net").textContent = won(net);
+    $("maturity").textContent = fmtDate(maturity);
+
+    const product = kind === "deposit" ? `정기예금 ${won(amount)}` : `정기적금 매월 ${won(amount)}`;
+    const how = calc === "simple" ? "단리" : "월복리";
+    $("message").textContent =
+      `고객님, ${product}을 연 ${rate}%(${how})로 ${months}개월 가입하시면 ` +
+      `만기일 ${fmtDate(maturity)}에 세후 ${won(total)}을 받으십니다. ` +
+      `(세전 이자 ${won(interest)}, 이자소득세 ${won(tax)} 차감) ` +
+      `실제 금액은 은행 시스템 기준으로 다시 안내드리겠습니다.`;
+    $("copy").disabled = false;
+  }
+
+  $("copy").addEventListener("click", async () => {
+    const text = $("message").textContent;
+    const done = () => { $("copy").textContent = "복사했어요"; setTimeout(() => { $("copy").textContent = "안내 문장 복사"; }, 1400); };
+    try { await navigator.clipboard.writeText(text); done(); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.append(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch { $("error").textContent = "복사가 막혔어요. 문장을 직접 드래그해 복사해 주세요."; }
+      ta.remove();
+    }
+  });
+
+  const today = new Date();
+  $("start").value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  for (const el of document.querySelectorAll("input")) el.addEventListener("input", calculate);
+  for (const el of document.querySelectorAll('input[type="radio"]')) el.addEventListener("change", calculate);
+  calculate();
+</script>
+</body>
+</html>
