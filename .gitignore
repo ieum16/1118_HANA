@@ -1,0 +1,12 @@
+# 이 PC에만 두는 내 정보 (닉네임)
+.me.json
+# 남이 만든 참고 화면은 올리지 않아요
+reference.png
+**/reference.png
+# 강사용 정리 결과
+_instructor/out/
+__pycache__/
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "오늘 할 일 작성기",
+  "version": "2.0.0",
+  "description": "오늘 할 일을 관리하고, 외화 금액을 원화로 계산합니다.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.frankfurter.dev/*"],
+  "action": {
+    "default_title": "오늘 할 일 작성기",
+    "default_popup": "popup.html"
+  }
+}
