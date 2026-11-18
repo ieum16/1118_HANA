@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>만기 연장 안내 작성기 v2</title>
+<style>
+  :root {
+    --bg: #f3f5f9;
+    --card: #ffffff;
+    --ink: #17213a;
+    --muted: #5f6b85;
+    --line: #dce2ee;
+    --accent: #1f3a8a;
+    --accent-soft: #e6ecfa;
+    --warn: #b42318;
+    --warn-soft: #fdecea;
+    --ok: #0f7b4f;
+    --ok-soft: #e3f4ec;
+    --amber: #9a5b00;
+    --amber-soft: #fff3dc;
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); }
+  .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+  header .eyebrow { margin: 0 0 4px; color: var(--accent); font-size: 13px; font-weight: 800; letter-spacing: .14em; }
+  h1 { margin: 0; font-size: clamp(26px, 5vw, 36px); letter-spacing: -0.03em; }
+  header .sub { margin: 6px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-width: 0; }
+  .card h2 { margin: 0 0 12px; font-size: 18px; }
+  .setup { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; }
+  @media (max-width: 760px) { .setup { grid-template-columns: minmax(0, 1fr); } }
+  .field { display: grid; gap: 6px; margin-bottom: 12px; }
+  .field label { font-size: 14px; font-weight: 800; }
+  .hint { color: var(--muted); font-weight: 600; font-size: 12px; }
+  textarea, input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%; min-width: 0; padding: 10px 12px; font: inherit; font-size: 15px;
+    border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
+  }
+  textarea { min-height: 150px; resize: vertical; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px; line-height: 1.55; white-space: pre; }
+  textarea:focus, input:focus { outline: none; border-color: var(--accent); }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { font: inherit; cursor: pointer; }
+  .btn { padding: 10px 16px; border-radius: 12px; border: 0; background: var(--accent); color: #fff; font-weight: 800; font-size: 15px; }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.ghost { background: var(--accent-soft); color: var(--accent); }
+  .btn.small { padding: 7px 12px; font-size: 13px; }
+  .rule { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 14px; font-weight: 700; }
+  .rule input { width: 72px; text-align: center; }
+  .skipped { margin: 10px 0 0; padding: 12px 14px; background: var(--warn-soft); border-radius: 12px; color: var(--warn); font-size: 14px; line-height: 1.6; }
+  .skipped ul { margin: 4px 0 0; padding-left: 20px; }
+  .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 640px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 26px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 13px; font-weight: 700; }
+  .stat.urgent b { color: var(--warn); }
+  .stat.done b { color: var(--ok); }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filters button { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-weight: 700; font-size: 14px; }
+  .filters button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .list { display: grid; gap: 14px; }
+  .cust { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr); gap: 18px; }
+  @media (max-width: 760px) { .cust { grid-template-columns: minmax(0, 1fr); } }
+  .cust.is-urgent { border-color: #f1b7b0; }
+  .cust.is-done { border-color: #a9dcc3; }
+  .top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .name { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; width: 100%; }
+  .tag { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .tag.d { background: var(--accent-soft); color: var(--accent); }
+  .tag.urgent { background: var(--warn-soft); color: var(--warn); }
+  .tag.done { background: var(--ok-soft); color: var(--ok); }
+  .tag.wait { background: var(--amber-soft); color: var(--amber); }
+  .dates { margin: 8px 0 12px; font-size: 14px; color: var(--muted); display: grid; gap: 6px; }
+  .dates b { color: var(--ink); }
+  .due-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .due-row input { width: auto; padding: 6px 10px; font-size: 14px; }
+  .docs-title { font-size: 14px; font-weight: 800; margin: 0 0 6px; }
+  .docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .docs label { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 1.5; cursor: pointer; padding: 4px 6px; border-radius: 8px; }
+  .docs label:hover { background: var(--bg); }
+  .docs input { margin-top: 3px; accent-color: var(--ok); width: 16px; height: 16px; flex: none; }
+  .docs input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .msg-box { background: var(--accent-soft); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+  .msg-box.re { background: var(--amber-soft); }
+  .msg-box.fin { background: var(--ok-soft); }
+  .msg-kind { margin: 0; font-size: 13px; font-weight: 800; color: var(--accent); }
+  .msg-box.re .msg-kind { color: var(--amber); }
+  .msg-box.fin .msg-kind { color: var(--ok); }
+  .msg { margin: 0; line-height: 1.7; font-size: 14px; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  .copy { width: 100%; padding: 11px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 800; font-size: 15px; }
+  .copy:hover { filter: brightness(1.12); }
+  .empty { text-align: center; color: var(--muted); padding: 28px; }
+  .foot { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0; }
+  .foot button { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 700; text-decoration: underline; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">LOAN · MATURITY · v2</p>
+    <h1>만기 연장 안내 작성기</h1>
+    <p class="sub">엑셀 만기 목록을 붙여 넣으면 고객마다 필요 서류가 들어간 안내 문장이 한꺼번에 만들어집니다. 받은 서류를 체크하면 아직 안 온 서류만 다시 요청하는 문장으로 바뀝니다.</p>
+  </header>
+
+  <section class="card setup" aria-labelledby="in-title">
+    <div>
+      <h2 id="in-title">① 만기 목록 붙여넣기</h2>
+      <div class="field">
+        <label for="paste">엑셀에서 표를 통째로 복사해 붙여 넣으세요 <span class="hint">회사명 · 고객유형 · 대출종류 · 만기일 칸이 있으면 돼요</span></label>
+        <textarea id="paste" spellcheck="false" placeholder="회사명	고객유형	대출종류	만기일&#10;(주)한빛정밀	법인	운전자금	2026-11-27"></textarea>
+      </div>
+      <div class="btns">
+        <button type="button" class="btn" id="read">목록 읽기</button>
+        <button type="button" class="btn ghost" id="sample">예시 목록 넣기</button>
+      </div>
+      <div id="skipped" class="skipped" role="alert" hidden></div>
+    </div>
+    <div>
+      <h2>② 기본 설정</h2>
+      <div class="field">
+        <label for="rm">담당자 이름 <span class="hint">비워도 돼요</span></label>
+        <input id="rm" type="text" autocomplete="off" value="연습요정">
+      </div>
+      <div class="field">
+        <span class="rule">서류 회신 기한은 만기일 <input id="gap" type="number" min="3" max="60" value="14" aria-label="만기일 며칠 전"> 일 전</span>
+        <span class="hint">주말이면 앞쪽 금요일로 당겨요. 이미 지난 날이면 오늘부터 3일 뒤로 잡고 "급해요"로 표시해요.</span>
+      </div>
+      <p class="hint" style="line-height:1.6;margin:0">고객 카드에서 회신 기한을 직접 바꿀 수도 있어요.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="out-title" style="display:grid;gap:14px">
+    <h2 id="out-title" style="margin:0;font-size:18px">③ 고객별 안내 문장</h2>
+    <div class="summary" id="summary"></div>
+    <div class="filters" role="group" aria-label="보기">
+      <button type="button" data-filter="all" aria-pressed="true">전체</button>
+      <button type="button" data-filter="urgent" aria-pressed="false">급한 곳</button>
+      <button type="button" data-filter="wait" aria-pressed="false">서류 기다리는 곳</button>
+      <button type="button" data-filter="done" aria-pressed="false">서류 다 받은 곳</button>
+    </div>
+    <div class="list" id="list" aria-live="polite"></div>
+  </section>
+
+  <p class="foot">실제 고객 정보 말고 연습용 목록으로 써 주세요. 붙여 넣은 목록과 체크 기록은 이 컴퓨터의 브라우저에만 남고 밖으로 보내지 않습니다 (<button type="button" id="reset">기록 모두 지우기</button>). 메신저로 보내는 것은 직접 해 주세요. 서류 목록은 연습용 예시이며, 실제 필요 서류와 연장 조건은 은행 내규와 시스템 기준을 따릅니다.</p>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const STORE = "hana-renewal-v2";
+
+  // 연습용 예시 서류 목록 (실제는 은행 내규 기준)
+  const DOCS = {
+    법인: [
+      "사업자등록증 사본",
+      "법인 등기사항전부증명서 (최근 3개월 이내 발급)",
+      "최근 3개년 재무제표 (결산 기준)",
+      "부가가치세 과세표준증명원 (최근 1년)",
+      "법인 인감증명서 (최근 3개월 이내 발급)",
+    ],
+    개인사업자: [
+      "사업자등록증 사본",
+      "소득금액증명원 (최근 2년)",
+      "부가가치세 과세표준증명원 (최근 1년)",
+      "대표자 신분증 (방문하실 때 지참)",
+    ],
+  };
+  const FACILITY_EXTRA = "담보 물건 등기사항전부증명서 (최근 3개월 이내 발급)";
+  const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
+
+  // 예시 목록: 열 때마다 오늘 기준 날짜로 만든다 (주말이면 월요일로)
+  const SAMPLE = [
+    ["(주)한빛정밀", "법인", "운전자금", 300, 8],
+    ["봄날베이커리", "개인사업자", "운전자금", 50, 13],
+    ["(주)다온물류", "법인", "시설자금", 1200, 19],
+    ["청솔인테리어", "개인사업자", "시설자금", 80, 22],
+    ["(주)새밭푸드", "법인", "운전자금", 500, 26],
+    ["모아공방", "개인사업자", "운전자금", 30, 29],
+    ["(주)누리테크솔루션", "법인", "시설자금", 2000, 34],
+    ["하람치과기공소", "개인사업자", "시설자금", 150, 41],
+    ["(주)바름포장", "법인", "운전자금", 700, 48],
+    ["오늘꽃집", "개인사업자", "운전자금", 20, 54],
+    ["(주)이음기계", "법인", "운전자금", 400, 57],
+    ["별빛카페", "개인사업자", "시설자금", 120, 62],
+  ];
+
+  // ---------- 날짜 ----------
+  function today() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const fmt = (d) => `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일(${WEEK[d.getDay()]})`;
+  const short = (d) => `${d.getMonth() + 1}/${d.getDate()}(${WEEK[d.getDay()]})`;
+  const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+  const weekdayBack = (d) => (d.getDay() === 6 ? addDays(d, -1) : d.getDay() === 0 ? addDays(d, -2) : d);
+  const weekdayForward = (d) => (d.getDay() === 6 ? addDays(d, 2) : d.getDay() === 0 ? addDays(d, 1) : d);
+
+  // "2026-12-08" "2026.12.8" "2026/12/08" "2026. 12. 8." 엑셀 날짜 숫자(46364)까지
+  function parseDate(text) {
+    const s = String(text).trim();
+    if (/^\d{5}$/.test(s)) {
+      const n = Number(s);
+      if (n > 40000 && n < 60000) { const base = new Date(1899, 11, 30); return addDays(base, n); }
+    }
+    const m = s.match(/^(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})\s*[.일]?$/);
+    if (!m) return null;
+    const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+    const date = new Date(y, mo - 1, d);
+    return date.getMonth() === mo - 1 && date.getDate() === d ? date : null;
+  }
+
+  // ---------- 읽기 ----------
+  const looksLikeRealNumber = (text) => /\d{6,}/.test(String(text).replace(/[-\s.]/g, ""));
+
+  function normType(text) {
+    const s = String(text).replace(/\s/g, "");
+    if (s === "법인" || s === "법인사업자") return "법인";
+    if (s === "개인사업자" || s === "개인") return "개인사업자";
+    return null;
+  }
+  function normLoan(text) {
+    const s = String(text).replace(/\s/g, "");
+    if (s.includes("시설")) return "시설자금";
+    if (s.includes("운전")) return "운전자금";
+    return null;
+  }
+
+  function parseList(raw) {
+    const lines = raw.split(/\r?\n/).map((l) => l.replace(/\s+$/, "")).filter((l) => l.trim() !== "");
+    const split = (l) => (l.includes("\t") ? l.split("\t") : l.split(/\s*,\s*/)).map((c) => c.trim());
+    let col = { company: 0, type: 1, loan: 2, maturity: 3 };
+    let start = 0;
+    if (lines.length) {
+      const head = split(lines[0]);
+      if (head.some((c) => /회사|업체|고객명/.test(c)) && head.some((c) => /만기/.test(c))) {
+        const find = (re) => head.findIndex((c) => re.test(c));
+        col = { company: find(/회사|업체|고객명/), type: find(/유형|구분/), loan: find(/종류|자금|과목/), maturity: find(/만기/) };
+        start = 1;
+      }
+    }
+    const customers = [];
+    const skipped = [];
+    const seen = new Set();
+    for (let i = start; i < lines.length; i += 1) {
+      const cells = split(lines[i]);
+      const at = (k) => (col[k] >= 0 ? cells[col[k]] ?? "" : "");
+      const company = at("company");
+      const where = `${i + 1}번째 줄${company ? ` (${company})` : ""}`;
+      if (!company) { skipped.push(`${where}: 회사명이 비어 있어요`); continue; }
+      if (company.length > 30) { skipped.push(`${where}: 회사명이 30자를 넘어요`); continue; }
+      if (looksLikeRealNumber(company)) { skipped.push(`${i + 1}번째 줄: 회사명 칸에 실제 번호처럼 보이는 숫자가 있어요. 번호는 빼 주세요`); continue; }
+      const type = normType(at("type"));
+      if (!type) { skipped.push(`${where}: 고객유형을 "법인" 또는 "개인사업자"로 적어 주세요 (지금: "${at("type")}")`); continue; }
+      const loan = normLoan(at("loan"));
+      if (!loan) { skipped.push(`${where}: 대출종류를 "운전자금" 또는 "시설자금"으로 적어 주세요 (지금: "${at("loan")}")`); continue; }
+      const maturity = parseDate(at("maturity"));
+      if (!maturity) { skipped.push(`${where}: 만기일을 읽지 못했어요 (지금: "${at("maturity")}")`); continue; }
+      if (maturity < today()) { skipped.push(`${where}: 만기일 ${iso(maturity)}이 이미 지났어요`); continue; }
+      const key = `${company}|${iso(maturity)}`;
+      if (seen.has(key)) { skipped.push(`${where}: 같은 회사 · 같은 만기일이 이미 위에 있어요`); continue; }
+      seen.add(key);
+      customers.push({ key, company, type, loan, maturity });
+    }
+    if (lines.length > 0 && lines.length - start > 100) skipped.unshift("한 번에 100줄까지만 읽어요. 나눠서 붙여 넣어 주세요.");
+    customers.sort((a, b) => a.maturity - b.maturity);
+    return { customers: customers.slice(0, 100), skipped };
+  }
+
+  // ---------- 상태 ----------
+  let saved = { list: "", rm: "연습요정", gap: 14, cards: {} };
+  function load() {
+    try { const s = JSON.parse(localStorage.getItem(STORE)); if (s) saved = { ...saved, ...s, cards: s.cards || {} }; } catch {}
+  }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(saved)); } catch {} }
+
+  let customers = [];
+  let filter = "all";
+
+  function docsFor(c) {
+    const list = [...DOCS[c.type]];
+    if (c.loan === "시설자금") list.push(FACILITY_EXTRA);
+    return list;
+  }
+
+  // 회신 기한: 직접 고른 날짜가 있으면 그걸, 없으면 만기일 N일 전 (주말이면 앞 금요일)
+  function dueFor(c) {
+    const t = today();
+    const chosen = saved.cards[c.key]?.due && parseDate(saved.cards[c.key].due);
+    if (chosen) return { due: chosen, urgent: daysBetween(t, c.maturity) <= 14, manual: true };
+    let due = weekdayBack(addDays(c.maturity, -Number(saved.gap || 14)));
+    let urgent = daysBetween(t, c.maturity) <= 14;
+    if (due <= t) {
+      urgent = true;
+      due = weekdayForward(addDays(t, 3));
+      if (due >= c.maturity) due = weekdayBack(addDays(c.maturity, -1));
+      if (due < t) due = null;
+    }
+    return { due, urgent, manual: false };
+  }
+
+  function statusOf(c) {
+    const docs = docsFor(c);
+    const got = (saved.cards[c.key]?.got || []).filter((d) => docs.includes(d));
+    const missing = docs.filter((d) => !got.includes(d));
+    return { docs, got, missing, done: missing.length === 0, started: got.length > 0 };
+  }
+
+  // ---------- 문장 ----------
+  function hello(c) {
+    const rm = saved.rm.trim();
+    return `안녕하세요, ${c.company} 대표님. 담당 RM${rm ? " " + rm : ""}입니다.`;
+  }
+  function buildMessage(c, st, d) {
+    const numbered = (arr) => arr.map((doc, i) => `${i + 1}. ${doc}`);
+    if (st.done) {
+      return [
+        hello(c),
+        `${c.loan} 대출 기한 연장에 필요한 서류 ${st.docs.length}가지를 모두 잘 받았습니다.`,
+        `만기일 ${fmt(c.maturity)} 전에 연장 심사를 진행하고, 결과를 다시 안내드리겠습니다.`,
+        "바쁘신 중에 챙겨 주셔서 감사합니다.",
+        "※ 연장 여부와 조건은 심사 후 정해집니다.",
+      ].join("\n");
+    }
+    const dueText = d.due ? `${fmt(d.due)}까지` : "가능한 빨리";
+    if (st.started) {
+      return [
+        hello(c),
+        `${c.loan} 대출 기한 연장 서류 보내 주셔서 감사합니다.`,
+        `아직 아래 ${st.missing.length}가지가 확인되지 않아 다시 안내드립니다. ${dueText} 보내 주시면 만기일 ${fmt(c.maturity)} 전에 검토를 마칠 수 있습니다.`,
+        "",
+        ...numbered(st.missing),
+        "",
+        "이미 보내셨다면 말씀해 주세요. 감사합니다.",
+      ].join("\n");
+    }
+    return [
+      hello(c),
+      `${c.company}의 ${c.loan} 대출 만기일이 ${fmt(c.maturity)}이라 기한 연장 안내드립니다.${d.urgent ? " 만기가 얼마 남지 않아 서둘러 연락드렸습니다." : ""}`,
+      `연장 검토를 위해 아래 서류 ${st.docs.length}가지를 ${dueText} 보내 주시면 됩니다.`,
+      "",
+      ...numbered(st.docs),
+      "",
+      "서류 준비하시다가 궁금한 점은 편하게 연락 주세요. 감사합니다.",
+      "※ 연장 여부와 조건은 심사 후 정해지며, 필요 서류는 은행 기준에 따라 달라질 수 있습니다.",
+    ].join("\n");
+  }
+
+  // ---------- 화면 ----------
+  function el(tag, props = {}, ...kids) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === "class") node.className = v;
+      else if (k === "text") node.textContent = v;
+      else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+      else node.setAttribute(k, v);
+    }
+    node.append(...kids.filter(Boolean));
+    return node;
+  }
+
+  async function copyText(text, button, label) {
+    const done = () => { button.textContent = "복사했어요"; setTimeout(() => { button.textContent = label; }, 1400); };
+    try { await navigator.clipboard.writeText(text); done(); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.append(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch { button.textContent = "복사가 막혔어요. 문장을 드래그해 주세요"; }
+      ta.remove();
+    }
+  }
+
+  function card(c) {
+    const st = statusOf(c);
+    const d = dueFor(c);
+    const left = daysBetween(today(), c.maturity);
+    const kind = st.done ? "fin" : st.started ? "re" : "first";
+    const kindLabel = { first: "첫 안내 문장", re: `재요청 문장 · 아직 안 온 서류 ${st.missing.length}가지`, fin: "접수 완료 문장" }[kind];
+
+    const dueInput = el("input", { type: "date", value: d.due ? iso(d.due) : "", "aria-label": `${c.company} 회신 기한` });
+    dueInput.addEventListener("change", () => {
+      const picked = parseDate(dueInput.value);
+      saved.cards[c.key] = { ...saved.cards[c.key], due: picked && picked >= today() && picked < c.maturity ? dueInput.value : "" };
+      if (dueInput.value && !saved.cards[c.key].due) alert("회신 기한은 오늘 이후, 만기일보다 앞으로 골라 주세요.");
+      save(); render();
+    });
+
+    const docList = el("ul", { class: "docs" }, ...st.docs.map((doc) => {
+      const box = el("input", { type: "checkbox" });
+      box.checked = st.got.includes(doc);
+      box.addEventListener("change", () => {
+        const got = new Set(statusOf(c).got);
+        if (box.checked) got.add(doc); else got.delete(doc);
+        saved.cards[c.key] = { ...saved.cards[c.key], got: [...got] };
+        save(); render();
+      });
+      return el("li", {}, el("label", {}, box, el("span", { text: doc })));
+    }));
+
+    const message = buildMessage(c, st, d);
+    const copyBtn = el("button", { type: "button", class: "copy", text: "문장 복사" });
+    copyBtn.addEventListener("click", () => copyText(message, copyBtn, "문장 복사"));
+
+    return el("article", { class: `card cust${d.urgent && !st.done ? " is-urgent" : ""}${st.done ? " is-done" : ""}` },
+      el("div", {},
+        el("div", { class: "top" },
+          el("p", { class: "name", text: c.company }),
+          el("span", { class: "tag", text: c.type }),
+          el("span", { class: "tag", text: c.loan }),
+          el("span", { class: "tag d", text: left === 0 ? "D-day" : `D-${left}` }),
+          d.urgent && !st.done ? el("span", { class: "tag urgent", text: "급해요" }) : null,
+          st.done ? el("span", { class: "tag done", text: "서류 다 받음" }) : st.started ? el("span", { class: "tag wait", text: `${st.got.length}/${st.docs.length} 받음` }) : null,
+        ),
+        el("div", { class: "dates" },
+          el("span", {}, "만기일 ", el("b", { text: fmt(c.maturity) })),
+          el("span", { class: "due-row" }, "회신 기한 ", dueInput, d.due ? null : el("b", { text: "만기가 너무 가까워요. 전화로 먼저 연락하세요", style: "color:var(--warn)" })),
+        ),
+        el("p", { class: "docs-title", text: `필요 서류 ${st.docs.length}가지 · 받은 것에 체크` }),
+        docList,
+      ),
+      el("div", { class: `msg-box ${kind === "first" ? "" : kind}` },
+        el("p", { class: "msg-kind", text: kindLabel }),
+        el("p", { class: "msg", text: message }),
+        copyBtn,
+      ),
+    );
+  }
+
+  function render() {
+    const rows = customers.map((c) => ({ c, st: statusOf(c), d: dueFor(c) }));
+    const n = rows.length;
+    const urgent = rows.filter((r) => r.d.urgent && !r.st.done).length;
+    const wait = rows.filter((r) => !r.st.done).length;
+    const done = rows.filter((r) => r.st.done).length;
+    $("summary").replaceChildren(
+      el("div", { class: "stat" }, el("b", { text: n }), el("span", { text: "만기 고객" })),
+      el("div", { class: "stat urgent" }, el("b", { text: urgent }), el("span", { text: "급한 곳 (만기 2주 안)" })),
+      el("div", { class: "stat" }, el("b", { text: wait }), el("span", { text: "서류 기다리는 곳" })),
+      el("div", { class: "stat done" }, el("b", { text: done }), el("span", { text: "서류 다 받은 곳" })),
+    );
+    const shown = rows.filter((r) => filter === "all"
+      || (filter === "urgent" && r.d.urgent && !r.st.done)
+      || (filter === "wait" && !r.st.done)
+      || (filter === "done" && r.st.done));
+    $("list").replaceChildren(...(shown.length
+      ? shown.map((r) => card(r.c))
+      : [el("p", { class: "card empty", text: n ? "이 조건에 맞는 고객이 없어요." : "만기 목록을 붙여 넣고 「목록 읽기」를 눌러 주세요." })]));
+  }
+
+  function readList() {
+    saved.list = $("paste").value;
+    const { customers: list, skipped } = parseList(saved.list);
+    customers = list;
+    const box = $("skipped");
+    if (skipped.length) {
+      box.hidden = false;
+      box.replaceChildren(el("b", { text: `읽지 못한 줄 ${skipped.length}개 (나머지는 정상으로 만들었어요)` }), el("ul", {}, ...skipped.map((s) => el("li", { text: s }))));
+    } else {
+      box.hidden = true;
+      box.replaceChildren();
+    }
+    save(); render();
+  }
+
+  function sampleText() {
+    const head = ["회사명", "고객유형", "대출종류", "대출잔액(백만원)", "만기일"].join("\t");
+    const rows = SAMPLE.map(([company, type, loan, amount, days]) =>
+      [company, type, loan, amount.toLocaleString("ko-KR"), iso(weekdayForward(addDays(today(), days)))].join("\t"));
+    return [head, ...rows].join("\n");
+  }
+
+  $("read").addEventListener("click", readList);
+  $("sample").addEventListener("click", () => { $("paste").value = sampleText(); readList(); });
+  $("rm").addEventListener("input", () => {
+    const v = $("rm").value;
+    if (looksLikeRealNumber(v) || v.trim().length > 10) { $("rm").setCustomValidity("x"); $("rm").style.borderColor = "var(--warn)"; return; }
+    $("rm").setCustomValidity(""); $("rm").style.borderColor = ""; saved.rm = v; save(); render();
+  });
+  $("gap").addEventListener("input", () => {
+    const g = Number($("gap").value);
+    if (!Number.isInteger(g) || g < 3 || g > 60) { $("gap").style.borderColor = "var(--warn)"; return; }
+    $("gap").style.borderColor = ""; saved.gap = g; save(); render();
+  });
+  for (const b of document.querySelectorAll(".filters button")) {
+    b.addEventListener("click", () => {
+      filter = b.dataset.filter;
+      for (const x of document.querySelectorAll(".filters button")) x.setAttribute("aria-pressed", String(x === b));
+      render();
+    });
+  }
+  $("reset").addEventListener("click", () => {
+    if (!confirm("붙여 넣은 목록과 체크 기록을 모두 지울까요?")) return;
+    try { localStorage.removeItem(STORE); } catch {}
+    saved = { list: "", rm: "연습요정", gap: 14, cards: {} };
+    $("rm").value = saved.rm; $("gap").value = saved.gap;
+    $("paste").value = sampleText(); readList();
+  });
+
+  // 처음 열면: 저장된 목록이 있으면 그걸, 없으면 예시 목록
+  load();
+  $("rm").value = saved.rm;
+  $("gap").value = saved.gap;
+  $("paste").value = saved.list || sampleText();
+  readList();
+</script>
+</body>
+</html>

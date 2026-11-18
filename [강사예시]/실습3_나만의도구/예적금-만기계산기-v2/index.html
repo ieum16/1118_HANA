@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>적금 상품 비교 계산기</title>
+<style>
+  :root {
+    --bg: #f4f6f5;
+    --card: #ffffff;
+    --ink: #1c2b27;
+    --muted: #66746f;
+    --line: #dde4e1;
+    --accent: #0f7b6c;
+    --accent-soft: #e3f2ef;
+    --warn: #b42318;
+    --gold: #9a6b00;
+    --gold-soft: #fff4d6;
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 40px; background: var(--bg); }
+  .wrap { max-width: 1080px; margin: 0 auto; display: grid; gap: 18px; }
+  header .eyebrow { margin: 0 0 4px; color: var(--accent); font-size: 13px; font-weight: 800; letter-spacing: .14em; }
+  h1 { margin: 0; font-size: clamp(26px, 5vw, 36px); letter-spacing: -0.03em; }
+  .sub { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-width: 0; }
+  .card h2 { margin: 0 0 12px; font-size: 18px; }
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px 24px; }
+  .field { display: grid; gap: 6px; }
+  .field > label, .legend { font-size: 14px; font-weight: 800; }
+  .hint { color: var(--muted); font-weight: 600; font-size: 12px; }
+  input[type="text"] {
+    width: 100%; min-width: 0; padding: 11px 13px; font: inherit; font-size: 17px;
+    border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; background: var(--bg); border-radius: 12px; padding: 4px; }
+  .seg input { position: absolute; opacity: 0; }
+  .seg label { text-align: center; padding: 9px 6px; border-radius: 9px; font-weight: 700; font-size: 15px; cursor: pointer; color: var(--muted); }
+  .seg input:checked + label { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgb(0 0 0 / 10%); }
+  .seg input:focus-visible + label { outline: 2px solid var(--accent); }
+  .checks { display: grid; gap: 6px; }
+  .checks label { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 1.5; cursor: pointer; }
+  .checks input { margin-top: 3px; accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+  .error { min-height: 20px; margin: 10px 0 0; color: var(--warn); font-weight: 700; font-size: 14px; }
+  .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+  .prod { display: grid; gap: 10px; align-content: start; position: relative; }
+  .prod.best { border: 2px solid var(--gold); }
+  .best-tag { position: absolute; top: -12px; right: 16px; background: var(--gold); color: #fff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
+  .pname { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 12px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .rate { margin: 0; font-size: 15px; color: var(--muted); }
+  .rate b { font-size: 26px; color: var(--accent); letter-spacing: -0.02em; }
+  .total { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .total small { display: block; font-size: 13px; color: var(--muted); font-weight: 700; letter-spacing: 0; }
+  dl { margin: 0; display: grid; gap: 6px; }
+  dl div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 6px; font-size: 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .why { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .why b { color: var(--ink); }
+  .blocked { margin: 0; color: var(--warn); font-weight: 700; font-size: 14px; line-height: 1.6; }
+  .notice { background: var(--accent-soft); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+  .notice h2 { margin: 0; font-size: 16px; }
+  .msg { margin: 0; line-height: 1.75; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  button.copy { width: 100%; padding: 12px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; }
+  button.copy:hover { filter: brightness(1.08); }
+  button.copy:disabled { background: #a9b7b2; cursor: not-allowed; }
+  .foot { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0; }
+  .foot a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">SAVINGS · COMPARE</p>
+    <h1>적금 상품 비교 계산기</h1>
+    <p class="sub">매월 넣을 금액과 기간, 고객이 채울 수 있는 우대 조건을 고르면 하나은행 적금 3개의 만기 금액을 한 화면에 나란히 보여 주고, 상담 안내 문장을 만들어 줍니다.</p>
+  </header>
+
+  <section class="card" aria-labelledby="in-title">
+    <h2 id="in-title">① 고객 조건</h2>
+    <div class="inputs">
+      <div class="field">
+        <label for="monthly">매월 넣을 금액 (원)</label>
+        <input id="monthly" type="text" inputmode="numeric" autocomplete="off" value="500,000">
+      </div>
+      <div class="field">
+        <span class="legend">기간</span>
+        <div class="seg">
+          <input type="radio" name="term" id="t12" value="12" checked><label for="t12">1년</label>
+          <input type="radio" name="term" id="t24" value="24"><label for="t24">2년</label>
+          <input type="radio" name="term" id="t36" value="36"><label for="t36">3년</label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="legend">세금</span>
+        <div class="seg">
+          <input type="radio" name="tax" id="tax-normal" value="normal" checked><label for="tax-normal">일반과세 15.4%</label>
+          <input type="radio" name="tax" id="tax-free" value="free"><label for="tax-free">비과세종합저축</label>
+        </div>
+        <span class="hint">비과세종합저축은 가입 대상자만 고를 수 있어요</span>
+      </div>
+      <div class="field">
+        <span class="legend">고객이 채울 수 있는 우대 조건</span>
+        <div class="checks">
+          <label><input type="checkbox" id="c-auto"><span>하나은행 입출금통장에서 자동이체 (계약기간 ½ 이상)</span></label>
+          <label><input type="checkbox" id="c-salary"><span>하나은행으로 급여 이체</span></label>
+          <label><input type="checkbox" id="c-online"><span>인터넷 · 모바일로 가입</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="legend">주거래 실적 <span class="hint">주거래하나 월복리 적금 우대용</span></span>
+        <div class="seg">
+          <input type="radio" name="main" id="m0" value="0" checked><label for="m0">없음</label>
+          <input type="radio" name="main" id="m1" value="1"><label for="m1">1종</label>
+          <input type="radio" name="main" id="m2" value="2"><label for="m2">2종 이상</label>
+        </div>
+      </div>
+    </div>
+    <p id="error" class="error" role="alert"></p>
+  </section>
+
+  <section aria-labelledby="out-title" style="display:grid;gap:14px">
+    <h2 id="out-title" style="margin:0;font-size:18px">② 상품별 만기 금액</h2>
+    <div class="products" id="products" aria-live="polite"></div>
+  </section>
+
+  <section class="notice" aria-labelledby="msg-title">
+    <h2 id="msg-title">③ 상담 안내 문장</h2>
+    <p class="msg" id="message">조건을 넣으면 안내 문장이 만들어집니다.</p>
+    <button type="button" class="copy" id="copy" disabled>안내 문장 복사</button>
+  </section>
+
+  <p class="foot">
+    금리 출처: 하나은행 홈페이지 상품 안내 · 금리안내 (금리 기준일 2026-11-19, 확인일 2026-11-19). 기본금리는 기간별 금리표의 연 금리(세전), 내맘 적금은 정액적립식 금리입니다.
+    우대금리는 조건을 모두 채우고 만기에 해지할 때만 받으며, 세부 조건은 상품설명서를 따릅니다. 급여하나 월복리 적금의 청년 특별금리(조건부)는 넣지 않았습니다.
+    이자는 매월 같은 날 같은 금액을 넣는다고 보고 단리 · 월복리로 어림한 값이고, 이자소득세는 15.4%(소득세 14% + 지방소득세 1.4%, 10원 미만 절사)입니다. 실제 금액은 은행 시스템 기준이며 차이 날 수 있습니다. 금리는 자주 바뀌니 쓰기 전에 다시 확인해 주세요.
+    <br>상품 안내: <a href="https://www.kebhana.com/cont/mall/mall08/mall0801/mall080102/1461831_115157.jsp" target="_blank" rel="noopener">내맘 적금</a> ·
+    <a href="https://www.kebhana.com/cont/mall/mall08/mall0801/mall080102/1455927_115157.jsp" target="_blank" rel="noopener">주거래하나 월복리 적금</a> ·
+    <a href="https://www.kebhana.com/cont/mall/mall08/mall0801/mall080102/1455929_115157.jsp" target="_blank" rel="noopener">급여하나 월복리 적금</a>
+  </p>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const won = (n) => `${Math.round(n).toLocaleString("ko-KR")}원`;
+  const pct = (n) => `${n.toFixed(2)}%`;
+
+  // 하나은행 홈페이지에서 옮겨 적은 금리 (기준일 2026-11-19). 바뀌면 여기만 고친다.
+  const PRODUCTS = [
+    {
+      id: "naemam",
+      name: "내맘 적금",
+      method: "simple", // 은행연합회 공시 분류: 단리
+      methodLabel: "단리",
+      base: { 12: 2.3, 24: 2.4, 36: 2.5 }, // 정액적립식
+      limit: { min: 1000, max: 10000000, text: "매월 1천원 ~ 1,000만원 (정액적립식)" },
+      bonus(c) {
+        const parts = [];
+        if (c.auto) parts.push(["입출금통장 자동이체", 0.5]);
+        return parts;
+      },
+      bonusMax: "자동이체 연 0.5%",
+    },
+    {
+      id: "main",
+      name: "주거래하나 월복리 적금",
+      method: "monthly",
+      methodLabel: "월복리",
+      base: { 12: 2.95, 24: 3.0, 36: 3.1 },
+      limit: { quarterMax: 3000000, text: "분기당 1만원 ~ 300만원 (자유적립식)" },
+      bonus(c) {
+        const parts = [];
+        if (c.main === 1) parts.push(["주거래 실적 1종", 0.5]);
+        if (c.main >= 2) parts.push(["주거래 실적 2종 이상", 0.9]);
+        if (c.online) parts.push(["온라인 가입", 0.1]);
+        return parts;
+      },
+      bonusMax: "최대 연 1.0% (주거래 실적 · 온라인 가입)",
+    },
+    {
+      id: "salary",
+      name: "급여하나 월복리 적금",
+      method: "monthly",
+      methodLabel: "월복리",
+      base: { 12: 2.95, 24: 3.0, 36: 3.1 },
+      limit: { quarterMax: 3000000, text: "분기당 1만원 ~ 300만원 (자유적립식)" },
+      bonus(c) {
+        const parts = [];
+        if (c.salary) parts.push(["급여 이체", 0.9]);
+        if (c.online) parts.push(["온라인 가입", 0.1]);
+        return parts;
+      },
+      bonusMax: "최대 연 1.0% (급여 이체 · 온라인 가입)",
+    },
+  ];
+
+  function toNumber(text) {
+    const cleaned = String(text).replace(/[,\s원]/g, "");
+    if (cleaned === "") return null;
+    return /^-?\d+(\.\d+)?$/.test(cleaned) ? Number(cleaned) : NaN;
+  }
+
+  // 매월 같은 금액을 넣을 때 세전 이자 (원 미만 버림)
+  // 단리: 첫 달 납입분은 n개월, 마지막 달 납입분은 1개월치 이자
+  // 월복리: k개월 맡긴 납입분은 (1 + 월이율)^k - 1 만큼 불어난다
+  function grossInterest(method, monthly, ratePct, months) {
+    const r = ratePct / 100 / 12;
+    if (method === "simple") return Math.floor(monthly * r * (months * (months + 1)) / 2);
+    let sum = 0;
+    for (let k = 1; k <= months; k += 1) sum += monthly * (Math.pow(1 + r, k) - 1);
+    return Math.floor(sum);
+  }
+  function taxOf(interest, kind) {
+    if (kind === "free") return 0;
+    const income = Math.floor((interest * 0.14) / 10) * 10;
+    const local = Math.floor((income * 0.1) / 10) * 10;
+    return income + local;
+  }
+
+  function limitProblem(p, monthly) {
+    if (p.limit.max && monthly > p.limit.max) return `매월 ${won(p.limit.max)}까지만 넣을 수 있어요.`;
+    if (p.limit.min && monthly < p.limit.min) return `매월 ${won(p.limit.min)} 이상 넣어야 해요.`;
+    if (p.limit.quarterMax && monthly * 3 > p.limit.quarterMax) return `분기당 300만원 한도라 매월 ${won(p.limit.quarterMax / 3)}까지만 넣을 수 있어요.`;
+    if (p.limit.quarterMax && monthly * 3 < 10000) return "분기당 1만원 이상 넣어야 해요.";
+    return "";
+  }
+
+  function readInputs() {
+    return {
+      monthly: toNumber($("monthly").value),
+      months: Number(document.querySelector('input[name="term"]:checked').value),
+      tax: document.querySelector('input[name="tax"]:checked').value,
+      auto: $("c-auto").checked,
+      salary: $("c-salary").checked,
+      online: $("c-online").checked,
+      main: Number(document.querySelector('input[name="main"]:checked').value),
+    };
+  }
+
+  function el(tag, props = {}, ...kids) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === "class") node.className = v;
+      else if (k === "text") node.textContent = v;
+      else node.setAttribute(k, v);
+    }
+    node.append(...kids.filter((x) => x !== null && x !== undefined && x !== false));
+    return node;
+  }
+
+  function stop(msg) {
+    $("error").textContent = msg;
+    $("products").replaceChildren();
+    $("message").textContent = "조건을 넣으면 안내 문장이 만들어집니다.";
+    $("copy").disabled = true;
+  }
+
+  function update() {
+    const c = readInputs();
+    if (c.monthly === null) return stop("");
+    if (Number.isNaN(c.monthly)) return stop("숫자로 입력해 주세요. (콤마는 괜찮아요)");
+    if (c.monthly <= 0) return stop("매월 넣을 금액은 0보다 크게 넣어 주세요.");
+    if (!Number.isInteger(c.monthly)) return stop("금액은 원 단위 정수로 넣어 주세요.");
+    $("error").textContent = "";
+
+    const rows = PRODUCTS.map((p) => {
+      const problem = limitProblem(p, c.monthly);
+      const bonus = p.bonus(c);
+      const bonusSum = bonus.reduce((s, [, v]) => s + v, 0);
+      const rate = p.base[c.months] + bonusSum;
+      const paid = c.monthly * c.months;
+      const interest = grossInterest(p.method, c.monthly, rate, c.months);
+      const tax = taxOf(interest, c.tax);
+      return { p, problem, bonus, rate, paid, interest, tax, total: paid + interest - tax };
+    });
+    const ok = rows.filter((r) => !r.problem);
+    const best = ok.length ? ok.reduce((a, b) => (b.total > a.total ? b : a)) : null;
+    const tops = best ? ok.filter((r) => r.total === best.total) : [];
+
+    $("products").replaceChildren(...rows.map((r) => {
+      const isBest = tops.length < ok.length && tops.includes(r);
+      return el("article", { class: `card prod${isBest ? " best" : ""}` },
+        isBest ? el("span", { class: "best-tag", text: "이 조건에서 가장 많이" }) : null,
+        el("p", { class: "pname", text: r.p.name }),
+        el("div", { class: "tags" }, el("span", { class: "tag", text: r.p.methodLabel }), el("span", { class: "tag", text: r.p.limit.text })),
+        r.problem
+          ? el("p", { class: "blocked", text: r.problem })
+          : el("div", { style: "display:grid;gap:10px" },
+              el("p", { class: "rate" }, "적용 금리 ", el("b", { text: pct(r.rate) })),
+              el("p", { class: "why" }, `기본 ${pct(r.p.base[c.months])}`, ...r.bonus.map(([name, v]) => ` + ${name} ${v.toFixed(2)}%`), r.bonus.length ? "" : el("b", { text: " · 우대 없음" })),
+              el("p", { class: "total" }, el("small", { text: "만기 수령액 (세후)" }), won(r.total)),
+              el("dl", {},
+                el("div", {}, el("dt", { text: "원금 합계" }), el("dd", { text: won(r.paid) })),
+                el("div", {}, el("dt", { text: "세전 이자" }), el("dd", { text: won(r.interest) })),
+                el("div", {}, el("dt", { text: c.tax === "free" ? "세금 (비과세)" : "이자소득세 15.4%" }), el("dd", { text: r.tax ? `- ${won(r.tax)}` : "0원" })),
+              ),
+            ),
+        el("p", { class: "why", text: `우대금리: ${r.p.bonusMax}` }),
+      );
+    }));
+
+    if (!ok.length) {
+      $("message").textContent = "넣을 수 있는 상품이 없어요. 매월 금액을 줄여 보세요.";
+      $("copy").disabled = true;
+      return;
+    }
+    const years = c.months / 12;
+    const lines = [
+      `고객님, 매월 ${won(c.monthly)}씩 ${years}년(${c.months}개월) 넣으시는 조건으로 하나은행 적금 ${ok.length}가지를 비교해 드렸습니다.`,
+      "",
+      ...ok.map((r) => `· ${r.p.name} (${r.p.methodLabel}, 연 ${pct(r.rate)}${r.bonus.length ? `, 우대 ${r.bonus.map(([n]) => n).join(" · ")} 포함` : ""}): 만기 때 세후 약 ${won(r.total)}`),
+      ...rows.filter((r) => r.problem).map((r) => `· ${r.p.name}: ${r.problem}`),
+      "",
+      tops.length === 1 ? `이 조건에서는 ${best.p.name}이 가장 많이 받으실 수 있습니다.`
+        : `이 조건에서는 ${tops.map((r) => r.p.name).join("과 ")}이 같은 금액으로 가장 많습니다. 고객님이 채우기 쉬운 우대 조건 쪽으로 고르시면 됩니다.`,
+      "우대금리는 조건을 채우고 만기까지 유지하셔야 받으실 수 있고, 실제 금액은 가입 시점 금리와 은행 시스템 기준으로 다시 안내드리겠습니다.",
+    ];
+    $("message").textContent = lines.join("\n");
+    $("copy").disabled = false;
+  }
+
+  $("copy").addEventListener("click", async () => {
+    const text = $("message").textContent;
+    const done = () => { $("copy").textContent = "복사했어요"; setTimeout(() => { $("copy").textContent = "안내 문장 복사"; }, 1400); };
+    try { await navigator.clipboard.writeText(text); done(); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.append(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch { $("error").textContent = "복사가 막혔어요. 문장을 직접 드래그해 복사해 주세요."; }
+      ta.remove();
+    }
+  });
+
+  for (const node of document.querySelectorAll("input")) {
+    node.addEventListener("input", update);
+    node.addEventListener("change", update);
+  }
+  update();
+</script>
+</body>
+</html>
