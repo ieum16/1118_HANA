@@ -50,6 +50,12 @@
   .btn.small { padding: 7px 12px; font-size: 13px; }
   .rule { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 14px; font-weight: 700; }
   .rule input { width: 72px; text-align: center; }
+  .drop { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px; margin-bottom: 12px; border: 2px dashed var(--line); border-radius: 14px; font-size: 14px; font-weight: 700; line-height: 1.5; }
+  .drop span { min-width: 0; flex: 1 1 220px; }
+  .drop .hint { display: block; }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .file-msg { margin: -4px 0 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px; font-weight: 700; line-height: 1.5; background: var(--ok-soft); color: var(--ok); }
+  .file-msg.bad { background: var(--warn-soft); color: var(--warn); }
   .skipped { margin: 10px 0 0; padding: 12px 14px; background: var(--warn-soft); border-radius: 12px; color: var(--warn); font-size: 14px; line-height: 1.6; }
   .skipped ul { margin: 4px 0 0; padding-left: 20px; }
   .summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -103,14 +109,20 @@
   <header>
     <p class="eyebrow">LOAN · MATURITY · v2</p>
     <h1>만기 연장 안내 작성기</h1>
-    <p class="sub">엑셀 만기 목록을 붙여 넣으면 고객마다 필요 서류가 들어간 안내 문장이 한꺼번에 만들어집니다. 받은 서류를 체크하면 아직 안 온 서류만 다시 요청하는 문장으로 바뀝니다.</p>
+    <p class="sub">엑셀 만기 목록 파일을 열거나 붙여 넣으면 고객마다 필요 서류가 들어간 안내 문장이 한꺼번에 만들어집니다. 받은 서류를 체크하면 아직 안 온 서류만 다시 요청하는 문장으로 바뀝니다.</p>
   </header>
 
   <section class="card setup" aria-labelledby="in-title">
     <div>
-      <h2 id="in-title">① 만기 목록 붙여넣기</h2>
+      <h2 id="in-title">① 만기 목록 넣기</h2>
+      <div class="drop" id="drop">
+        <input type="file" id="file" accept=".xlsx,.csv" hidden>
+        <button type="button" class="btn" id="pick">엑셀 파일 열기</button>
+        <span>또는 파일을 여기로 끌어다 놓기 <span class="hint">.xlsx · .csv · 첫 번째 시트를 읽어요 · 파일은 이 브라우저 안에서만 읽고 어디에도 올라가지 않아요</span></span>
+      </div>
+      <p id="file-msg" class="file-msg" role="status" hidden></p>
       <div class="field">
-        <label for="paste">엑셀에서 표를 통째로 복사해 붙여 넣으세요 <span class="hint">회사명 · 고객유형 · 대출종류 · 만기일 칸이 있으면 돼요</span></label>
+        <label for="paste">또는 엑셀에서 표를 통째로 복사해 붙여 넣으세요 <span class="hint">회사명 · 고객유형 · 대출종류 · 만기일 칸이 있으면 돼요</span></label>
         <textarea id="paste" spellcheck="false" placeholder="회사명	고객유형	대출종류	만기일&#10;(주)한빛정밀	법인	운전자금	2026-11-27"></textarea>
       </div>
       <div class="btns">
@@ -200,8 +212,8 @@
   // "2026-12-08" "2026.12.8" "2026/12/08" "2026. 12. 8." 엑셀 날짜 숫자(46364)까지
   function parseDate(text) {
     const s = String(text).trim();
-    if (/^\d{5}$/.test(s)) {
-      const n = Number(s);
+    if (/^\d{5}(\.\d+)?$/.test(s)) {
+      const n = Math.floor(Number(s));
       if (n > 40000 && n < 60000) { const base = new Date(1899, 11, 30); return addDays(base, n); }
     }
     const m = s.match(/^(\d{4})\s*[-./년]\s*(\d{1,2})\s*[-./월]\s*(\d{1,2})\s*[.일]?$/);
@@ -470,7 +482,167 @@
     return [head, ...rows].join("\n");
   }
 
-  $("read").addEventListener("click", readList);
+  // ---------- 엑셀 · CSV 파일 읽기 (외부 라이브러리 없이, 이 브라우저 안에서만) ----------
+  // .xlsx는 zip 압축 파일이다. zip 목차를 읽고, 브라우저에 들어 있는 압축 풀기(DecompressionStream)로 시트 XML을 꺼낸다.
+  async function unzip(buffer) {
+    const view = new DataView(buffer);
+    const bytes = new Uint8Array(buffer);
+    if (view.byteLength < 22 || view.getUint32(0, true) !== 0x04034b50) throw new Error("NOT_ZIP");
+    let end = -1;
+    for (let i = view.byteLength - 22; i >= Math.max(0, view.byteLength - 66000); i -= 1) {
+      if (view.getUint32(i, true) === 0x06054b50) { end = i; break; }
+    }
+    if (end < 0) throw new Error("NOT_ZIP");
+    const count = view.getUint16(end + 10, true);
+    let p = view.getUint32(end + 16, true);
+    const names = new TextDecoder();
+    const files = {};
+    for (let n = 0; n < count; n += 1) {
+      if (view.getUint32(p, true) !== 0x02014b50) throw new Error("NOT_ZIP");
+      const method = view.getUint16(p + 10, true);
+      const size = view.getUint32(p + 20, true);
+      const nameLen = view.getUint16(p + 28, true);
+      const extraLen = view.getUint16(p + 30, true);
+      const commentLen = view.getUint16(p + 32, true);
+      const local = view.getUint32(p + 42, true);
+      const name = names.decode(bytes.subarray(p + 46, p + 46 + nameLen));
+      files[name] = { method, size, local };
+      p += 46 + nameLen + extraLen + commentLen;
+    }
+    return async (name) => {
+      const f = files[name];
+      if (!f) return null;
+      const start = f.local + 30 + view.getUint16(f.local + 26, true) + view.getUint16(f.local + 28, true);
+      const data = bytes.subarray(start, start + f.size);
+      if (f.method === 0) return new TextDecoder().decode(data);
+      if (f.method !== 8) throw new Error("UNSUPPORTED");
+      if (typeof DecompressionStream === "undefined") throw new Error("NO_DECOMPRESS");
+      const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Response(stream).text();
+    };
+  }
+
+  const xml = (text) => new DOMParser().parseFromString(text, "application/xml");
+  const colIndex = (ref) => [...ref.replace(/\d+/g, "")].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+
+  async function readXlsx(buffer) {
+    const get = await unzip(buffer);
+    // 첫 번째 시트 파일 찾기 (workbook.xml의 첫 sheet → rels의 Target)
+    let sheetPath = "xl/worksheets/sheet1.xml";
+    const wb = await get("xl/workbook.xml");
+    const rels = await get("xl/_rels/workbook.xml.rels");
+    if (wb && rels) {
+      const first = xml(wb).getElementsByTagName("sheet")[0];
+      const rid = first && (first.getAttribute("r:id") || first.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id"));
+      const rel = [...xml(rels).getElementsByTagName("Relationship")].find((r) => r.getAttribute("Id") === rid);
+      if (rel) {
+        const target = rel.getAttribute("Target");
+        sheetPath = target.startsWith("/") ? target.slice(1) : `xl/${target.replace(/^\.\//, "")}`;
+      }
+    }
+    const sheet = await get(sheetPath);
+    if (!sheet) throw new Error("NO_SHEET");
+    const sharedText = await get("xl/sharedStrings.xml");
+    const shared = sharedText
+      ? [...xml(sharedText).getElementsByTagName("si")].map((si) => [...si.getElementsByTagName("t")].map((t) => t.textContent).join(""))
+      : [];
+    // 날짜 서식이 걸린 칸 찾기: 엑셀은 날짜를 46353 같은 숫자로 저장하고 서식으로만 날짜처럼 보여 준다
+    const dateStyles = new Set();
+    const stylesText = await get("xl/styles.xml");
+    if (stylesText) {
+      const st = xml(stylesText);
+      const custom = {};
+      for (const f of st.getElementsByTagName("numFmt")) custom[f.getAttribute("numFmtId")] = f.getAttribute("formatCode") || "";
+      const isDateFmt = (id) => (id >= 14 && id <= 22) || (id >= 45 && id <= 47)
+        || (custom[id] !== undefined && /[yd]/i.test(custom[id].replace(/"[^"]*"|\[[^\]]*\]/g, "")));
+      const xfs = st.getElementsByTagName("cellXfs")[0];
+      if (xfs) [...xfs.getElementsByTagName("xf")].forEach((xf, i) => { if (isDateFmt(Number(xf.getAttribute("numFmtId")))) dateStyles.add(String(i)); });
+    }
+    const rows = [];
+    for (const row of xml(sheet).getElementsByTagName("row")) {
+      const cells = [];
+      for (const c of row.getElementsByTagName("c")) {
+        const type = c.getAttribute("t");
+        const v = c.getElementsByTagName("v")[0]?.textContent ?? "";
+        let value = v;
+        if (type === "s") value = shared[Number(v)] ?? "";
+        else if (type === "inlineStr") value = [...c.getElementsByTagName("t")].map((t) => t.textContent).join("");
+        else if (type === "d") value = v.slice(0, 10);
+        else if ((!type || type === "n") && /^\d+(\.\d+)?$/.test(v) && dateStyles.has(c.getAttribute("s") || "0")) value = iso(addDays(new Date(1899, 11, 30), Math.floor(Number(v))));
+        const ref = c.getAttribute("r");
+        cells[ref ? colIndex(ref) : cells.length] = String(value).replace(/[\t\r\n]+/g, " ").trim();
+      }
+      if (cells.some((x) => x)) rows.push(Array.from(cells, (x) => x ?? "").join("\t"));
+    }
+    return rows.join("\n");
+  }
+
+  // CSV: 엑셀이 저장한 한글 CSV는 보통 EUC-KR(CP949)이라, UTF-8로 깨지면 EUC-KR로 다시 읽는다
+  function readCsv(buffer) {
+    let text = new TextDecoder("utf-8").decode(buffer);
+    if (text.includes("�")) text = new TextDecoder("euc-kr").decode(buffer);
+    text = text.replace(/^﻿/, "");
+    const out = [];
+    let row = [""];
+    let quoted = false;
+    for (let i = 0; i < text.length; i += 1) {
+      const ch = text[i];
+      if (quoted) {
+        if (ch === '"' && text[i + 1] === '"') { row[row.length - 1] += '"'; i += 1; }
+        else if (ch === '"') quoted = false;
+        else row[row.length - 1] += ch;
+      } else if (ch === '"') quoted = true;
+      else if (ch === ",") row.push("");
+      else if (ch === "\n" || ch === "\r") {
+        if (ch === "\r" && text[i + 1] === "\n") i += 1;
+        out.push(row); row = [""];
+      } else row[row.length - 1] += ch;
+    }
+    out.push(row);
+    return out.filter((r) => r.some((x) => x.trim())).map((r) => r.map((x) => x.replace(/\t/g, " ").trim()).join("\t")).join("\n");
+  }
+
+  function fileMessage(text, bad) {
+    const box = $("file-msg");
+    box.hidden = false;
+    box.textContent = text;
+    box.classList.toggle("bad", Boolean(bad));
+  }
+
+  async function handleFile(file) {
+    if (!file) return;
+    const name = file.name || "";
+    const ext = (name.split(".").pop() || "").toLowerCase();
+    if (ext === "xls") return fileMessage("예전 엑셀 형식(.xls)은 읽지 못해요. 엑셀에서 「다른 이름으로 저장」→ .xlsx로 저장하거나, 표를 복사해 아래 칸에 붙여 넣어 주세요.", true);
+    if (ext !== "xlsx" && ext !== "csv") return fileMessage(".xlsx나 .csv 파일만 읽어요. 표를 복사해 아래 칸에 붙여 넣어도 돼요.", true);
+    if (file.size > 5 * 1024 * 1024) return fileMessage("파일이 5MB보다 커요. 만기 목록만 남기거나 표를 복사해 붙여 넣어 주세요.", true);
+    try {
+      const buffer = await file.arrayBuffer();
+      const text = ext === "csv" ? readCsv(buffer) : await readXlsx(buffer);
+      if (!text.trim()) return fileMessage("파일에 읽을 내용이 없어요. 첫 번째 시트에 만기 목록이 있는지 확인해 주세요.", true);
+      $("paste").value = text;
+      readList();
+      fileMessage(`「${name}」 파일을 읽어서 아래 칸에 채웠어요. 고객 ${customers.length}곳의 문장을 만들었어요.`);
+    } catch (err) {
+      const why = {
+        NOT_ZIP: "엑셀 파일로 열리지 않아요. 회사 문서보안(DRM)이 걸린 파일이면 브라우저가 읽을 수 없어요. 엑셀에서 열어 표를 복사해 아래 칸에 붙여 넣어 주세요.",
+        NO_DECOMPRESS: "이 브라우저는 엑셀 파일 읽기를 지원하지 않아요. 크롬이나 엣지 최신판으로 열거나, 표를 복사해 붙여 넣어 주세요.",
+      }[err.message] || "파일을 읽지 못했어요. 엑셀에서 표를 복사해 아래 칸에 붙여 넣어 주세요.";
+      fileMessage(why, true);
+    }
+  }
+
+  $("pick").addEventListener("click", () => $("file").click());
+  $("file").addEventListener("change", () => { handleFile($("file").files[0]); $("file").value = ""; });
+  const drop = $("drop");
+  for (const type of ["dragenter", "dragover"]) drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add("over"); });
+  for (const type of ["dragleave", "drop"]) drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove("over"); });
+  drop.addEventListener("drop", (e) => handleFile(e.dataTransfer.files[0]));
+  // 카드 밖에 떨어뜨려도 브라우저가 파일을 열어 버리지 않게
+  window.addEventListener("dragover", (e) => e.preventDefault());
+  window.addEventListener("drop", (e) => { if (!drop.contains(e.target)) { e.preventDefault(); handleFile(e.dataTransfer.files[0]); } });
+
+  $("read").addEventListener("click", () => { $("file-msg").hidden = true; readList(); });
   $("sample").addEventListener("click", () => { $("paste").value = sampleText(); readList(); });
   $("rm").addEventListener("input", () => {
     const v = $("rm").value;
