@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="브릿지팀의 역할과 반복되는 고객 문의를 공유하는 방법을 알아보세요.">
+  <title>브릿지팀 | 팀 소개</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #17345b;
+      --ink: #102746;
+      --muted: #4a617d;
+      --sky: #f2f7fc;
+      --blue: #2563eb;
+      --line: #dce7f3;
+      --header-height: 4.5rem;
+      font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: white; line-height: 1.65; }
+    a { color: inherit; }
+    button { font: inherit; cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+    [id] { scroll-margin-top: calc(var(--header-height) + 1rem); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { letter-spacing: -.045em; line-height: 1.25; }
+    p, li, dd { overflow-wrap: anywhere; }
+    .wrap { width: min(69rem, calc(100% - 4rem)); margin-inline: auto; }
+    .skip {
+      position: fixed; inset: .5rem auto auto .5rem; z-index: 3;
+      padding: .5rem 1rem; background: white; transform: translateY(-150%);
+    }
+    .skip:focus { transform: none; }
+    .header { position: sticky; top: 0; z-index: 2; background: white; border-bottom: 1px solid var(--line); }
+    .header-inner { position: relative; min-height: var(--header-height); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; font-size: 1.16rem; font-weight: 800; text-decoration: none; }
+    .brand-mark { display: block; width: 2rem; height: 2rem; }
+    .nav { display: flex; gap: clamp(1rem, 3vw, 2.4rem); align-items: center; }
+    .nav a { text-decoration: none; font-weight: 650; font-size: .95rem; }
+    .nav a:hover { color: var(--blue); }
+    .menu-toggle { display: none; border: 1px solid var(--line); border-radius: .65rem; background: white; color: var(--ink); padding: .4rem .7rem; }
+    .menu-icon { display: inline-block; width: 1rem; height: .72rem; border-block: 2px solid; position: relative; }
+    .menu-icon::after { content: ""; position: absolute; inset: 50% 0 auto; border-top: 2px solid; transform: translateY(-50%); }
+    .hero { background: var(--sky); padding-block: clamp(3rem, 7vw, 6rem); }
+    .hero-inner { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(1.75rem, 5vw, 4rem); }
+    .hero h1 { font-size: clamp(3rem, 7vw, 5.7rem); font-weight: 850; }
+    .lead { margin-top: 1.15rem; font-size: clamp(1.15rem, 2.25vw, 1.55rem); font-weight: 650; color: var(--navy); word-break: keep-all; }
+    .primary, .copy {
+      display: inline-flex; align-items: center; justify-content: center; min-height: 2.8rem;
+      border-radius: .65rem; padding: .6rem 1rem; text-decoration: none; font-size: .94rem; font-weight: 750;
+    }
+    .primary { margin-top: 1.7rem; background: var(--blue); color: white; }
+    .primary:hover { background: #1c50c4; }
+    .illustration {
+      position: relative; isolation: isolate; overflow: hidden; aspect-ratio: 1.55;
+      border-radius: 1.2rem; background: radial-gradient(ellipse at 50% 52%, #285bab, transparent 70%), #102746;
+    }
+    .illustration::before {
+      content: ""; position: absolute; inset: 0; z-index: -1; opacity: .32;
+      background-image: linear-gradient(#7199cc44 1px, transparent 1px), linear-gradient(90deg, #7199cc44 1px, transparent 1px);
+      background-size: 1.6rem 1.6rem; mask-image: radial-gradient(ellipse, black 35%, transparent 88%);
+    }
+    .bridge-arch {
+      position: absolute; inset: 23% 16% auto; height: 36%; border: clamp(3px, .55vw, 6px) solid #9ac6ff;
+      border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+    .bridge-deck { position: absolute; inset: 59% 10% auto; height: 3px; border-radius: 2px; background: #b9d8ff; }
+    .bridge-deck::before, .bridge-deck::after {
+      content: ""; position: absolute; top: 50%; width: .7rem; aspect-ratio: 1;
+      transform: translateY(-50%); border-radius: 50%; background: #e2efff; box-shadow: 0 0 0 .3rem #82b7ff30;
+    }
+    .bridge-deck::after { right: 0; }
+    .bridge-piers { position: absolute; inset: 43% 28% 27%; border-inline: 2px solid #7ea8e0; }
+    .bridge-piers::after { content: ""; position: absolute; top: -46%; left: 50%; height: 100%; border-left: 2px solid #7ea8e0; }
+    .work, .contact { padding-block: clamp(3.25rem, 7vw, 5.5rem); }
+    .section-title { margin-bottom: 1.5rem; font-size: clamp(1.85rem, 4vw, 2.7rem); }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+    .card { display: flex; flex-direction: column; gap: .65rem; padding: clamp(1.1rem, 2.5vw, 1.6rem); border: 1px solid var(--line); border-top: 3px solid #81abf7; border-radius: .85rem; }
+    .card h3 { font-size: 1.24rem; }
+    .card p { color: var(--muted); }
+    .card .example { margin-top: auto; padding-top: .8rem; border-top: 1px solid var(--line); font-size: .94rem; }
+    .example strong { display: block; color: var(--navy); font-size: .875rem; margin-bottom: .2rem; }
+    .contact { background: var(--navy); color: white; }
+    .contact .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.5rem, 5vw, 4rem); align-items: start; }
+    .contact .section-title { margin-bottom: .8rem; }
+    .contact-intro p, .contact-intro li { color: #e1edff; }
+    .contact-intro ul { margin-block: .8rem; padding-left: 1.25rem; }
+    .contact-intro .privacy { font-size: .9rem; }
+    .channel { margin-top: 1.4rem; }
+    .channel dt { color: #bfd7fa; font-size: .9rem; }
+    .channel dd { margin: .2rem 0 0; font-weight: 750; }
+    .sample { border-radius: .85rem; padding: clamp(1.15rem, 3vw, 1.8rem); background: var(--sky); color: var(--ink); }
+    .sample h3 { font-size: 1.18rem; }
+    .sample blockquote { margin: .85rem 0 1.15rem; }
+    .copy { border: 1px solid #a7bee0; background: white; color: var(--navy); }
+    .copy:hover { background: #e6effb; }
+    .status { min-height: 1.6em; margin-top: .4rem; color: var(--muted); font-size: .875rem; }
+    [hidden] { display: none !important; }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+    @media (max-width: 860px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 639px) {
+      :root { --header-height: 4rem; }
+      .wrap { width: calc(100% - 2rem); }
+      .hero-inner, .cards, .contact .wrap { grid-template-columns: 1fr; }
+      .menu-toggle { display: inline-flex; align-items: center; gap: .55rem; }
+      .nav {
+        display: none; position: absolute; top: 100%; inset-inline: 0; padding: .5rem;
+        background: white; border: 1px solid var(--line); border-radius: .65rem; box-shadow: 0 .6rem 1.5rem #10274615;
+      }
+      .nav.is-open { display: grid; gap: 0; }
+      .nav a { padding: .6rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip">본문으로 건너뛰기</a>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#intro"><img class="brand-mark" src="images/logo.png" alt="" width="32" height="32">브릿지팀</a>
+      <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false">
+        <span class="menu-icon" aria-hidden="true"></span>메뉴
+      </button>
+      <nav id="main-nav" class="nav" aria-label="주 메뉴">
+        <a href="#intro">팀 소개</a>
+        <a href="#work">하는 일</a>
+        <a href="#contact">문의 공유</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <section class="hero" id="intro" aria-labelledby="intro-title" tabindex="-1">
+      <div class="wrap hero-inner">
+        <div>
+          <h1 id="intro-title">브릿지팀</h1>
+          <p class="lead">고객 문의를 분석해 서비스 개선점을 찾는 팀</p>
+          <a class="primary" href="#contact">반복 문의 공유하기</a>
+        </div>
+        <div class="illustration" aria-hidden="true">
+          <span class="bridge-arch"></span>
+          <span class="bridge-piers"></span>
+          <span class="bridge-deck"></span>
+        </div>
+      </div>
+    </section>
+    <section class="work wrap" id="work" aria-labelledby="work-title" tabindex="-1">
+      <h2 class="section-title" id="work-title">하는 일</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>고객 문의 유형 분류</h3>
+          <p>비슷한 문의를 주제별로 묶어 자주 나오는 문제를 찾습니다.</p>
+          <p class="example"><strong>예시</strong>배송 상태 확인과 반품 접수 문의를 유형별로 정리합니다.</p>
+        </article>
+        <article class="card">
+          <h3>반복 문의 원인 분석</h3>
+          <p>여러 문의에서 고객이 공통으로 막히는 화면이나 단계를 찾습니다.</p>
+          <p class="example"><strong>예시</strong>배송 조회 버튼을 찾기 어렵다는 문의가 어느 화면에 집중되는지 확인합니다.</p>
+        </article>
+        <article class="card">
+          <h3>서비스 개선안 제안</h3>
+          <p>분석 결과를 바탕으로 관련 팀과 화면이나 안내 문구의 개선점을 논의합니다.</p>
+          <p class="example"><strong>예시</strong>주문 상세 화면에서 배송 조회 버튼이 더 잘 보이는 위치를 제안합니다.</p>
+        </article>
+      </div>
+    </section>
+    <section class="contact" id="contact" aria-labelledby="contact-title" tabindex="-1">
+      <div class="wrap">
+        <div class="contact-intro">
+          <h2 class="section-title" id="contact-title">문의 공유</h2>
+          <p>비슷한 문의가 반복되면 아래 내용을 정리해 브릿지팀에 알려 주세요.</p>
+          <ul>
+            <li>어떤 문의인지</li>
+            <li>어느 화면이나 단계에서 발생했는지</li>
+            <li>언제, 얼마나 자주 들어왔는지</li>
+          </ul>
+          <p class="privacy">고객 이름, 연락처, 주문번호는 빼고 상황만 요약해 주세요.</p>
+          <dl class="channel">
+            <dt>공유 채널 예시</dt>
+            <dd>#브릿지팀-문의</dd>
+          </dl>
+        </div>
+        <div class="sample">
+          <h3>작성 예시</h3>
+          <blockquote id="sample-text">배송 조회 버튼 위치 문의가 지난주에 세 번 들어왔어요. 모두 주문 상세 화면에서 버튼을 찾지 못한 사례였어요.</blockquote>
+          <button class="copy" type="button" hidden>예시 복사</button>
+          <p class="status" role="status"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const menuButton = document.querySelector('.menu-toggle');
+    const navigation = document.querySelector('#main-nav');
+
+    function setMenu(open) {
+      menuButton.setAttribute('aria-expanded', String(open));
+      navigation.classList.toggle('is-open', open);
+    }
+
+    menuButton.addEventListener('click', () => {
+      setMenu(menuButton.getAttribute('aria-expanded') !== 'true');
+    });
+    navigation.addEventListener('click', (event) => {
+      if (event.target.matches('a')) setMenu(false);
+    });
+    document.querySelector('.header').addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+        setMenu(false);
+        menuButton.focus();
+      }
+    });
+    matchMedia('(max-width: 639px)').addEventListener('change', () => setMenu(false));
+
+    const copyButton = document.querySelector('.copy');
+    const copyStatus = document.querySelector('.status');
+    const sampleText = document.querySelector('#sample-text');
+    copyButton.hidden = false;
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(sampleText.textContent.trim());
+        copyStatus.textContent = '작성 예시를 복사했어요.';
+      } catch {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(sampleText);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        copyStatus.textContent = '선택된 문장을 직접 복사해 주세요.';
+      }
+    });
+  </script>
+</body>
+</html>
