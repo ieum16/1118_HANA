@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>일해라!</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+  <script src="exchange.js" type="module"></script>
+</head>
+<body>
+  <main>
+    <header class="heading">
+      <h1>일해라!</h1>
+      <span id="progress-count" class="count">0 / 0 완료</span>
+    </header>
+    <progress id="progress-bar" max="1" value="0" aria-label="할 일 완료율"></progress>
+
+    <section id="stage" class="stage" aria-label="응원하는 친구들">
+      <div id="message" class="messages" role="status" aria-atomic="true">
+        <span class="bubble">오늘도 함께 해보자!</span>
+      </div>
+      <div class="friends">
+        <div class="friend" id="chiikawa"><img src="images/chiikawa.png" alt="치이카와"></div>
+        <div class="friend" id="hachiware"><img src="images/hachiware.png" alt="하치와레"></div>
+        <div class="friend" id="usagi"><img src="images/usagi.png" alt="우사기"></div>
+      </div>
+    </section>
+
+    <form id="add-form">
+      <label class="sr-only" for="task-input">새 할 일</label>
+      <input id="task-input" type="text" maxlength="160" placeholder="할 일을 적어 주세요" autocomplete="off" required disabled>
+      <button id="add-button" type="submit" disabled>추가</button>
+    </form>
+    <p id="error" class="error" role="alert" hidden></p>
+
+    <section aria-labelledby="todo-title">
+      <div class="section-heading">
+        <h2 id="todo-title">할 일</h2>
+        <span class="hint">↑ ↓ 순서 변경</span>
+      </div>
+      <p id="empty" class="empty">아직 할 일이 없어요.</p>
+      <ol id="pending" class="tasks"></ol>
+    </section>
+    <section id="done-section" class="done-section" aria-labelledby="done-title" hidden>
+      <h2 id="done-title">완료한 일</h2>
+      <ul id="done" class="tasks"></ul>
+    </section>
+
+    <section class="exchange" aria-labelledby="fx-title">
+      <fieldset id="fx-controls" disabled>
+        <div class="section-heading">
+          <h2 id="fx-title">환율 계산기</h2>
+          <button id="fx-fetch" type="button">오늘 환율 불러오기</button>
+        </div>
+        <p id="fx-source" class="fx-source" hidden></p>
+        <p id="fx-fetch-status" class="fx-status" role="status" hidden></p>
+
+        <div class="fx-rates" role="group" aria-label="통화별 기준환율">
+          <label>USD <small>1달러</small><input data-rate="USD" inputmode="decimal" maxlength="24" placeholder="원"></label>
+          <label>JPY <small>100엔</small><input data-rate="JPY" inputmode="decimal" maxlength="24" placeholder="원"></label>
+          <label>EUR <small>1유로</small><input data-rate="EUR" inputmode="decimal" maxlength="24" placeholder="원"></label>
+        </div>
+        <details class="fx-paste">
+          <summary>은행 환율표 붙여넣기</summary>
+          <label class="sr-only" for="fx-paste">은행 환율표</label>
+          <textarea id="fx-paste" rows="3" maxlength="30000" placeholder="은행 표의 제목과 행을 함께 복사하거나, 한 줄에 USD 1,400처럼 입력하세요."></textarea>
+          <button id="fx-import" type="button">표에서 채우기</button>
+          <p id="fx-paste-status" class="fx-status" role="status" hidden></p>
+        </details>
+
+        <div class="fx-grid">
+          <label>통화
+            <select id="fx-currency">
+              <option value="USD">USD · 달러</option>
+              <option value="JPY">JPY · 엔</option>
+              <option value="EUR">EUR · 유로</option>
+            </select>
+          </label>
+          <label>외화 금액 <input id="fx-amount" inputmode="decimal" maxlength="24" placeholder="0"></label>
+          <label>살 때 스프레드 % <input id="fx-buy" inputmode="decimal" maxlength="12" placeholder="예: 1.75"></label>
+          <label>팔 때 스프레드 % <input id="fx-sell" inputmode="decimal" maxlength="12" placeholder="예: 1.75"></label>
+          <label class="fx-discount">공통 우대율 % <input id="fx-discount" inputmode="decimal" maxlength="12" placeholder="0"></label>
+        </div>
+        <dl class="fx-results" aria-live="polite">
+          <div><dt>기준환율로 환산</dt><dd id="fx-result-base">—</dd></div>
+          <div><dt>외화 살 때</dt><dd id="fx-result-buy">—</dd></div>
+          <div><dt>외화 팔 때</dt><dd id="fx-result-sell">—</dd></div>
+        </dl>
+        <p id="fx-validation" class="fx-status" hidden></p>
+      </fieldset>
+      <p id="fx-storage-status" class="fx-status" role="status" hidden></p>
+    </section>
+
+    <footer><a href="https://www.anime-chiikawa.jp/chara.html" target="_blank" rel="noreferrer">캐릭터 이미지 © 나가노 / 치이카와 제작위원회</a></footer>
+  </main>
+
+  <template id="task-template">
+    <li class="task">
+      <span class="rank"></span>
+      <input class="check" type="checkbox">
+      <span class="task-name"></span>
+      <div class="controls">
+        <button type="button" class="star" title="중요 표시" aria-pressed="false">☆</button>
+        <button type="button" class="up" title="위로 이동">↑</button>
+        <button type="button" class="down" title="아래로 이동">↓</button>
+        <button type="button" class="delete" title="삭제">×</button>
+      </div>
+    </li>
+  </template>
+</body>
+</html>
