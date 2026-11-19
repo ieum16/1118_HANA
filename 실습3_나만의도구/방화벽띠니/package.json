@@ -1,0 +1,15 @@
+{
+  "name": "morning-ticker-crawler",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test crawler.test.mjs"
+  },
+  "dependencies": {
+    "cheerio": "1.2.0",
+    "robots-parser": "3.0.1"
+  }
+}
