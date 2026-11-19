@@ -73,3 +73,11 @@ team-page/
 - index.html을 더블클릭해 열 수 있으며 서버·설치·로그인이 필요 없다.
 - 로컬 브라우저에서 데스크톱·375px 화면과 모바일 메뉴·FAQ를 확인했다.
 - 공개 배포와 GitHub 업로드는 별도 단계다.
+
+## 9. Superdesign 참고 디자인 수정
+- 참고: https://superdesign.dev/ 의 Neo-Brutalism Style.
+- 밝은 바탕, 파란 버튼, 노란 강조, 굵은 테두리와 단단한 그림자를 적용했다.
+- 원본 고양이 로고와 업무 내용, 메뉴·FAQ 기능은 유지했다.
+- 개인 실습2 폴더와 team-page 작업 폴더의 index.html을 동일하게 수정했다.
+- 데스크톱·375px 화면과 메뉴·FAQ를 확인하고 로컬 미리보기를 열었다.
+- 사용자 승인 후 개인 GitHub에 갱신했고 기존 Vercel 주소에서 새 디자인 반영을 확인했다. 수업 제출용 screenshot.png도 새 첫 화면으로 교체했다.
