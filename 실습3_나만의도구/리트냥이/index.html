@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>서울 동네 길찾기</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #20352c; background: #f2f5f1; font-family: "Malgun Gothic", system-ui, sans-serif; }
+    main { width: min(46rem, 100%); margin: auto; padding: clamp(2rem, 7vw, 5rem) 1.25rem; }
+    header { border-top: .35rem solid #2b5346; margin-bottom: 2rem; }
+    h1 { font-size: clamp(2rem, 6vw, 3.5rem); letter-spacing: -.06em; margin: 1.2rem 0 .5rem; }
+    p { line-height: 1.75; word-break: keep-all; }
+    details { background: white; border: 1px solid #cbd7ce; border-radius: 1rem; margin: .8rem 0; }
+    summary { display: flex; align-items: center; gap: .9rem; padding: 1.2rem; cursor: pointer; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary strong { color: var(--accent); flex: none; font-size: 1.2rem; }
+    summary::after { content: "+"; margin-left: auto; font-size: 1.4rem; }
+    details[open] summary::after { content: "−"; }
+    section { margin: 0 1.2rem; padding: 1.2rem 0 1.4rem; border-top: 1px solid #d9e3da; }
+    dl { margin: 0; }
+    dl div { position: relative; padding: 0 0 1.1rem 1.7rem; }
+    dl div:last-child { padding-bottom: 0; }
+    dl div::before { content: ""; position: absolute; left: 0; top: .28rem; border: 3px solid var(--accent); border-radius: 50%; width: .65rem; height: .65rem; }
+    dl div:first-child::after { content: ""; position: absolute; left: .44rem; top: 1.24rem; bottom: -.28rem; border-left: 2px solid var(--accent); }
+    dt { font-size: .875rem; color: #516458; }
+    dd { margin: .15rem 0 0; font-weight: bold; font-size: 1.24rem; }
+    nav { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.2rem; }
+    a { color: #315443; text-underline-offset: .2em; }
+    .map { color: white; background: #264d40; text-decoration: none; font-weight: bold; padding: .7rem 1rem; border-radius: .5rem; }
+    :focus-visible { outline: 3px solid #2368a1; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>서울 동네 길찾기</h1>
+      <p>지역을 선택해 지하철역에서 목적지까지 걷는 길을 확인하세요.</p>
+    </header>
+    <details name="district" style="--accent:#426530" open>
+      <summary><strong>광진구</strong><span>서울상상나라</span></summary>
+      <section aria-label="광진구 도보 안내">
+        <dl>
+          <div><dt>출발 · 7호선</dt><dd>어린이대공원역</dd></div>
+          <div><dt>도착</dt><dd>서울상상나라</dd></div>
+        </dl>
+        <p>1번 출구에서 어린이대공원 정문 쪽으로 걸으세요. 서울상상나라까지 도보로 약 5분입니다.</p>
+        <nav aria-label="광진구 지도와 교통 안내">
+          <a class="map" href="https://www.google.com/maps/dir/?api=1&amp;origin=%EC%84%9C%EC%9A%B8%20%EA%B4%91%EC%A7%84%EA%B5%AC%20%EC%96%B4%EB%A6%B0%EC%9D%B4%EB%8C%80%EA%B3%B5%EC%9B%90%EC%97%AD&amp;destination=%EC%84%9C%EC%9A%B8%20%EA%B4%91%EC%A7%84%EA%B5%AC%20%EC%84%9C%EC%9A%B8%EC%83%81%EC%83%81%EB%82%98%EB%9D%BC&amp;travelmode=walking" target="_blank" rel="noopener">지도에서 길찾기</a>
+          <a href="https://seoulchildrensmuseum.org/reservation/viewLocation.do" target="_blank" rel="noopener">서울상상나라 오시는 길</a>
+        </nav>
+      </section>
+    </details>
+    <details name="district" style="--accent:#a24132">
+      <summary><strong>송파구</strong><span>올림픽공원 세계평화의문</span></summary>
+      <section aria-label="송파구 도보 안내">
+        <dl>
+          <div><dt>출발 · 8호선</dt><dd>몽촌토성역</dd></div>
+          <div><dt>도착</dt><dd>올림픽공원 세계평화의문</dd></div>
+        </dl>
+        <p>역에서 평화의광장 방면으로 나가세요. 광장 입구에서 세계평화의문까지 걸어가는 코스입니다.</p>
+        <nav aria-label="송파구 지도와 교통 안내">
+          <a class="map" href="https://www.google.com/maps/dir/?api=1&amp;origin=%EC%84%9C%EC%9A%B8%20%EC%86%A1%ED%8C%8C%EA%B5%AC%20%EB%AA%BD%EC%B4%8C%ED%86%A0%EC%84%B1%EC%97%AD&amp;destination=%EC%84%9C%EC%9A%B8%20%EC%86%A1%ED%8C%8C%EA%B5%AC%20%EC%98%AC%EB%A6%BC%ED%94%BD%EA%B3%B5%EC%9B%90%20%EC%84%B8%EA%B3%84%ED%8F%89%ED%99%94%EC%9D%98%EB%AC%B8&amp;travelmode=walking" target="_blank" rel="noopener">지도에서 길찾기</a>
+          <a href="https://www.ksponco.or.kr/olympicpark/menu.es?mid=a20109000000" target="_blank" rel="noopener">올림픽공원 오시는 길</a>
+        </nav>
+      </section>
+    </details>
+    <details name="district" style="--accent:#684a8f">
+      <summary><strong>강동구</strong><span>강동아트센터</span></summary>
+      <section aria-label="강동구 도보 안내">
+        <dl>
+          <div><dt>출발 · 5호선</dt><dd>고덕역</dd></div>
+          <div><dt>도착</dt><dd>강동아트센터</dd></div>
+        </dl>
+        <p>4번 출구에서 이마트 사거리를 거쳐 강동경희대학교병원 방면으로 걸으세요. 병원 옆 강동아트센터까지 약 7분입니다.</p>
+        <nav aria-label="강동구 지도와 교통 안내">
+          <a class="map" href="https://www.google.com/maps/dir/?api=1&amp;origin=%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%8F%99%EA%B5%AC%20%EA%B3%A0%EB%8D%95%EC%97%AD&amp;destination=%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%8F%99%EA%B5%AC%20%EA%B0%95%EB%8F%99%EC%95%84%ED%8A%B8%EC%84%BC%ED%84%B0&amp;travelmode=walking" target="_blank" rel="noopener">지도에서 길찾기</a>
+          <a href="https://www.gdfac.or.kr/home/display/region/content/JSVFRWpvUW1RQjZNU21QelgrOW1mSEZtY3ljVG1hU0JISWt0ZU1ZTGQxRmdtVT0%3D" target="_blank" rel="noopener">강동문화재단 교통 안내</a>
+        </nav>
+      </section>
+    </details>
+  </main>
+</body>
+</html>
