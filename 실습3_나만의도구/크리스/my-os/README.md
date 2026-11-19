@@ -1,5 +1,8 @@
 # DEALING DESK — 간단 조치 안내 도구
 
+
+https://automatedmsg.vercel.app/
+
 반복되는 문의에 조치 방법과 담당자 연락처를 함께 안내하는 브라우저 도구입니다.
 
 ## 기능
