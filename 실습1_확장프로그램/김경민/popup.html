@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="confetti.js" defer></script>
+  <script src="popup.js" defer></script>
+  <script src="exchange-rates.js" defer></script>
+  <script src="exchange.js" defer></script>
+</head>
+<body>
+  <main class="board">
+    <header class="board-header">
+      <span class="board-icon" aria-hidden="true">✓</span>
+      <h1>오늘 할 일 작성기</h1>
+    </header>
+
+    <form id="add-task" novalidate>
+      <div class="add-row">
+        <input id="task-title" aria-label="새 할 일" aria-describedby="title-error" placeholder="할 일을 입력하세요" maxlength="160" required autofocus>
+        <button class="add-button" type="submit">추가</button>
+      </div>
+      <p id="title-error" class="error" role="alert" hidden></p>
+    </form>
+
+    <section aria-labelledby="list-title">
+      <div class="list-header">
+        <h2 id="list-title">할 일 목록</h2>
+        <output id="remaining" aria-live="polite">남은 할 일 <strong>0개</strong></output>
+      </div>
+      <ul id="tasks"></ul>
+      <p id="empty-state">등록된 할 일이 없어요.</p>
+    </section>
+    <p id="storage-error" class="error" role="alert" hidden></p>
+
+    <section class="exchange" id="exchange" aria-labelledby="exchange-title">
+      <h2 id="exchange-title">환율 계산기</h2>
+      <div class="exchange-rates" role="group" aria-label="통화별 기준환율">
+        <label>USD <span>1달러당 원</span>
+          <input id="fx-usd" inputmode="decimal" maxlength="24" placeholder="기준환율">
+        </label>
+        <label>JPY <span>100엔당 원</span>
+          <input id="fx-jpy" inputmode="decimal" maxlength="24" placeholder="기준환율">
+        </label>
+        <label>EUR <span>1유로당 원</span>
+          <input id="fx-eur" inputmode="decimal" maxlength="24" placeholder="기준환율">
+        </label>
+      </div>
+
+      <div class="exchange-amount">
+        <label>통화
+          <select id="fx-currency">
+            <option value="USD">USD</option>
+            <option value="JPY">JPY</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </label>
+        <label>외화 금액
+          <input id="fx-amount" inputmode="decimal" maxlength="24" placeholder="예: 100">
+        </label>
+      </div>
+
+      <dl class="exchange-result" aria-live="polite" aria-atomic="true">
+        <div><dt>기준환율 환산</dt><dd id="fx-base-result">—</dd></div>
+        <div id="fx-buy-row" hidden><dt>살 때 · 낼 금액</dt><dd id="fx-buy-result">—</dd></div>
+        <div id="fx-sell-row" hidden><dt>팔 때 · 받을 금액</dt><dd id="fx-sell-result">—</dd></div>
+      </dl>
+      <p id="fx-error" class="error" role="status" hidden></p>
+
+      <details class="exchange-details">
+        <summary>스프레드·우대율 <span id="fx-options-currency">USD</span></summary>
+        <div class="exchange-spreads">
+          <label>살 때 (%)<input id="fx-buy-spread" inputmode="decimal" maxlength="24" placeholder="예: 1.75"></label>
+          <label>팔 때 (%)<input id="fx-sell-spread" inputmode="decimal" maxlength="24" placeholder="살 때와 동일"></label>
+          <label>우대율 (%)<input id="fx-discount" inputmode="decimal" maxlength="24" placeholder="0"></label>
+        </div>
+        <p class="exchange-help">선택한 통화에 적용합니다. 우대율은 스프레드에서 할인되는 비율입니다.</p>
+      </details>
+
+      <details class="exchange-details">
+        <summary>은행 환율표 붙여넣기</summary>
+        <label class="exchange-help" for="fx-paste">통화와 매매기준율 열을 함께 복사해 붙여넣으세요.</label>
+        <textarea id="fx-paste" rows="3" maxlength="60000" spellcheck="false" placeholder="예: USD 1,400.00"></textarea>
+        <button id="fx-import" type="button">환율표 적용</button>
+        <p id="fx-import-status" class="exchange-help" role="status" hidden></p>
+      </details>
+      <p id="fx-storage-error" class="error" role="status" hidden></p>
+    </section>
+  </main>
+
+  <template id="task-template">
+    <li class="task">
+      <div class="task-row">
+        <label class="completion">
+          <input class="task-done" type="checkbox">
+          <span class="task-name"></span>
+        </label>
+        <button class="delete-button" type="button">삭제</button>
+      </div>
+      <div class="rating" role="group">
+        <span class="field-label" aria-hidden="true">중요도</span>
+        <div class="stars">
+          <button type="button" aria-label="중요도 1점" aria-pressed="false">☆</button>
+          <button type="button" aria-label="중요도 2점" aria-pressed="false">☆</button>
+          <button type="button" aria-label="중요도 3점" aria-pressed="false">☆</button>
+          <button type="button" aria-label="중요도 4점" aria-pressed="false">☆</button>
+          <button type="button" aria-label="중요도 5점" aria-pressed="false">☆</button>
+        </div>
+      </div>
+      <label class="memo">
+        <span class="field-label">비고</span>
+        <textarea class="task-memo" rows="2" maxlength="300" placeholder="간단한 메모를 남겨보세요"></textarea>
+      </label>
+    </li>
+  </template>
+</body>
+</html>

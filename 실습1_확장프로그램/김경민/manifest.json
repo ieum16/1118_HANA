@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "오늘 할 일 작성기",
+  "version": "1.0.0",
+  "description": "할 일을 추가하고 중요도와 비고를 함께 기록하세요.",
+  "action": {
+    "default_title": "오늘 할 일 작성기",
+    "default_popup": "popup.html"
+  }
+}
