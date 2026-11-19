@@ -1,0 +1,9 @@
+{
+  "name": "automated-msg",
+  "version": "1.0.0",
+  "private": true,
+  "description": "딜링룸 간단 조치 안내와 연락처 관리 도구",
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  }
+}
