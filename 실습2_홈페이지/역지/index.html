@@ -91,6 +91,9 @@
     .work-copy { transition: transform .2s ease; }
     .work-copy h3 { font-size: clamp(1.6rem, 4.6vw, 3.9rem); font-weight: 400; line-height: 1.04; letter-spacing: -.055em; }
     .work-copy p { margin-top: 10px; color: #4b675c; }
+    .work-details { max-width: 52rem; margin: 10px 0 0; padding-inline-start: 1.55em; }
+    .work-details li + li { margin-top: 5px; }
+    .work-details li::marker { color: var(--berry); font-variant-numeric: tabular-nums; }
     .work-arrow { width: clamp(24px, 5vw, 53px); height: auto; color: var(--berry); opacity: 0; transition: transform .2s ease, opacity .2s ease; }
     @media (hover: hover) and (pointer: fine) {
       .work-item:hover .work-copy { transform: translateX(16px); }
@@ -213,17 +216,39 @@
       <ol class="work-list">
         <li class="work-item">
           <span class="work-number" aria-hidden="true">01</span>
-          <div class="work-copy"><h3>데이터 정리</h3><p>업무에 필요한 데이터를 보기 쉽게 정리합니다.</p></div>
+          <div class="work-copy">
+            <h3>데이터 정리</h3>
+            <p>업무에 필요한 데이터를 보기 쉽게 정리합니다.</p>
+            <ol class="work-details">
+              <li>각 서버별 데이터를 보관 주기에 맞춰 관리합니다.</li>
+              <li>주기적으로 데이터 정합성 검증을 하여 관리합니다.</li>
+              <li>추가 요청이 온다면, 요청팀 및 원천팀과 협의하여 보관 주기 및 관리 방법을 결정합니다.</li>
+            </ol>
+          </div>
           <svg class="work-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
         </li>
         <li class="work-item">
           <span class="work-number" aria-hidden="true">02</span>
-          <div class="work-copy"><h3>오늘의 할 일 정하기</h3><p>오늘 처리할 일을 골라 우선순위를 정합니다.</p></div>
+          <div class="work-copy">
+            <h3>오늘의 할 일 정하기</h3>
+            <p>오늘 처리할 일을 골라 우선순위를 정합니다.</p>
+            <ol class="work-details">
+              <li>Codex와 ChatGPT 사용법 배우기</li>
+              <li>2호선 지옥철 뚫고 집 가기</li>
+              <li>푹 쉬기</li>
+            </ol>
+          </div>
           <svg class="work-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
         </li>
         <li class="work-item">
           <span class="work-number" aria-hidden="true">03</span>
-          <div class="work-copy"><h3>오늘 일을 내일로 미룰 일 정하기</h3><p>내일 이어서 할 일을 골라둡니다.</p></div>
+          <div class="work-copy">
+            <h3>오늘 일을 내일로 미룰 일 정하기</h3>
+            <p>내일 이어서 할 일을 골라둡니다.</p>
+            <ol class="work-details">
+              <li>모든 것</li>
+            </ol>
+          </div>
           <svg class="work-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
         </li>
       </ol>
