@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>프로젝트 인프라 예산 · 아키기획팀</title>
+<style>
+
+:root {
+  --green: #008485;
+  --action: #006c6d;
+  --action-hover: #005b5c;
+  --ink: #172b3a;
+  --text: #334155;
+  --muted: #526174;
+  --line: #dce3e9;
+  --paper: #f5f7fa;
+  --mint: #eaf5f2;
+  --white: #fff;
+  --error: #8d3224;
+  --error-bg: #fff1ed;
+  --warning: #855000;
+  --radius: 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+  color: var(--text);
+  background: var(--paper);
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+body { margin: 0; font-size: 16px; line-height: 1.7; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { color: var(--ink); word-break: keep-all; line-height: 1.35; font-weight: 650; }
+h1 { font-size: clamp(1.9rem, 3.2vw, 2.75rem); letter-spacing: -.05em; }
+h1 span { color: var(--action); }
+h2 { font-size: 1.5rem; letter-spacing: -.035em; margin-bottom: 20px; }
+h3 { font-size: 1.1rem; letter-spacing: -.02em; }
+a { color: var(--action); text-underline-offset: 5px; }
+button, input, select, textarea { font: inherit; }
+button, a { touch-action: manipulation; }
+button { cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--green); outline-offset: 4px; }
+[hidden] { display: none !important; }
+.wrap { width: min(1320px, calc(100% - 64px)); margin-inline: auto; }
+header { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.95); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
+header .wrap { min-height: 72px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 650; text-decoration: none; white-space: nowrap; }
+.brand-mark { padding-right: 12px; border-right: 1px solid var(--line); color: var(--green); font-size: 1.4rem; font-weight: 750; letter-spacing: -.07em; }
+.header-nav { display: flex; gap: 20px; font-size: 14px; }
+.header-nav a { padding: 10px 0; text-decoration: none; }
+.header-nav a:hover { text-decoration: underline; }
+#connection { word-break: keep-all; font-size: 14px; color: var(--muted); text-align: right; }
+.intro { padding: 52px 0 32px; }
+.intro p { margin-top: 20px; color: var(--muted); max-width: 850px; font-size: 17px; line-height: 1.8; }
+button { min-height: 44px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; background: var(--white); color: var(--ink); font-weight: 600; transition: background-color .16s, border-color .16s, transform .16s; }
+button.primary { background: var(--action); color: var(--white); border-color: var(--action); border-radius: 999px; padding-inline: 24px; }
+button:hover:not(:disabled) { background: var(--mint); border-color: var(--action); }
+button.primary:hover:not(:disabled) { background: var(--action-hover); }
+button:active:not(:disabled) { transform: scale(.98); }
+input, select, textarea { width: 100%; min-width: 0; min-height: 48px; padding: 11px 14px; color: var(--ink); background: var(--white); border: 1px solid #aebdc8; border-radius: 8px; font-size: 16px; }
+input:hover, select:hover, textarea:hover { border-color: var(--muted); }
+input:user-invalid { border-color: var(--error); }
+input[aria-invalid="true"] { border-color: var(--error); }
+textarea { resize: vertical; min-height: 112px; }
+select { appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23526174' stroke-width='1.6'/%3E%3C/svg%3E"); background-position: right 12px center; background-repeat: no-repeat; }
+.toolbar { display: grid; grid-template-columns: minmax(180px,1.35fr) minmax(160px,.7fr) minmax(280px,1.2fr) auto; align-items: end; gap: 20px; padding: 24px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 24px; }
+.toolbar label { min-width: 0; }
+.toolbar label span { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--ink); }
+.new-project { display: flex; gap: 8px; align-items: end; min-width: 0; }
+.new-project input { min-width: 0; }
+.new-project button { white-space: nowrap; min-height: 48px; }
+#top-save { min-height: 48px; }
+.workspace { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 24px; align-items: start; }
+#budget-form { display: flex; flex-direction: column; gap: 24px; }
+.panel { min-width: 0; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
+.heading { display: flex; flex-direction: column; align-items: start; gap: 8px; margin-bottom: 24px; }
+.heading h2 { margin: 0; }
+.heading p { color: var(--muted); font-size: 14px; }
+.fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+.field { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.field > span, .field > label { font-size: 14px; font-weight: 600; color: var(--ink); }
+.field .help { font-size: 14px; font-weight: 400; color: var(--muted); }
+.full { grid-column: 1/-1; }
+.small, .help { font-size: 14px; color: var(--muted); }
+.project-info { color: var(--muted); font-size: 14px; margin-bottom: 24px; overflow-wrap: anywhere; }
+.notice { padding: 14px 18px; border-left: 3px solid var(--green); background: var(--mint); color: var(--ink); margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 14px; overflow-wrap: anywhere; }
+.notice.error { background: var(--error-bg); border-color: var(--error); color: var(--error); }
+#message { margin: 0 0 24px; }
+#remote-notice { margin: 0 0 24px; }
+#remote-notice button { margin-top: 12px; }
+.latest { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 14px; padding: 16px; background: var(--white); }
+.architecture-tiers { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 24px 0; }
+.architecture-tiers > div { padding: 20px 16px; background: var(--paper); border-radius: 10px; }
+.architecture-tiers strong { display: block; font-size: 16px; font-weight: 600; color: var(--ink); }
+.architecture-tiers span { display: block; margin-top: 6px; font-size: 14px; color: var(--muted); }
+#add-architecture { margin-top: 6px; }
+.recommendation { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
+.candidate { padding: 20px; border: 1px solid var(--line); border-radius: 12px; }
+.candidate.preferred { background: var(--mint); border-color: var(--green); }
+.candidate strong { display: block; font-size: 14px; color: var(--action); margin-bottom: 6px; }
+.candidate h3 { font-size: 18px; }
+.candidate p { font-size: 14px; margin-top: 6px; color: var(--muted); }
+.candidate ul { font-size: 14px; padding-left: 20px; margin: 12px 0 0; }
+details { border-top: 1px solid var(--line); padding-top: 16px; }
+summary { cursor: pointer; font-size: 14px; color: var(--ink); font-weight: 600; }
+details > p { margin-top: 12px; }
+.team-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.team-tabs button { font-size: 14px; border-radius: 999px; }
+.team-tabs button[aria-pressed="true"] { color: var(--white); background: var(--action); border-color: var(--action); }
+#team-help { margin-bottom: 8px; }
+.item { border-top: 1px solid var(--line); padding-top: 28px; margin-top: 28px; }
+.item-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.item-heading strong { color: var(--ink); font-size: 18px; font-weight: 600; overflow-wrap: anywhere; }
+.item-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.item label { display: block; min-width: 0; font-size: 14px; color: var(--ink); font-weight: 600; }
+.item input, .item select { margin-top: 8px; font-weight: 400; }
+.item .spec { grid-column: 1/-1; }
+.item-foot { margin: 20px 0 8px; padding: 14px 16px; background: var(--paper); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.item-cost { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink); }
+.quantity-warning { display: block; margin-top: 6px; font-weight: 400; color: var(--error); font-size: 14px; }
+.remove { color: var(--error); background: transparent; border-color: transparent; font-size: 14px; padding-inline: 8px; white-space: nowrap; }
+#add-item { margin-top: 16px; }
+.summary { position: sticky; top: 96px; padding: 26px; }
+.summary h2 { margin-bottom: 8px; font-size: 22px; }
+#estimate-caption { margin-bottom: 16px; }
+.summary dl { margin: 0; }
+.summary dl > div { display: flex; justify-content: space-between; gap: 14px; padding: 10px 0; }
+.summary dt { font-size: 14px; color: var(--muted); }
+.summary dd { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.total { border-top: 1px solid var(--line); padding-top: 20px; margin: 16px 0 20px; color: var(--ink); font-size: 14px; }
+.total strong { display: block; font-size: clamp(1.6rem,2.2vw,2rem); font-weight: 650; letter-spacing: -.03em; color: var(--action); font-variant-numeric: tabular-nums; margin-top: 4px; overflow-wrap: anywhere; }
+.budget-components { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+.cost-breakdown { margin-bottom: 20px; }
+.cost-breakdown dl { margin-top: 12px; }
+.summary .total { border-top: 0; padding-top: 0; margin-top: 12px; }
+.team-breakdown { margin-top: 20px; }
+.team-cost { padding-top: 12px; }
+.team-cost h3 { display: none; }
+.team-cost p { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+.team-cost p > span { color: var(--ink); }
+.team-cost p > span > span { display: block; color: var(--muted); font-size: 14px; }
+.team-cost strong { font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.summary .button-row { display: grid; gap: 10px; margin-top: 20px; }
+.summary .button-row button { font-size: 14px; }
+#delete-project { background: transparent; border-color: transparent; color: var(--error); }
+.savebar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding-top: 24px; margin-top: 24px; border-top: 1px solid var(--line); }
+.unsaved { color: var(--warning); }
+.start-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; }
+.start-card p + p { margin-top: 12px; }
+.empty { padding: 24px 0; font-size: 16px; color: var(--muted); }
+.mobile-actionbar { display: none; }
+footer { border-top: 1px solid var(--line); padding: 32px 0; margin-top: 48px; color: var(--muted); font-size: 14px; }
+@media (max-width: 1200px) {
+  .toolbar { grid-template-columns: minmax(160px,1fr) minmax(140px,.7fr) auto; }
+  .new-project { grid-column: 1/3; grid-row: 2; }
+  #top-save { grid-column: 3; grid-row: 2; }
+  .workspace { grid-template-columns: minmax(0,1fr) 300px; }
+  .panel { padding: 24px; }
+  .architecture-tiers { grid-template-columns: 1fr; gap: 8px; }
+  .architecture-tiers > div { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 16px; }
+  .architecture-tiers span { margin-top: 0; }
+}
+@media (max-width: 1000px) {
+  .wrap { width: calc(100% - 40px); }
+  .workspace { grid-template-columns: 1fr; }
+  .summary { position: static; }
+  .header-nav { gap: 14px; }
+  .summary .button-row { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .summary dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 32px; }
+  .summary .total strong { font-size: 32px; }
+  .header-nav a[href="#project-information"] { display: none; }
+}
+@media (max-width: 640px) {
+  html { scroll-padding-top: 84px; }
+  .wrap { width: calc(100% - 32px); }
+  header .wrap { min-height: 68px; gap: 12px; }
+  .brand { font-size: 14px; gap: 8px; white-space: normal; }
+  .brand-mark { font-size: 20px; padding-right: 8px; }
+  .header-nav { display: none; }
+  #connection { flex: 0 0 100px; font-size: 14px; }
+  .intro { padding: 36px 0 28px; }
+  .intro p { font-size: 16px; margin-top: 16px; }
+  .toolbar { grid-template-columns: 1fr; padding: 20px; gap: 18px; }
+  .new-project { grid-column: auto; grid-row: auto; display: grid; grid-template-columns: 1fr; }
+  #top-save { display: none; }
+  .panel { padding: 20px; border-radius: 14px; }
+  h2 { font-size: 24px; }
+  .fields, .item-grid { grid-template-columns: 1fr; gap: 20px; }
+  .full, .item .spec { grid-column: auto; }
+  .heading { margin-bottom: 20px; }
+  .architecture-tiers > div { display: block; }
+  .architecture-tiers span { margin-top: 5px; }
+  .team-tabs button { flex: 1 1 44%; padding-inline: 10px; font-size: 14px; }
+  .item-foot { flex-direction: column; align-items: start; gap: 5px; }
+  .summary dl { display: block; }
+  .summary .button-row { grid-template-columns: 1fr; }
+  .mobile-actionbar {
+    display: flex; position: fixed; z-index: 25; left: 0; right: 0; bottom: 0;
+    align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+    background: var(--white); border-top: 1px solid var(--line);
+  }
+  .mobile-actionbar span { display: block; font-size: 14px; color: var(--muted); }
+  .mobile-actionbar strong { display: block; font-size: 18px; color: var(--action); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .mobile-actionbar button { flex-shrink: 0; }
+  body { padding-bottom: calc(104px + env(safe-area-inset-bottom,0px)); }
+  footer { margin-top: 32px; padding: 28px 0; }
+  .savebar { align-items: stretch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; }
+}
+@media print {
+  header, .toolbar, .savebar, .team-tabs, .remove, .button-row, #message, #remote-notice, .mobile-actionbar { display: none !important; }
+  .workspace { display: block; }
+  .panel { break-inside: avoid; margin-bottom: 20px; }
+  .summary { position: static; }
+  .wrap { width: 100%; }
+  body { background: var(--white); padding: 0; }
+}
+
+</style>
+<script src="budget-core.js" defer></script><script src="budget.js" defer></script>
+</head>
+<body>
+<header><div class="wrap"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">AKI</span>아키기획팀</a><nav class="header-nav" aria-label="예산 작업 바로가기"><a href="#project-information">사업 정보</a><a href="#environment-review">환경 검토</a><a href="#equipment-input">장비 입력</a><a href="#estimate-title">가견적</a></nav><span id="connection" role="status">공유 서버 연결 중</span></div></header>
+<main class="wrap">
+<div class="intro"><h1>사업의 기준을 정하고,<br><span>예산을 함께 완성하세요.</span></h1><p>현업 담당자는 서비스와 이용 대상을 설명하고, 인프라팀·네트워크팀·클라우드플랫폼팀·DB팀은 필요한 규격과 수량·단가를 입력합니다.</p></div>
+<div id="file-help" class="start-card" hidden><h2>공유 서버로 접속해 주세요</h2><p>team-page 폴더의 <strong>서버시작.cmd</strong>를 실행한 뒤 <a href="http://localhost:4174/budget.html">공유 예산 화면 열기</a>를 눌러 주세요.</p><p>다른 담당자는 서버 실행 창에 나오는 팀 공유 주소로 접속합니다.</p></div>
+<div id="application" hidden>
+<div class="toolbar">
+<label><span>사업 선택</span><select id="project-select" aria-label="사업 선택"></select></label>
+<label class="writer"><span>작성자 이름 또는 닉네임</span><input id="editor" maxlength="80" autocomplete="off" placeholder="예) 리얼아이언"></label>
+<div class="new-project"><input id="new-name" maxlength="120" aria-label="새 사업명" placeholder="새 사업명"><button id="create" type="button">사업 만들기</button></div>
+<button class="primary" id="top-save" type="submit" form="budget-form" disabled>변경 저장</button>
+</div>
+<p id="message" class="notice" role="status" hidden></p>
+<div id="remote-notice" class="notice" hidden><p>다른 사용자가 이 사업을 수정했습니다. 내 입력을 저장하면 서로 다른 항목의 변경은 합쳐집니다.</p><button id="compare" type="button">최신 변경 비교</button><pre id="comparison" class="latest" hidden></pre></div>
+<div id="empty" class="start-card"><h2>첫 사업을 등록해 주세요</h2><p>위에서 사업명을 입력하면 사업 설명과 환경 검토, 팀별 예산 입력을 시작할 수 있어요.</p></div>
+<div id="workspace" class="workspace" hidden>
+<div>
+<form id="budget-form">
+
+<section class="panel" id="project-information" aria-labelledby="business-title">
+<div class="heading"><h2 id="business-title">사업 설명과 산정 기준</h2><p>IT 용어를 몰라도 평소 업무 설명으로 시작하세요.</p></div>
+<p id="project-info" class="project-info"></p>
+<div class="fields">
+<label class="field full"><span>사업명</span><input data-field="name" maxlength="120" required></label>
+<label class="field full"><span>어떤 서비스를 만들고 싶나요?</span><textarea data-field="business" maxlength="3000" placeholder="예) 지점 직원이 교육 자료를 찾아보고 교육을 신청하는 사내 서비스를 만듭니다."></textarea></label>
+<label class="field"><span>주사용자</span><input data-field="primaryUser" maxlength="3000" placeholder="예) 지점 직원, 교육 운영 담당자"></label>
+<label class="field"><span>서비스 제공 대상</span><input data-field="audience" maxlength="3000" placeholder="예) 사내 직원 / 협력사 / 일반 고객"></label>
+<label class="field"><span>예상 동시 사용자와 이용 규모</span><input data-field="users" maxlength="3000" placeholder="예) 하루 3,000명, 동시에 약 100명"></label>
+<label class="field"><span>필요한 환경</span><input data-field="environments" maxlength="3000" placeholder="예) 개발 · 검증 · 운영"></label>
+<label class="field"><span>서비스가 멈춰도 되는 정도</span><input data-field="availability" maxlength="3000" placeholder="예) 업무시간 중 중단 최소화, 야간 점검 가능"></label>
+<label class="field"><span>알고 있는 자원·자료 보관 기준</span><input data-field="resources" maxlength="3000" placeholder="예) 첨부파일 1TB, 3년 보관 / 모르면 미정"></label>
+<label class="field"><span>사용 시작일</span><input data-field="start" type="date" min="0001-01-01" max="9999-12-31"></label>
+<label class="field"><span>사용 종료일</span><input data-field="end" type="date" min="0001-01-01" max="9999-12-31"></label>
+<label class="field"><span>월 과금 기간 (개월)</span><input data-field="months" type="number" min="1" max="1200" step="1" required><span class="help">월 비용에 곱하는 개월 수입니다. 날짜와 별도로 정합니다.</span></label>
+<div class="field"><span>날짜로 과금 기간 채우기</span><button id="months-from-dates" type="button">시작·종료 월 포함 계산</button><span class="help">같은 달은 1개월, 일할 계산은 적용하지 않습니다.</span></div>
+</div>
+</section>
+<section class="panel" id="architecture-review" aria-labelledby="architecture-title">
+<div class="heading"><h2 id="architecture-title">기본 아키텍처 · 3티어와 이중화</h2><p>모든 사업의 필수 구성 기준</p></div>
+<p>화면·업무 처리·데이터를 분리하고, 서버와 공통 장비를 이중화하는 구조로 예산을 작성합니다.</p>
+<div class="architecture-tiers" aria-label="WEB, WAS, DB의 3티어 구조">
+<div><strong>WEB · 화면·접속</strong><span>서버 또는 VM 2개 이상</span></div>
+<div><strong>WAS · 업무 처리</strong><span>서버 또는 VM 2개 이상</span></div>
+<div><strong>DB · 데이터</strong><span>서버 또는 DB 자원 2개 이상</span></div>
+</div>
+<p class="small">공통 장비도 총 수량 최소 2개로 산정합니다. N+1 등 확장 구성은 3개 이상도 입력할 수 있습니다. L3·L4 스위치, 방화벽, VPN, 스토리지 등의 독립 배치·전원·경로·복제·절체 구성은 담당 기술팀이 확인합니다. 스토리지는 이중 컨트롤러와 데이터 복제까지 함께 검토합니다.</p>
+<p id="architecture-status" class="notice" role="status"></p>
+<button id="add-architecture" type="button">물리서버 기준 기본 구성 추가</button>
+<p class="small" style="margin-top:12px">WEB·WAS·DB 서버, SAN 스토리지, L3·L4 스위치, 방화벽, VPN을 각각 2개씩 채웁니다. 단가는 직접 입력합니다. 클라우드 사업에서는 서버 품목을 VM으로 변경하고 기존 공용 장비와 중복 구매 여부를 확인해 주세요.</p>
+</section>
+<section class="panel" id="environment-review" aria-labelledby="environment-title">
+<h2 id="environment-title">어떤 환경부터 검토하면 좋을까요?</h2>
+<p class="small">간단한 사업 설명과 아래 답을 담당 팀이 함께 검토합니다. 환경 후보는 공개된 기본 개념을 참고한 이 페이지의 규칙으로 판단하며, 사업 설명을 자동 해석하는 AI 기능은 사용하지 않습니다.</p>
+<div class="fields" style="margin-top:20px">
+<label class="field"><span>외부 클라우드에 시스템과 자료를 둘 수 있나요?</span><select data-field="external"><option value="unknown">담당 팀에 확인 필요</option><option value="yes">가능해요</option><option value="no">내부에만 두어야 해요</option></select></label>
+<label class="field"><span>꼭 필요한 전용 장비나 물리 서버 제어가 있나요?</span><select data-field="dedicated"><option value="unknown">잘 모르겠어요</option><option value="yes">있어요</option><option value="no">없어요</option></select></label>
+<label class="field"><span>이용량이 갑자기 늘거나 크게 변하나요?</span><select data-field="variable"><option value="unknown">잘 모르겠어요</option><option value="yes">행사·특정 시기에 크게 늘어요</option><option value="no">대체로 일정해요</option></select></label>
+<label class="field"><span>기존 내부 클라우드 자원을 쓸 수 있나요?</span><select data-field="privateCapacity"><option value="unknown">담당 팀에 확인 필요</option><option value="yes">사용 가능한 자원이 있어요</option><option value="no">새로 확보해야 해요</option></select></label>
+<label class="field full"><span>장비 확보보다 빠른 서비스 개시가 우선인가요?</span><select data-field="urgency"><option value="unknown">아직 정하지 않았어요</option><option value="yes">빠른 개시가 중요해요</option><option value="no">자원 확보 일정을 조정할 수 있어요</option></select></label>
+</div>
+<div id="environment-results" aria-live="polite"></div>
+<details style="margin-top:18px"><summary>판단 규칙과 참고 자료</summary><p class="small">전용 장비 필요 → 베어메탈 우선 검토. 외부 클라우드 사용 불가 → 내부 환경 후보 검토. 외부 사용 가능·전용 장비 불필요 조건에서 이용량 변동, 빠른 개시, 내부 자원 부족 중 하나에 해당 → 퍼블릭 클라우드 우선 검토. 그 외 내부 자원이 있으면 프라이빗 클라우드 우선 검토. 핵심 답이 미정이면 추가 확인을 요청합니다. 가용성·성능·보안·라이선스와 실제 비용은 담당 팀이 검증합니다.</p><p class="small">클라우드 기본 개념 참고 <a href="https://csrc.nist.gov/pubs/sp/800/145/final" target="_blank" rel="noreferrer">NIST SP 800-145</a>. 위 우선순위는 이 도구의 참고 규칙입니다. 베어메탈은 물리 자원 방식이며 클라우드 내부에서도 사용될 수 있습니다.</p></details>
+</section>
+<section class="panel" id="equipment-input" aria-labelledby="items-title">
+<div class="heading"><h2 id="items-title">팀별 인프라 수량·단가</h2><p>단가와 계산 금액은 모두 원(KRW) 기준입니다.</p></div>
+<div id="team-tabs" class="team-tabs" aria-label="입력 팀 선택"></div>
+<p id="team-help" class="small"></p>
+<p class="small">장비 종류 콤보박스에서 기본 장비 또는 직접 입력을 선택하세요. 장비 종류를 변경하면 품목명·규격·배치 계층·수량·과금 방식을 채우고, 단가는 새로 입력받습니다. 단가는 장비 1개당 가격입니다.</p>
+<div id="items"></div>
+<button id="add-item" type="button">품목 추가</button>
+<p class="small" style="margin-top:12px">총 수량은 이중화 기준으로 2 이상 입력해 주세요. 2대 가격을 한 번에 입력하지 않도록 단가는 장비 1개 기준으로 입력합니다. 단가 0원도 허용하며, 품목명·수량·단가가 미입력인 항목은 합계에서 제외합니다.</p>
+</section>
+<section class="panel" aria-labelledby="calculation-title">
+<h2 id="calculation-title">가견적 계산 기준</h2>
+<div class="fields"><label class="field"><span>예비비율 (%)</span><input data-field="contingency" type="number" min="0" max="100" step="0.01" required></label><label class="field"><span>부가세율 (%)</span><input data-field="tax" type="number" min="0" max="100" step="0.01" required></label></div>
+<p class="small" style="margin-top:14px">공급가액 = 일회성 비용 + 월 비용 × 과금 개월 수. 예비비는 공급가액에 적용하고, 부가세는 공급가액과 예비비의 합계에 적용합니다. 각 단계에서 원 단위 반올림합니다. 초기 부가세율 10%는 수정할 수 있는 가정입니다.</p>
+<div class="savebar"><button type="submit" id="save" class="primary">변경 저장</button><button id="reload" type="button">최신 내용 불러오기</button><span id="dirty-status" class="small"></span></div>
+</section>
+</form>
+</div>
+<aside class="panel summary" aria-labelledby="estimate-title">
+<h2 id="estimate-title">사업 가견적</h2><p id="estimate-caption" class="small"></p>
+<div id="totals" aria-live="polite"></div><details class="team-breakdown"><summary>팀별 비용 상세</summary><div id="team-totals" class="team-cost"></div></details>
+<p class="small" style="margin-top:18px">입력한 단가 기준의 검토용 가견적입니다. 실제 가격과 구성은 담당 팀의 검토·회사 기준으로 확정합니다.</p>
+<div class="button-row"><button id="csv" type="button">가견적 CSV 내려받기</button><button id="json" type="button">사업 JSON 내려받기</button><button id="delete-project" type="button">사업 삭제</button></div>
+</aside>
+<div class="mobile-actionbar" aria-label="모바일 가견적과 저장"><div><span id="mobile-dirty">공유 저장본</span><strong id="mobile-total">0원</strong></div><button class="primary" type="submit" form="budget-form">변경 저장</button></div>
+</div>
+</div>
+</main><footer><div class="wrap">아키기획팀 · 공유 접속자는 모든 팀의 사업 자료를 공동 편집할 수 있습니다. 팀 선택은 입력 담당 구분에 사용합니다.</div></footer>
+</body></html>

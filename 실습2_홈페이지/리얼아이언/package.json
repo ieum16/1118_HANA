@@ -1,0 +1,13 @@
+{
+  "name": "aki-team-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "아키기획팀 소개 홈페이지와 공동 인프라 예산 도구",
+  "scripts": {
+    "build": "node build.cjs",
+    "start": "node server.cjs"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
