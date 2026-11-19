@@ -1,0 +1,91 @@
+body:has(#exchange[open]) {
+  max-height: 580px;
+  overflow-y: auto;
+}
+
+#exchange {
+  margin-top: 10px;
+  border: 1px solid #cce2d4;
+  border-radius: 10px;
+  background: #fff;
+}
+
+#exchange summary {
+  padding: 9px 11px;
+  color: #155b3e;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exchange-body {
+  padding: 0 10px 10px;
+}
+
+#fx-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#fx-fields legend, #fx-fields label {
+  padding: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#fx-fields input, #fx-fields select, #fx-fields textarea {
+  display: block;
+  width: 100%;
+  margin-top: 3px;
+  padding-inline: 6px;
+}
+
+.fx-rates, .fx-pair {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.fx-rates { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fx-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.fx-hint, .fx-error {
+  margin-top: 5px;
+  color: #4d6659;
+  font-size: 13px;
+}
+
+.fx-error { color: #9c2838; }
+#fx-save-status:empty, #fx-import-status:empty { margin: 0; }
+
+.fx-results {
+  margin-top: 9px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: #edf5ef;
+}
+
+.fx-results dl { margin: 0; }
+.fx-results dl div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 7px;
+  padding-block: 4px;
+}
+.fx-results dl div + div { border-top: 1px solid #d4e5db; }
+.fx-results dt { font-size: 14px; }
+.fx-results dd {
+  margin: 0;
+  color: #155b3e;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.fx-import { margin-top: 10px; }
+#fx-table { resize: vertical; }
+#fx-import { margin-top: 5px; }

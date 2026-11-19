@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>이번달 할 일 작성기</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="exchange.css">
+  <script src="popup.js" defer></script>
+  <script src="exchange.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>이번달 할 일 작성기</h1>
+    <nav class="month-nav" aria-label="일정 월 선택">
+      <button id="previous-month" class="arrow" type="button" aria-label="이전 달">‹</button>
+      <h2 id="month" aria-live="polite"></h2>
+      <button id="next-month" class="arrow" type="button" aria-label="다음 달">›</button>
+      <button id="current-month" class="secondary" type="button">이번 달</button>
+    </nav>
+    <p id="remaining" aria-live="polite"></p>
+  </header>
+
+  <main>
+    <form id="task-form" novalidate>
+      <label for="task-title">새 할 일</label>
+      <div class="input-row">
+        <input id="task-title" type="text" placeholder="할 일 입력" autocomplete="off" aria-describedby="message" required disabled>
+        <button id="add" type="submit" disabled>추가</button>
+        <button id="details" class="secondary" type="button" disabled>상세 추가</button>
+      </div>
+    </form>
+    <p id="message" role="status"></p>
+
+    <div class="list-controls">
+      <input id="search" type="search" aria-label="할 일 검색" placeholder="제목·메모 검색" autocomplete="off">
+      <select id="status" aria-label="완료 상태">
+        <option value="all">전체</option>
+        <option value="open">미완료</option>
+        <option value="done">완료</option>
+      </select>
+      <select id="sort" aria-label="정렬 기준">
+        <option value="date">마감일순</option>
+        <option value="scheduled">예정일순</option>
+        <option value="priority">우선순위순</option>
+        <option value="added">등록순</option>
+      </select>
+    </div>
+    <ul id="tasks" aria-label="선택한 달의 할 일"></ul>
+    <p id="empty" hidden></p>
+
+    <details id="exchange">
+      <summary>환율 계산기</summary>
+      <div class="exchange-body">
+        <fieldset id="fx-fields" disabled>
+          <legend>기준환율 (원)</legend>
+          <div class="fx-rates">
+            <label>USD · 1달러<input data-rate="USD" type="text" inputmode="decimal" maxlength="25" placeholder="1,400" autocomplete="off"></label>
+            <label>JPY · 100엔<input data-rate="JPY" type="text" inputmode="decimal" maxlength="25" placeholder="950" autocomplete="off"></label>
+            <label>EUR · 1유로<input data-rate="EUR" type="text" inputmode="decimal" maxlength="25" placeholder="1,500" autocomplete="off"></label>
+          </div>
+
+          <div class="fx-pair">
+            <label>통화<select id="fx-currency">
+              <option value="USD">USD</option>
+              <option value="JPY">JPY</option>
+              <option value="EUR">EUR</option>
+            </select></label>
+            <label>외화 금액<input id="fx-amount" type="text" inputmode="decimal" maxlength="25" autocomplete="off"></label>
+          </div>
+          <div class="fx-pair" aria-describedby="fx-spread-help">
+            <label>스프레드 (%)<input id="fx-spread" type="text" inputmode="decimal" maxlength="12" placeholder="선택" autocomplete="off"></label>
+            <label>우대율 (%)<input id="fx-discount" type="text" inputmode="decimal" maxlength="12" placeholder="0" autocomplete="off"></label>
+          </div>
+          <p class="fx-hint" id="fx-spread-help">선택한 통화의 살 때·팔 때에 같은 스프레드를 적용해요.</p>
+
+          <div class="fx-results" aria-live="polite" aria-atomic="true">
+            <dl>
+              <div><dt>기준환율로 환산</dt><dd id="fx-base">—</dd></div>
+              <div><dt>외화 살 때 (지불)</dt><dd id="fx-buy">—</dd></div>
+              <div><dt>외화 팔 때 (수령)</dt><dd id="fx-sell">—</dd></div>
+            </dl>
+            <p id="fx-validation" class="fx-error" hidden></p>
+          </div>
+
+          <div class="fx-import">
+            <label for="fx-table">은행 환율표 붙여넣기</label>
+            <p class="fx-hint" id="fx-table-help">여러 환율이 있는 표는 매매기준율 열 제목도 함께 복사해 주세요.</p>
+            <textarea id="fx-table" rows="2" aria-describedby="fx-table-help" placeholder="USD 1,400.50&#10;JPY 950.25&#10;EUR 1,500.00"></textarea>
+            <button id="fx-import" class="secondary" type="button">기준환율 채우기</button>
+            <p id="fx-import-status" class="fx-hint" role="status"></p>
+          </div>
+        </fieldset>
+        <p id="fx-save-status" class="fx-error" role="status"></p>
+      </div>
+    </details>
+  </main>
+
+  <template id="task-row">
+    <li>
+      <label class="task">
+        <input type="checkbox">
+        <span class="task-name"></span>
+      </label>
+      <div class="row-actions">
+        <button class="edit" type="button">수정</button>
+        <button class="delete" type="button">삭제</button>
+      </div>
+      <div class="task-info" hidden>
+        <time class="scheduled"></time>
+        <time class="due"></time>
+        <span class="priority"></span>
+      </div>
+      <p class="note" hidden></p>
+    </li>
+  </template>
+
+  <dialog id="task-dialog" aria-labelledby="dialog-title">
+    <form id="edit-form" novalidate>
+      <h2 id="dialog-title"></h2>
+      <label for="edit-title">할 일</label>
+      <input id="edit-title" type="text" required autofocus>
+
+      <div class="edit-fields">
+        <div>
+          <label for="scheduled-date">예정일</label>
+          <input id="scheduled-date" type="date" min="0001-01-01" max="9999-12-31">
+        </div>
+        <div>
+          <label for="weekday">요일</label>
+          <select id="weekday">
+            <option value="">선택</option>
+            <option value="1">월요일</option>
+            <option value="2">화요일</option>
+            <option value="3">수요일</option>
+            <option value="4">목요일</option>
+            <option value="5">금요일</option>
+            <option value="6">토요일</option>
+            <option value="0">일요일</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="edit-fields">
+        <div>
+          <label for="due-date">마감일</label>
+          <input id="due-date" type="date" min="0001-01-01" max="9999-12-31">
+        </div>
+        <div>
+          <label for="priority">우선순위</label>
+          <select id="priority">
+            <option value="normal">보통</option>
+            <option value="high">높음</option>
+            <option value="low">낮음</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="note">메모</label>
+      <textarea id="note" rows="2"></textarea>
+      <p id="edit-message" role="status"></p>
+      <div class="dialog-actions">
+        <button id="cancel" class="secondary" type="button">취소</button>
+        <button id="save" type="submit">저장</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
