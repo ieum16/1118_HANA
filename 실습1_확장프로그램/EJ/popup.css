@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+body { width: 360px; margin: 0; background: #fbfaf7; color: #202020; font-family: system-ui, sans-serif; font-size: 13px; }
+main { padding: 22px 20px; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+h1 { margin: 0 0 8px; font-size: 23px; letter-spacing: -.7px; }
+#remaining { margin: 0; color: #555; font-size: 12px; }
+label { display: block; margin-bottom: 8px; font-weight: 600; }
+.input-row { display: flex; gap: 8px; }
+input[type="text"] { width: 0; flex: 1; min-height: 40px; padding: 10px; border: 1px solid #ccc; border-radius: 10px; background: #fff; color: #202020; font: inherit; }
+button { min-height: 36px; padding: 8px 12px; border: 0; border-radius: 10px; background: #202020; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+button:hover { background: #444; }
+button:disabled { opacity: .5; cursor: wait; }
+:focus-visible { outline: 2px solid #202020; outline-offset: 3px; }
+#message { margin: 10px 0; color: #922c2c; font-size: 12px; line-height: 1.6; }
+#message:empty { margin: 0; }
+#empty { padding: 24px 0 8px; color: #666; text-align: center; line-height: 1.8; }
+ul { margin: 18px 0 0; padding: 0; list-style: none; max-height: 350px; overflow-y: auto; }
+li { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #e5e3de; }
+.task-label { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; margin: 0; font-weight: 400; line-height: 1.6; cursor: pointer; }
+input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; accent-color: #202020; }
+.task-label span { overflow-wrap: anywhere; }
+.completed span { color: #777; text-decoration: line-through; }
+.delete-button { background: #efede8; color: #333; font-size: 12px; flex-shrink: 0; }
+.delete-button:hover { background: #e1ded6; }
+.cat { position: relative; width: 76px; height: 68px; }
+.ear { position: absolute; top: 3px; width: 24px; height: 32px; border: 2px solid #202020; border-radius: 7px; background: #fff; }
+.ear.left { left: 7px; transform: rotate(-18deg); }
+.ear.right { right: 7px; transform: rotate(18deg); }
+.face { position: absolute; bottom: 0; width: 76px; height: 55px; border: 2px solid #202020; border-radius: 45% 45% 42% 42%; background: #fff; }
+.eye { position: absolute; top: 19px; width: 5px; height: 7px; border-radius: 50%; background: #202020; }
+.eye.left { left: 20px; }
+.eye.right { right: 20px; }
+.nose { position: absolute; top: 26px; left: 33px; width: 6px; height: 4px; border-radius: 50%; background: #202020; }
+.smile { position: absolute; top: 27px; left: 27px; font-size: 18px; line-height: 1; }
+.cheek { position: absolute; top: 30px; width: 10px; height: 4px; border-radius: 50%; background: #d8d5cf; }
+.cheek.left { left: 9px; }
+.cheek.right { right: 9px; }
+header { margin-bottom: 14px; }
+.calendar { border: 1px solid #e1ded6; border-radius: 14px; padding: 10px; margin-bottom: 14px; background: #fff; }
+.calendar-heading { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.calendar-heading h2 { flex: 1; margin: 0; text-align: center; font-size: 14px; }
+.calendar-heading button { min-height: 28px; padding: 2px 9px; background: #efede8; color: #202020; font-size: 12px; }
+.weekdays, .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+.weekdays { margin: 6px 0; color: #666; font-size: 11px; }
+.day { position: relative; min-height: 28px; padding: 3px; background: transparent; color: #202020; border-radius: 8px; font-size: 12px; font-weight: 400; }
+.day:hover { background: #efede8; }
+.day.today { outline: 1px solid #888; outline-offset: -2px; }
+.day.selected { background: #202020; color: #fff; }
+.day.has-tasks::after { content: ''; position: absolute; bottom: 2px; left: calc(50% - 1.5px); width: 3px; height: 3px; background: currentColor; border-radius: 50%; }
+.calendar-hint, #date-help { margin: 7px 0 0; font-size: 11px; color: #666; }
+#task-date { width: 100%; min-height: 34px; border: 1px solid #ccc; border-radius: 8px; padding: 6px 10px; background: #fff; color: #202020; font: inherit; }
+#date-help { margin-bottom: 12px; }
+#empty { padding: 6px 0; }
+ul { margin-top: 10px; max-height: 130px; }
+main { padding-top: 16px; padding-bottom: 16px; }
+
+body { max-height: 580px; overflow-y: auto; }
+.daily-card { margin-top: 16px; padding: 14px; background: #fff; border: 1px solid #e1ded6; border-radius: 14px; }
+.daily-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.daily-heading h2 { margin: 0; font-size: 14px; }
+.daily-heading button { min-height: 28px; padding: 4px 8px; font-size: 11px; }
+.daily-card p { margin: 6px 0; line-height: 1.6; }
+.daily-card a, .daily-note { font-size: 11px; color: #666; }
+.daily-card select { width: 100%; padding: 7px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 8px; font: inherit; background: #fff; color: #202020; }
+.rate-line { display: flex; justify-content: space-between; gap: 8px; }
+.rate-line strong { font-variant-numeric: tabular-nums; }
+.weather-summary { font-size: 17px; font-weight: 700; }

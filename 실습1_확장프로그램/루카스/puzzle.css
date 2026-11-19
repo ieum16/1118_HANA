@@ -1,0 +1,52 @@
+:root {
+  color-scheme: light;
+  font: 16px/1.6 "Malgun Gothic", system-ui, sans-serif;
+  color: #17304d;
+  background: #edf4fb;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px 12px; }
+main {
+  max-width: 590px;
+  margin: auto;
+  padding: clamp(15px, 5vw, 32px);
+  background: #fff;
+  border: 1px solid #d6e4f1;
+  border-radius: 18px;
+}
+h1 { margin: 0; font-size: 2rem; }
+p { margin: 8px 0 16px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+button, select {
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #a9c2da;
+  border-radius: 8px;
+  padding: 5px 12px;
+}
+button { cursor: pointer; }
+button:hover { background: #e1effc; }
+:focus-visible { outline: 2px solid #296dae; outline-offset: -2px; }
+#board {
+  display: grid;
+  width: min(100%, 420px);
+  aspect-ratio: 1;
+  margin: 20px auto;
+  background: #ecf5ff;
+  border-radius: 10px;
+}
+.dot { align-self: center; justify-self: center; background: #17304d; width: 7px; height: 7px; border-radius: 50%; }
+.clue { display: grid; place-items: center; font-size: clamp(15px, 4vw, 24px); font-weight: 700; }
+.edge { display: grid; place-items: center; padding: 0; position: relative; border: 0; border-radius: 3px; background: transparent; }
+.edge::before { content: ""; background: #b4cae0; width: 100%; height: 1px; }
+.edge.vertical::before { width: 1px; height: 100%; }
+.edge[data-state="1"]::before { background: #1c5d99; height: 5px; }
+.edge.vertical[data-state="1"]::before { height: 100%; width: 5px; }
+.edge[data-state="2"]::before { content: "×"; background: none; width: auto; height: auto; color: #a42738; font-weight: 700; line-height: 1; }
+.edge[data-state="2"].vertical::before { width: auto; height: auto; }
+#check { background: #205d98; color: white; border-color: #205d98; }
+#check:hover { background: #164676; }
+#result { min-height: 1.6em; margin-bottom: 0; }
+.edge[data-state="1"]:not(.vertical)::before { width: calc(100% + 10px); justify-self: center; }
+.edge.vertical[data-state="1"]::before { height: calc(100% + 10px); align-self: center; }

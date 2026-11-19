@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>원화 환율 계산기</title>
+  <link rel="stylesheet" href="exchange.css">
+</head>
+<body>
+  <main>
+    <h1>원화 환율 계산기</h1>
+    <label for="currency">통화</label>
+    <select id="currency">
+      <option value="USD">미국 달러 (USD)</option>
+      <option value="EUR">유로 (EUR)</option>
+      <option value="JPY">일본 엔 (JPY)</option>
+      <option value="GBP">영국 파운드 (GBP)</option>
+      <option value="CNY">중국 위안 (CNY)</option>
+      <option value="AUD">호주 달러 (AUD)</option>
+      <option value="CAD">캐나다 달러 (CAD)</option>
+    </select>
+    <label for="amount">외화 금액</label>
+    <input id="amount" type="number" min="0" step="any" value="1">
+    <label for="rate">기준환율 (외화 1단위당 원화)</label>
+    <input id="rate" type="number" min="0" step="any" placeholder="직접 입력 또는 환율 불러오기">
+    <button id="load-rate" type="button">오늘 환율 불러오기</button>
+    <p id="rate-status" role="status"></p>
+    <div class="total">환산 금액 <output id="total" for="currency amount rate">—</output></div>
+  </main>
+  <script src="exchange.js"></script>
+</body>
+</html>
