@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>자동화 요청 | TimeSaver</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #0057d2;
+      --primary-deep: #0040b0;
+      --navy: #022879;
+      --sky: #6bc0ff;
+      --canvas: #ffffff;
+      --chrome: #f5f6f7;
+      --band: #eaecee;
+      --band-blue: #ebf8ff;
+      --band-lavender: #f7f4ff;
+      --ink: #000000;
+      --lead: #3c3c3c;
+      --body: #223548;
+      --list: #354a5f;
+      --meta: #475e75;
+      --nav: #545454;
+      --rule: #c8d1db;
+      --gutter: clamp(1rem, 4vw, 3rem);
+      font-family: Inter, Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      color: var(--body);
+      background: var(--canvas);
+      line-height: 1.5;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { color: var(--ink); line-height: 1.1; }
+    a { color: var(--primary); text-underline-offset: .2em; }
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .wrap { width: min(calc(100% - var(--gutter) * 2), 72rem); margin-inline: auto; }
+    .global-bar { background: var(--chrome); }
+    .header-inner { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+    .brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--body); text-decoration: none; font-size: 1.25rem; font-weight: 700; border-radius: 4px; }
+    .brand-mark { display: block; flex: 0 0 2rem; width: 2rem; height: 2rem; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: .65rem .875rem; border: 1px solid var(--primary); border-radius: 8px; background: var(--primary); color: var(--canvas); text-decoration: none; font: inherit; font-weight: 500; line-height: 1.1; cursor: pointer; }
+    .button:hover { background: var(--primary-deep); border-color: var(--primary-deep); }
+    .button-secondary { background: var(--canvas); color: var(--primary-deep); border-color: var(--meta); }
+    .button-secondary:hover { background: var(--band-blue); border-color: var(--primary); }
+    [hidden] { display: none !important; }
+    .request-wrap { width: min(calc(100% - var(--gutter) * 2), 44rem); margin-inline: auto; }
+    .breadcrumb { min-height: 44px; display: flex; align-items: center; flex-wrap: wrap; gap: .15rem .55rem; padding-block: .35rem; color: var(--nav); font-size: .9375rem; }
+    .intro-band { padding-block: clamp(1.75rem, 5vw, 3rem); background: var(--primary-deep); color: var(--canvas); }
+    .intro-band h1 { color: var(--canvas); font-size: clamp(1.9rem, 4vw, 2.25rem); font-weight: 500; }
+    .request-content { padding-block: 1.5rem 3rem; }
+    h2 { margin-bottom: .5rem; font-size: clamp(1.35rem, 4vw, 1.65rem); font-weight: 600; }
+    .progress { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+    .progress li { display: flex; justify-content: center; align-items: center; min-height: 44px; padding: .25rem; border-bottom: 3px solid var(--rule); color: var(--nav); font-size: .875rem; line-height: 1.35; text-align: center; word-break: keep-all; overflow-wrap: anywhere; }
+    .progress li[aria-current="step"] { border-color: var(--primary); color: var(--primary); font-weight: 650; }
+    .progress .complete { border-color: var(--sky); color: var(--body); }
+    .panel { padding: clamp(1rem, 4vw, 2rem); background: var(--chrome); }
+    .help { word-break: keep-all; overflow-wrap: anywhere; }
+    .field { margin-top: 1.15rem; }
+    label { display: block; margin-bottom: .35rem; font-weight: 600; }
+    input, textarea { display: block; width: 100%; min-width: 0; min-height: 44px; padding: .65rem .75rem; border: 1px solid var(--meta); border-radius: 8px; background: var(--canvas); color: var(--body); font: inherit; }
+    textarea { resize: vertical; }
+    .hint, .footnote { color: var(--meta); font-size: .875rem; }
+    .hint { margin-top: .5rem; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .65rem; margin-top: 1.5rem; }
+    .review { margin: 1.25rem 0 0; }
+    .review div { padding-block: .65rem; border-top: 1px solid var(--rule); }
+    .review dt { font-weight: 600; }
+    .review dd { margin: .25rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--list); }
+    .footnote { margin-top: .9rem; }
+    #download-status:empty { margin: 0; }
+    @media (max-width: 479px) {
+      .progress { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem .65rem; }
+      .actions > button { flex: 1 1 auto; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="global-bar">
+      <div class="wrap header-inner">
+        <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="8" fill="#022879"/><path d="M11 12h18v4h-7v13h-4V16h-7z" fill="#ffffff"/></svg><span>TimeSaver</span></a>
+      </div>
+    </div>
+    <nav class="request-wrap breadcrumb" aria-label="현재 위치">
+      <a href="index.html">팀 소개</a><span aria-hidden="true">/</span><span aria-current="page">자동화 요청</span>
+    </nav>
+  </header>
+
+  <main>
+    <div class="intro-band"><div class="request-wrap"><h1>자동화 요청</h1></div></div>
+    <div class="request-wrap request-content">
+      <ol class="progress" aria-label="요청서 작성 단계">
+        <li aria-current="step">1. 사용자 정보</li>
+        <li>2. 요구사항</li>
+        <li>3. 희망 완료일</li>
+        <li>4. 확인</li>
+      </ol>
+
+      <noscript><p class="panel">요청서를 작성하려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
+
+      <form class="panel" id="request-form" novalidate hidden>
+        <section aria-labelledby="identity-title">
+          <h2 id="identity-title" tabindex="-1">요청자 정보를 알려주세요</h2>
+          <p class="help">성명, 소속팀, 사원번호를 모두 입력해 주세요.</p>
+          <div class="field">
+            <label for="employee-name">성명</label>
+            <input id="employee-name" name="employeeName" type="text" autocomplete="name" maxlength="100" required>
+          </div>
+          <div class="field">
+            <label for="team">소속팀</label>
+            <input id="team" name="team" type="text" maxlength="100" required>
+          </div>
+          <div class="field">
+            <label for="employee-id">사원번호</label>
+            <input id="employee-id" name="employeeId" type="text" autocomplete="off" maxlength="50" required>
+          </div>
+        </section>
+
+        <section aria-labelledby="requirements-title" hidden>
+          <h2 id="requirements-title" tabindex="-1">어떤 일을 자동화하고 싶나요?</h2>
+          <p class="help" id="requirements-help">지금 어떻게 처리하는지와 자동화 후에 어떤 결과가 나오면 좋을지 적어 주세요.</p>
+          <div class="field">
+            <label for="requirements">필요한 기능</label>
+            <textarea id="requirements" name="requirements" rows="6" maxlength="5000" aria-describedby="requirements-help requirements-example" required></textarea>
+            <p class="help hint" id="requirements-example">예시. 매주 월요일에 여러 엑셀 파일을 합쳐 보고서를 만듭니다. 파일을 올리면 중복을 제거하고 기존 보고서 양식으로 내려받고 싶습니다.</p>
+          </div>
+        </section>
+
+        <section aria-labelledby="deadline-title" hidden>
+          <h2 id="deadline-title" tabindex="-1">언제까지 필요하신가요?</h2>
+          <p class="help" id="deadline-help">기능을 사용할 수 있으면 좋겠다고 생각하는 날짜를 선택해 주세요.</p>
+          <div class="field">
+            <label for="deadline">희망 개발 완료일</label>
+            <input id="deadline" name="deadline" type="date" aria-describedby="deadline-help" required>
+          </div>
+        </section>
+
+        <section aria-labelledby="review-title" hidden>
+          <h2 id="review-title" tabindex="-1">작성한 내용을 확인해 주세요</h2>
+          <p class="help">내용을 수정하려면 ‘이전’을 눌러 주세요. 다운로드는 요청서 파일을 저장하는 단계입니다.</p>
+          <dl class="review">
+            <div><dt>성명</dt><dd id="review-name"></dd></div>
+            <div><dt>소속팀</dt><dd id="review-team"></dd></div>
+            <div><dt>사원번호</dt><dd id="review-employee-id"></dd></div>
+            <div><dt>필요한 기능</dt><dd id="review-requirements"></dd></div>
+            <div><dt>희망 개발 완료일</dt><dd id="review-deadline"></dd></div>
+          </dl>
+        </section>
+
+        <div class="actions">
+          <button class="button button-secondary" id="previous" type="button" hidden>이전</button>
+          <button class="button" id="next" type="submit">다음</button>
+        </div>
+        <p class="help footnote" id="download-status" role="status"></p>
+      </form>
+      <p class="help footnote">접수 채널은 준비 중입니다. 작성 내용은 현재 화면에만 유지되며, 내려받은 파일에는 입력한 사원정보가 포함됩니다.</p>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("request-form");
+    const panels = [...form.querySelectorAll("section")];
+    const progress = [...document.querySelectorAll(".progress li")];
+    const previous = document.getElementById("previous");
+    const next = document.getElementById("next");
+    const downloadStatus = document.getElementById("download-status");
+    const deadline = form.elements.deadline;
+    const reviewFields = [
+      ["review-name", form.elements.employeeName, "성명"],
+      ["review-team", form.elements.team, "소속팀"],
+      ["review-employee-id", form.elements.employeeId, "사원번호"],
+      ["review-requirements", form.elements.requirements, "필요한 기능"],
+      ["review-deadline", deadline, "희망 개발 완료일"]
+    ];
+    const reviewStep = panels.length - 1;
+    let step = 0;
+
+    function showStep(index) {
+      step = index;
+      panels.forEach((panel, position) => { panel.hidden = position !== step; });
+      progress.forEach((item, position) => {
+        item.classList.toggle("complete", position < step);
+        if (position === step) item.setAttribute("aria-current", "step");
+        else item.removeAttribute("aria-current");
+      });
+      previous.hidden = step === 0;
+      next.textContent = step === reviewStep ? "요청서 내려받기" : "다음";
+      downloadStatus.textContent = "";
+
+      if (step === reviewStep) {
+        reviewFields.forEach(([id, input]) => {
+          document.getElementById(id).textContent = input.value.trim();
+        });
+      }
+
+      panels[step].querySelector("h2").focus();
+    }
+
+    function downloadRequest() {
+      const lines = reviewFields.map(([, input, label]) => label + "\n" + input.value.trim());
+      const file = new Blob(["\ufeffTimeSaver 자동화 요청서\r\n\r\n" + lines.join("\n\n").replace(/\n/g, "\r\n")], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "TimeSaver-자동화-요청서.txt";
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      downloadStatus.textContent = "요청서 다운로드를 시작했습니다. 저장 위치는 브라우저의 다운로드 목록에서 확인할 수 있어요.";
+    }
+
+    previous.addEventListener("click", () => showStep(step - 1));
+    form.addEventListener("input", (event) => event.target.setCustomValidity?.(""));
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (step === reviewStep) {
+        downloadRequest();
+        return;
+      }
+
+      for (const input of panels[step].querySelectorAll("input, textarea")) {
+        input.setCustomValidity("");
+        if (input.type !== "date" && !input.value.trim()) input.setCustomValidity("내용을 입력해 주세요.");
+        if (!input.reportValidity()) return;
+      }
+
+      showStep(step + 1);
+    });
+
+    form.hidden = false;
+  </script>
+</body>
+</html>

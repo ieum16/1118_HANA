@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="반복 보고서 작성, 엑셀 데이터 정리, 사내 업무 도구 제작을 돕는 TimeSaver 팀입니다.">
+  <title>TimeSaver | 팀 소개</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #0057d2;
+      --primary-deep: #0040b0;
+      --navy: #022879;
+      --sky: #6bc0ff;
+      --canvas: #ffffff;
+      --chrome: #f5f6f7;
+      --band: #eaecee;
+      --band-blue: #ebf8ff;
+      --band-lavender: #f7f4ff;
+      --ink: #000000;
+      --lead: #3c3c3c;
+      --body: #223548;
+      --list: #354a5f;
+      --meta: #475e75;
+      --nav: #545454;
+      --rule: #c8d1db;
+      --gutter: clamp(1rem, 4vw, 3rem);
+      font-family: Inter, Pretendard, "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      color: var(--body);
+      background: var(--canvas);
+      line-height: 1.5;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { color: var(--ink); line-height: 1.1; }
+    a { color: var(--primary); text-underline-offset: .2em; }
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .wrap { width: min(calc(100% - var(--gutter) * 2), 72rem); margin-inline: auto; }
+    .global-bar { background: var(--chrome); }
+    .header-inner { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: .5rem .75rem; flex-wrap: wrap; padding-block: .5rem; }
+    .brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--body); text-decoration: none; font-size: 1.25rem; font-weight: 700; border-radius: 4px; }
+    .brand-mark { display: block; flex: 0 0 2rem; width: 2rem; height: 2rem; }
+    .button { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 44px; padding: .65rem .875rem; border: 1px solid var(--primary); border-radius: 8px; background: var(--primary); color: var(--canvas); text-decoration: none; text-align: center; font: inherit; font-weight: 500; line-height: 1.1; overflow-wrap: anywhere; cursor: pointer; }
+    .button:hover { background: var(--primary-deep); border-color: var(--primary-deep); }
+    .button-secondary { background: var(--canvas); color: var(--primary-deep); border-color: var(--meta); }
+    .button-secondary:hover { background: var(--band-blue); border-color: var(--primary); }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-height, 7rem) + .5rem); }
+    .skip-link { position: fixed; inset: .5rem auto auto 1rem; z-index: 3; padding: .5rem .875rem; background: var(--canvas); border-radius: 4px; transform: translateY(-200%); }
+    .skip-link:focus { transform: translateY(0); }
+    .site-header { position: sticky; inset-block-start: 0; z-index: 2; }
+    .site-nav { background: var(--canvas); border-bottom: 1px solid var(--rule); }
+    .nav-list { display: flex; justify-content: center; gap: clamp(.75rem, 4vw, 3rem); margin-block: 0; padding: 0; list-style: none; }
+    .nav-list li { min-width: 0; }
+    .nav-list a { display: flex; align-items: center; justify-content: center; height: 100%; min-height: 44px; padding: .4rem .65rem; border-bottom: 3px solid transparent; color: var(--nav); font-size: .9375rem; line-height: 1.3; text-align: center; word-break: keep-all; overflow-wrap: anywhere; text-decoration: none; }
+    .nav-list a:hover, .nav-list a[aria-current="location"] { color: var(--primary); border-bottom-color: var(--primary); }
+    .nav-list a[aria-current="location"] { font-weight: 650; }
+    .nav-list a:focus-visible { outline-offset: -3px; }
+    .hero { background: linear-gradient(112deg, var(--navy) 5%, var(--primary-deep) 100%); color: var(--canvas); }
+    .hero-inner { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); align-items: center; gap: clamp(2rem, 7vw, 6rem); padding-block: clamp(3rem, 6vw, 4.5rem); }
+    h1 { color: var(--canvas); font-size: clamp(2rem, 5vw, 3.5625rem); font-weight: 700; overflow-wrap: anywhere; }
+    h1 span { display: block; margin-top: .16em; }
+    .hero-copy p { margin-top: 1.25rem; max-width: 30rem; font-size: clamp(1.05rem, 2vw, 1.25rem); word-break: keep-all; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+    .hero-actions :focus-visible { outline-color: var(--canvas); }
+    .hero-art { position: relative; min-height: clamp(12rem, 26vw, 20rem); display: grid; place-items: center; isolation: isolate; overflow: hidden; border-radius: 12px; }
+    .clock-face { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+    .hero-mark { width: clamp(4.25rem, 7vw, 6.25rem); aspect-ratio: 1; display: grid; place-items: center; border-radius: 12px; background: var(--canvas); }
+    .hero-mark svg { width: 56%; height: 56%; }
+    .section { padding-block: clamp(2.75rem, 6vw, 4.5rem); }
+    .section-heading { margin-bottom: 1.5rem; font-size: clamp(1.65rem, 3.5vw, 2rem); font-weight: 500; }
+    .work-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+    .work-card { min-width: 0; display: flex; flex-direction: column; align-items: start; gap: .75rem; padding-block-start: 1.25rem; border-top: 1px solid var(--rule); }
+    .work-card h3 { font-size: 1.25rem; font-weight: 600; }
+    .work-card p, .request-panel p { word-break: keep-all; overflow-wrap: anywhere; }
+    .icon { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 8px; background: var(--band-blue); color: var(--primary); }
+    .icon svg { display: block; width: 1.4rem; height: 1.4rem; }
+    .work-card .example { font-size: .9375rem; font-weight: 350; color: var(--list); }
+    .example strong { display: block; margin-bottom: .2rem; color: var(--meta); font-weight: 600; }
+    .tools { background: var(--band-blue); }
+    .tools .section-heading { margin-bottom: .6rem; }
+    .tools-intro { margin-bottom: 1.5rem; color: var(--lead); font-size: 1.125rem; }
+    .tools .icon { background: var(--canvas); }
+    .tool-trigger { margin-top: auto; }
+    .tool-dialog { width: min(calc(100% - 2rem), 32rem); max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); padding: clamp(1rem, 4vw, 2rem); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--rule); border-radius: 12px; background: var(--canvas); color: var(--body); }
+    .tool-dialog::backdrop { background: var(--navy); opacity: .55; }
+    .tool-dialog-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+    .tool-dialog-header h2 { min-width: 0; font-size: clamp(1.25rem, 4vw, 1.6rem); font-weight: 600; overflow-wrap: anywhere; }
+    .tool-close { white-space: nowrap; }
+    .tool-scene { width: min(100%, 16rem); width: min(100%, clamp(7rem, 36dvh, 16rem)); aspect-ratio: 1; margin: 1rem auto; border-radius: 12px; background: var(--chrome) url("images/tool-examples.png") no-repeat; background-size: 300% 300%; }
+    .tool-step-count { color: var(--meta); font-size: .875rem; font-weight: 500; }
+    .tool-step-title { margin-top: .25rem; font-size: 1.25rem; font-weight: 600; }
+    .tool-step-copy { margin-top: .4rem; }
+    .tool-controls { position: sticky; bottom: -1px; display: flex; justify-content: space-between; gap: .65rem; margin-top: .75rem; padding-block: .5rem .25rem; background: var(--canvas); }
+    .tool-controls [aria-disabled="true"] { background: var(--chrome); color: var(--meta); border-color: var(--rule); cursor: default; }
+    .request-section { margin-top: clamp(1.5rem, 4vw, 3rem); background: var(--band-lavender); }
+    .request-panel { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 1.5rem 3rem; }
+    .request-panel .section-heading { margin-bottom: .75rem; }
+    .request-panel .button { margin-top: 1.25rem; }
+    .request-list { margin: 0; padding: 0; list-style: none; color: var(--list); }
+    .request-list li { padding: .7rem 0; border-top: 1px solid var(--rule); }
+    footer { padding-block: 1.5rem; background: var(--band); color: var(--nav); font-size: .9375rem; }
+    @media (max-width: 1023px) {
+      .hero-inner { gap: 1.5rem; }
+      .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.15rem; }
+    }
+    @media (max-width: 767px) {
+      .hero-inner, .work-grid, .request-panel { grid-template-columns: minmax(0, 1fr); }
+      .hero-art { min-height: 11rem; }
+    }
+    @media (max-width: 479px) {
+      .nav-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .25rem; }
+      .nav-list a { padding-inline: .15rem; }
+      .header-inner > .button { padding-inline: .65rem; }
+    }
+    @media (max-height: 420px) {
+      html { scroll-padding-top: .75rem; }
+      .site-header { position: static; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <header class="site-header">
+    <div class="global-bar">
+      <div class="wrap header-inner">
+        <a class="brand" href="#intro"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="8" fill="#022879"/><path d="M11 12h18v4h-7v13h-4V16h-7z" fill="#ffffff"/></svg><span>TimeSaver</span></a>
+        <a class="button" href="request.html">자동화 요청</a>
+      </div>
+    </div>
+    <nav class="site-nav" aria-label="이 페이지의 섹션">
+      <ul class="wrap nav-list">
+        <li><a href="#intro" aria-current="location">팀 소개</a></li>
+        <li><a href="#work">하는 일</a></li>
+        <li><a href="#tools">우리가 만든 도구</a></li>
+        <li><a href="#contact">요청 안내</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="intro" aria-labelledby="intro-title" tabindex="-1">
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <h1 id="intro-title">반복 업무를 줄이는 <span>TimeSaver</span></h1>
+          <p>직원들의 반복 업무를 줄여 전사 업무 효율을 높입니다.</p>
+          <div class="hero-actions">
+            <a class="button" href="request.html">자동화 요청</a>
+            <a class="button button-secondary" href="#tools">도구 보기</a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg class="clock-face" viewBox="0 0 360 250" fill="none">
+            <circle cx="180" cy="125" r="109" stroke="#6bc0ff"/>
+            <circle cx="180" cy="125" r="90" stroke="#6bc0ff" stroke-width="4" stroke-dasharray="1 5.283"/>
+            <circle cx="180" cy="125" r="73" stroke="#6bc0ff"/>
+            <path d="M180 16v8m109 101h-8m-101 109v-8M71 125h8" stroke="#ffffff" stroke-width="2"/>
+          </svg>
+          <div class="hero-mark">
+            <svg viewBox="0 0 40 40">
+              <path d="M5 7h30v6H23v21h-6V13H5z" fill="#022879"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="work" aria-labelledby="work-title" tabindex="-1">
+      <h2 class="section-heading" id="work-title">하는 일</h2>
+      <div class="work-grid">
+        <article class="work-card">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M8 16h8m-8-4h5"/>
+            </svg>
+          </span>
+          <h3>반복 보고서 작성 자동화</h3>
+          <p>정기 보고에 필요한 숫자를 모아 정해진 양식에 옮기는 일을 줄입니다.</p>
+          <p class="example"><strong>요청 예시</strong>“매주 같은 양식의 보고서에 표를 옮기는 과정을 자동화하고 싶어요.”</p>
+        </article>
+        <article class="work-card">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <path d="M3 9h18m-18 5h18M10 9v11"/>
+            </svg>
+          </span>
+          <h3>엑셀 데이터 정리</h3>
+          <p>여러 표의 형식을 맞추고, 중복을 정리하고, 필요한 항목만 모으는 일을 줄입니다.</p>
+          <p class="example"><strong>요청 예시</strong>“서식이 다른 엑셀 표를 같은 열 순서로 정리하고 싶어요.”</p>
+        </article>
+        <article class="work-card">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <path d="M3 9h18m-12 5 2 2 4-4"/>
+            </svg>
+          </span>
+          <h3>사내 업무 도구 제작</h3>
+          <p>자주 쓰는 계산, 문구 작성, 확인 절차를 간단한 웹 도구로 만듭니다.</p>
+          <p class="example"><strong>요청 예시</strong>“조건을 고르면 안내 문구가 완성되는 도구가 필요해요.”</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section tools" id="tools" aria-labelledby="tools-title" tabindex="-1">
+      <div class="wrap">
+        <h2 class="section-heading" id="tools-title">우리가 만든 도구</h2>
+        <p class="tools-intro">출근부터 퇴근까지, 직장 생활을 돕는 도구 아이디어를 소개합니다.</p>
+        <div class="work-grid">
+          <article class="work-card">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM16 9h2a2 2 0 1 1 0 4h-2M3 21h16M8 5V3m4 2V3"/>
+              </svg>
+            </span>
+            <h3>출근 커피 배달</h3>
+            <p>출근하면 그날의 날씨에 맞춰 커피 메뉴를 골라 내 자리로 배달해 줍니다.</p>
+            <button class="button button-secondary tool-trigger" type="button" aria-haspopup="dialog" aria-label="출근 커피 배달 자세히 보기" data-example="coffee-example" data-scene-row="0">자세히 보기</button>
+            <template id="coffee-example">
+              <ol>
+                <li><strong>출근 확인.</strong> 비 오는 아침, 사무실에 도착합니다.</li>
+                <li><strong>메뉴 선택.</strong> 도구가 날씨를 확인하고 따뜻한 카페라테를 고릅니다.</li>
+                <li><strong>자리로 배달.</strong> 따로 메뉴를 고르거나 주문하지 않아도 내 자리에서 커피를 받습니다.</li>
+              </ol>
+            </template>
+          </article>
+          <article class="work-card">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 3v5a3 3 0 0 0 6 0V3M7 3v18M18 3c-2 2-3 5-3 9h4m0-9v18"/>
+              </svg>
+            </span>
+            <h3>점심 알림과 구내식당 주문</h3>
+            <p>점심시간이 되면 PC 알림을 띄우고, 오늘 구내식당 메뉴 중 날씨에 어울리는 메뉴를 추천합니다. 알림에서 추천 메뉴 하나를 고르면 구내식당에 자동으로 주문됩니다.</p>
+            <button class="button button-secondary tool-trigger" type="button" aria-haspopup="dialog" aria-label="점심 알림과 구내식당 주문 자세히 보기" data-example="lunch-example" data-scene-row="1">자세히 보기</button>
+            <template id="lunch-example">
+              <ol>
+                <li><strong>점심 알림.</strong> 일에 집중하고 있을 때 PC에 “점심시간이에요” 알림이 뜹니다.</li>
+                <li><strong>메뉴 추천.</strong> 무더운 날이라면 알림에 오늘 구내식당 메뉴인 냉메밀과 냉면을 추천합니다.</li>
+                <li><strong>메뉴 선택과 주문.</strong> 알림에서 냉메밀을 고르면 구내식당에 주문이 자동으로 들어갑니다.</li>
+              </ol>
+            </template>
+          </article>
+          <article class="work-card">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="5" cy="19" r="2"/>
+                <path d="M7 19h7a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6h9m-3-3 3 3-3 3"/>
+              </svg>
+            </span>
+            <h3>퇴근 알림과 경로 추천</h3>
+            <p>오후 6시가 되면 PC로 퇴근 시간을 알려줍니다. 집을 목적지로 설정해 자차와 대중교통 각각에 최적의 퇴근길을 추천합니다.</p>
+            <button class="button button-secondary tool-trigger" type="button" aria-haspopup="dialog" aria-label="퇴근 알림과 경로 추천 자세히 보기" data-example="commute-example" data-scene-row="2">자세히 보기</button>
+            <template id="commute-example">
+              <ol>
+                <li><strong>퇴근 알림.</strong> 오후 6시에 PC에 “퇴근 시간이에요” 알림이 뜹니다.</li>
+                <li><strong>집까지 경로 확인.</strong> 집을 목적지로 자차와 대중교통 경로를 각각 추천합니다. 예를 들어 자차는 정체 구간을 피하는 우회로, 대중교통은 환승 없이 가는 지하철을 보여줍니다.</li>
+                <li><strong>이동 수단 선택.</strong> 두 경로의 예상 소요 시간을 보고 오늘 이용할 경로를 고릅니다.</li>
+              </ol>
+            </template>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section request-section" id="contact" aria-labelledby="contact-title" tabindex="-1">
+      <div class="wrap request-panel">
+        <div>
+          <h2 class="section-heading" id="contact-title">자동화 요청</h2>
+          <p>자동화가 필요한 업무를 알려주세요. 작성한 내용은 요청서 파일로 내려받을 수 있습니다.</p>
+          <a class="button" href="request.html">요청서 작성하기</a>
+        </div>
+        <ul class="request-list">
+          <li>성명, 소속팀, 사원번호</li>
+          <li>자동화가 필요한 업무와 원하는 기능</li>
+          <li>희망 개발 완료일</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="tool-dialog" id="tool-dialog" aria-labelledby="tool-dialog-title">
+    <div class="tool-dialog-header">
+      <h2 id="tool-dialog-title"></h2>
+      <form method="dialog">
+        <button class="button button-secondary tool-close" autofocus>닫기</button>
+      </form>
+    </div>
+    <div class="tool-scene" aria-hidden="true"></div>
+    <div aria-live="polite" aria-atomic="true">
+      <p class="tool-step-count"></p>
+      <h3 class="tool-step-title"></h3>
+      <p class="tool-step-copy"></p>
+    </div>
+    <div class="tool-controls">
+      <button class="button button-secondary" id="tool-previous" type="button">이전</button>
+      <button class="button" id="tool-next" type="button">다음</button>
+    </div>
+  </dialog>
+
+  <footer><div class="wrap">TimeSaver</div></footer>
+
+  <script>
+    const siteHeader = document.querySelector(".site-header");
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(() => {
+        document.documentElement.style.setProperty("--header-height", siteHeader.offsetHeight + "px");
+      }).observe(siteHeader);
+    }
+
+    const sectionLinks = [...document.querySelectorAll(".nav-list a")];
+    function updateSectionLink() {
+      const current = location.hash || "#intro";
+      sectionLinks.forEach((link) => {
+        if (link.hash === current) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    }
+    window.addEventListener("hashchange", updateSectionLink);
+    updateSectionLink();
+
+    const toolDialog = document.getElementById("tool-dialog");
+    const dialogTitle = document.getElementById("tool-dialog-title");
+    const scene = toolDialog.querySelector(".tool-scene");
+    const stepCount = toolDialog.querySelector(".tool-step-count");
+    const stepTitle = toolDialog.querySelector(".tool-step-title");
+    const stepCopy = toolDialog.querySelector(".tool-step-copy");
+    const toolPrevious = document.getElementById("tool-previous");
+    const toolNext = document.getElementById("tool-next");
+    let toolTrigger;
+    let exampleSteps;
+    let currentStep;
+
+    function showToolStep(index) {
+      if (index < 0 || index >= exampleSteps.length) return;
+
+      currentStep = index;
+      const step = exampleSteps[index];
+      const heading = step.querySelector("strong").textContent;
+      const sceneRow = Number(toolTrigger.dataset.sceneRow);
+
+      scene.style.backgroundPosition = (index * 50) + "% " + (sceneRow * 50) + "%";
+      stepCount.textContent = (index + 1) + " / " + exampleSteps.length + " 단계";
+      stepTitle.textContent = heading.replace(/\.$/, "");
+      stepCopy.textContent = step.textContent.trim().slice(heading.length).trim();
+      toolPrevious.setAttribute("aria-disabled", String(index === 0));
+      toolNext.setAttribute("aria-disabled", String(index === exampleSteps.length - 1));
+      toolDialog.scrollTop = 0;
+    }
+
+    document.querySelectorAll(".tool-trigger").forEach((button) => {
+      button.addEventListener("click", () => {
+        toolTrigger = button;
+        exampleSteps = document.getElementById(button.dataset.example).content.querySelectorAll("li");
+        dialogTitle.textContent = button.closest("article").querySelector("h3").textContent;
+        showToolStep(0);
+        toolDialog.showModal();
+      });
+    });
+
+    toolPrevious.addEventListener("click", () => showToolStep(currentStep - 1));
+    toolNext.addEventListener("click", () => showToolStep(currentStep + 1));
+    toolDialog.addEventListener("close", () => toolTrigger.focus());
+  </script>
+</body>
+</html>
