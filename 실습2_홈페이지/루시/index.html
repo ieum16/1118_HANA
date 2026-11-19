@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="종검 팀의 업무 지식맵, PMS 개발 요청, 문의 답변, 월간 업무 일정을 확인하는 업무 포털입니다.">
+  <title>종검 | 업무 포털</title>
+  <style>
+    @font-face {
+      font-family: "Hana 2.0";
+      src: url("fonts/Hana2-Regular.otf") format("opentype");
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Hana 2.0";
+      src: url("fonts/Hana2-Bold.otf") format("opentype");
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --teal: #00766e;
+      --deep-teal: #005a54;
+      --ink: #173633;
+      --muted: #4b6662;
+      --line: #d5e5e1;
+      --pale: #eff7f5;
+      --white: #fff;
+      --radius: 16px;
+      --system-font: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+      font-family: "Hana 2.0", var(--system-font);
+      line-height: 1.6;
+      color: var(--ink);
+      background: #f7faf9;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body, h1, h2, h3, p, dl, dd, ul { margin: 0; }
+    [hidden] { display: none !important; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    a, button, input { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+    html { scroll-padding-top: 84px; }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+    .wrap { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .skip {
+      position: fixed;
+      z-index: 5;
+      top: 8px;
+      left: 8px;
+      transform: translateY(-150%);
+      padding: 8px 16px;
+      background: var(--white);
+      color: var(--deep-teal);
+    }
+    .skip:focus { transform: none; }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      color: var(--ink);
+      background: var(--white);
+      border-top: 3px solid var(--teal);
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; white-space: nowrap; }
+    .brand-logo {
+      flex: none;
+      position: relative;
+      width: clamp(86px, 13vw, 112px);
+      height: 38px;
+      overflow: hidden;
+    }
+    .brand-logo img { position: absolute; top: 50%; left: 50%; width: 153%; height: auto; transform: translate(-50%, -50%); }
+    .brand-name { color: var(--deep-teal); font-size: 1.125rem; font-weight: 700; }
+    .nav { display: flex; align-items: center; gap: 6px; }
+    .nav a { padding: 8px 13px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: .9375rem; font-weight: 650; }
+    .nav a:hover, .nav a[aria-current="location"] { background: var(--pale); color: var(--deep-teal); }
+    .menu-toggle { display: none; }
+
+    .hero {
+      background: linear-gradient(110deg, #f0faf6, #dff3eb);
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 350px); align-items: center; gap: 48px; padding-block: 57px 60px; }
+    .hero h1 { display: flex; align-items: center; gap: clamp(12px, 2vw, 22px); margin-top: 1px; color: var(--deep-teal); font-size: clamp(3rem, 6vw, 4.75rem); line-height: 1.12; letter-spacing: -.09em; }
+    .hero-mascot { flex: none; width: clamp(64px, 8vw, 96px); height: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--white); }
+    .hero-role { margin-top: 12px; font-size: clamp(1.25rem, 2.6vw, 1.65rem); font-weight: 700; letter-spacing: -.045em; }
+    .hero-description { margin-top: 8px; color: var(--muted); }
+    .quick-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .quick-links a, .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 7px 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--white);
+      color: var(--deep-teal);
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 700;
+    }
+    .button:hover { background: var(--pale); }
+    .quick-links a:first-child { border-color: var(--teal); background: var(--teal); color: var(--white); }
+    .quick-links a:hover { border-color: var(--teal); background: var(--pale); }
+    .quick-links a:first-child:hover { background: var(--deep-teal); }
+    .month-preview {
+      min-width: 0;
+      padding: 21px 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: 0 9px 24px #005a540e;
+    }
+    .month-preview h2 { color: var(--deep-teal); font-size: 1.0625rem; }
+    .month-preview ul { list-style: none; padding: 0; margin-top: 9px; }
+    .month-preview a { display: flex; align-items: baseline; gap: 14px; padding-block: 8px; text-decoration: none; border-bottom: 1px solid var(--line); }
+    .month-preview li:last-child a { border-bottom: 0; }
+    .month-preview a:hover { text-decoration: underline; }
+    .month-preview time { min-width: 43px; white-space: nowrap; color: var(--deep-teal); font-size: .875rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+
+    .content { padding-block: 23px 60px; }
+    .demo-note { display: flex; align-items: baseline; gap: 10px; margin-bottom: 25px; color: var(--muted); font-size: .875rem; }
+    .demo-note strong { flex-shrink: 0; color: var(--deep-teal); }
+    .section { margin-top: 34px; }
+    .section:first-of-type { margin-top: 0; }
+    .section-header { margin-bottom: 13px; }
+    .section-header h2 { font-size: clamp(1.45rem, 3vw, 1.875rem); line-height: 1.3; letter-spacing: -.06em; }
+    .section-header p { margin-top: 4px; color: var(--muted); }
+    .panel { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .search-bar { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding: 16px 20px; }
+    .search-bar form { flex: 1; max-width: 510px; }
+    .search-bar label { display: block; margin-bottom: 5px; font-size: .875rem; font-weight: 750; }
+    .search-controls { display: flex; gap: 8px; }
+    .search-controls input { flex: 1; min-width: 0; min-height: 42px; padding: 7px 11px; color: var(--ink); border: 1px solid #92b0a9; border-radius: 9px; }
+    .search-controls input::placeholder { color: var(--muted); }
+    .count { padding-block: 8px; color: var(--muted); font-size: .875rem; white-space: nowrap; }
+    .pms-table { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
+    .pms-table thead { background: var(--pale); color: var(--deep-teal); }
+    .pms-table :is(th, td) { padding: 13px clamp(8px, 1.5vw, 20px); border-top: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+    .pms-table thead th:first-child { width: 17%; }
+    .pms-table thead th:nth-child(2) { width: 25%; }
+    .pms-table thead th:nth-last-child(-n+2) { width: 12%; }
+    .pms-table tbody th, .pms-card dd:first-of-type { color: var(--teal); }
+    .pms-table td { color: var(--muted); }
+    .pms-table .request { color: var(--ink); font-weight: 700; }
+    .pms-list { display: none; }
+    .empty { padding: 19px 20px; color: var(--muted); }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+    .filters .button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal); color: var(--white); }
+    .inquiry-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .inquiry-card { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+    .inquiry-main { padding: 17px 20px; flex: 1; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; background: #e2f4ed; color: var(--deep-teal); font-size: .875rem; font-weight: 750; }
+    .inquiry-main h3 { margin-block: 8px 7px; font-size: 1.0625rem; }
+    .answer { color: var(--muted); }
+    .answer strong { margin-right: 6px; color: var(--deep-teal); }
+    .inquirer { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); background: var(--pale); }
+    .inquirer dt { color: var(--muted); font-size: .875rem; }
+    .inquirer dd { font-size: .875rem; font-weight: 700; }
+
+    .knowledge-map { padding: 21px 20px 18px; background: linear-gradient(125deg, var(--white), var(--pale)); text-align: center; }
+    .map-system { display: inline-block; position: relative; padding: 7px 17px; border: 1px solid #a8cdc3; border-radius: 9px; background: var(--white); color: var(--deep-teal); font-weight: 750; }
+    .map-system::after { content: ""; position: absolute; top: 100%; left: 50%; height: 14px; border-left: 1px solid #8ab5ab; }
+    .map-groups { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 760px; margin: 14px auto 0; }
+    .map-groups::before, .map-areas::before { content: ""; position: absolute; inset: 0 25% auto; border-top: 1px solid #8ab5ab; }
+    .map-group { position: relative; min-width: 0; padding: 12px 8px 0; }
+    .map-group::before, .map-node::before { content: ""; position: absolute; top: 0; left: 50%; height: 12px; border-left: 1px solid #8ab5ab; }
+    .map-link-label { position: relative; color: var(--muted); font-size: .875rem; font-weight: 700; overflow-wrap: anywhere; }
+    .map-link-label::after { content: ""; position: absolute; top: 100%; left: 50%; height: 5px; border-left: 1px solid #8ab5ab; }
+    .map-areas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); position: relative; gap: 0; margin-top: 5px; }
+    .map-node { position: relative; padding: 12px 4px 0; }
+    .map-node .button { width: 100%; min-height: 46px; text-align: center; }
+    .map-node .button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: var(--white); }
+    .map-guide { padding: 18px 20px 20px; border-top: 1px solid var(--line); }
+    .map-guide > p { margin: 4px 0 12px; color: var(--muted); }
+    .scenario { border: 1px solid var(--line); border-radius: 10px; }
+    .scenario + .scenario { margin-top: 8px; }
+    .scenario > summary, .related-record > summary { padding: 10px 13px; color: var(--deep-teal); font-weight: 700; cursor: pointer; overflow-wrap: anywhere; }
+    .scenario-body { padding: 6px 13px 13px; }
+    .scenario-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .scenario-columns h4, .scenario-related h4 { margin: 0 0 5px; font-size: 1rem; }
+    .scenario-columns ol { margin: 0; padding-inline-start: 23px; }
+    .scenario-columns li + li { margin-top: 4px; }
+    .scenario-checklist { list-style: none; padding: 0; }
+    .scenario-checklist label { display: flex; align-items: baseline; gap: 7px; }
+    .scenario-checklist input { accent-color: var(--teal); }
+    .scenario-related { margin-top: 15px; }
+    .related-record { border-top: 1px solid var(--line); }
+    .related-record > summary { padding-inline: 0; font-size: .9375rem; }
+    .related-record > .inquiry-card { margin-bottom: 9px; }
+    .related-pms { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; padding: 4px 0 10px; overflow-wrap: anywhere; }
+    .related-pms dt { color: var(--muted); font-weight: 700; }
+
+    .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 14px 18px; }
+    .calendar-toolbar h3 { font-size: 1.125rem; }
+    .month-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+    #current-month { border-color: #a8cdc3; background: var(--pale); }
+    .calendar { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .calendar thead { background: var(--pale); font-size: .875rem; }
+    .calendar th { padding: 8px; border-top: 1px solid var(--line); }
+    .calendar td { height: 85px; padding: 6px; border-top: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: top; }
+    .calendar td:last-child { border-right: 0; }
+    .calendar td.outside { background: #f6faf8; }
+    .calendar th:first-child, .calendar td:first-child .day-number:not([aria-current]) { color: #a83849; }
+    .calendar th:last-child, .calendar td:last-child .day-number:not([aria-current]) { color: #2d5789; }
+    .day-number { display: inline-block; min-width: 26px; padding-inline: 3px; text-align: center; font-size: .875rem; }
+    .day-number[aria-current="date"] { border-radius: 7px; background: var(--teal); color: var(--white); font-weight: 800; }
+    .day-events { list-style: none; padding: 0; }
+    .day-events li { margin-top: 4px; }
+    .event { width: 100%; padding: 4px 6px; text-align: left; border: 0; border-radius: 6px; overflow-wrap: anywhere; }
+    .event:focus-visible { outline-offset: -2px; }
+    .event:hover .event-title { text-decoration: underline; }
+    .event-title { display: block; font-size: .875rem; line-height: 1.4; font-weight: 700; }
+    .event-type, .event-time { display: block; font-size: .875rem; }
+    .event-type { font-weight: 750; }
+    .event-meeting { background: #eaf1fb; color: #214677; }
+    .event-leave { background: #e9f4f0; color: #225b49; }
+    .event-training { background: #f2edf9; color: #5b4081; }
+    .event-other { background: #f5efdf; color: #655022; }
+    .schedule-empty { border-top: 1px solid var(--line); }
+    dialog { width: min(460px, calc(100% - 32px)); padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); }
+    dialog::backdrop { background: #0b2825a8; }
+    dialog h2 { margin-block: 8px 6px; font-size: 1.375rem; overflow-wrap: anywhere; }
+    dialog p { margin-bottom: 9px; color: var(--muted); overflow-wrap: anywhere; }
+    dialog form { margin-top: 18px; text-align: right; }
+    .footer { border-top: 1px solid var(--line); padding-block: 19px; color: var(--muted); font-size: .875rem; }
+
+    @media (max-width: 880px) {
+      .header-inner, .brand { gap: 8px; }
+      .nav { display: none; position: absolute; top: 100%; left: 0; right: 0; padding: 8px 16px 14px; border-bottom: 1px solid var(--line); background: var(--white); }
+      .nav.is-open { display: grid; }
+      .menu-toggle { display: inline-flex; gap: 8px; }
+      .menu-toggle::before { content: ""; width: 14px; height: 10px; border-block: 1px solid currentColor; background: linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat; }
+    }
+
+    @media (max-width: 760px) {
+      .wrap { width: calc(100% - 32px); }
+      .hero-inner { grid-template-columns: 1fr; gap: 24px; padding-block: 38px 34px; }
+      .month-preview { padding: 14px 16px; }
+      .search-bar { padding: 13px; align-items: stretch; flex-direction: column; gap: 4px; }
+      .search-bar form { max-width: none; }
+      .count { padding-block: 2px; }
+      .pms-table { display: none; }
+      .pms-list { display: block; }
+      .pms-card { display: grid; grid-template-columns: 5rem minmax(0, 1fr); gap: 6px 10px; padding: 12px 13px; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+      .pms-card dt { font-weight: 750; font-size: .875rem; color: var(--muted); }
+      .inquiry-list { grid-template-columns: 1fr; }
+      .inquirer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .scenario-columns { grid-template-columns: 1fr; }
+      .knowledge-map, .map-guide { padding-inline: 12px; }
+      .map-group { padding-inline: 2px; }
+      .map-node { padding-inline: 2px; }
+      .map-node .button { padding-inline: 3px; overflow-wrap: anywhere; }
+      .calendar-toolbar { padding: 12px; }
+      .calendar th { padding: 6px 2px; }
+      .calendar td { height: 66px; padding: 4px 2px; text-align: center; }
+      .day-events li { margin-top: 3px; }
+      .event { min-height: 28px; padding: 2px 1px; text-align: center; }
+      .event-title, .event-time { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 이동</a>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#intro">
+        <span class="brand-logo"><img src="images/logo.png" alt="하나은행" width="800" height="420"></span>
+        <span class="brand-name">종검 업무 포털</span>
+      </a>
+      <button id="menu-toggle" class="button menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false">메뉴</button>
+      <nav id="site-nav" class="nav" aria-label="주 메뉴">
+        <a href="#intro">팀 소개</a>
+        <a href="#knowledge">업무 지식맵</a>
+        <a href="#pms">PMS</a>
+        <a href="#inquiries">문의 사례</a>
+        <a href="#schedule">월간 업무 일정</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="intro" aria-labelledby="intro-heading">
+      <div class="wrap hero-inner">
+        <div>
+          <h1 id="intro-heading" tabindex="-1">
+            <img class="hero-mascot" src="images/jonggeom-mascot.png" alt="" width="480" height="480">
+            <span>종검</span>
+          </h1>
+          <p class="hero-role">종합 검사 시스템 운영팀</p>
+          <p class="hero-description">자점감사·준법·검사·글로벌 준법 담당자가 업무 절차, 개발 요청, 문의 답변, 업무 일정을 확인하는 공간입니다.</p>
+          <div class="quick-links">
+            <a href="#knowledge">업무 지식맵 보기</a>
+            <a href="#pms">PMS 보기</a>
+            <a href="#inquiries">문의 사례 보기</a>
+            <a href="#schedule">월간 업무 일정 보기</a>
+          </div>
+        </div>
+        <aside class="month-preview" aria-labelledby="preview-heading">
+          <h2 id="preview-heading">이번 달 주요 일정</h2>
+          <ul id="schedule-preview"></ul>
+        </aside>
+      </div>
+    </section>
+
+    <div class="wrap content">
+      <p class="demo-note"><strong>실습용 예시</strong><span>업무 절차와 연결 관계, 개발 요청, 문의 사례, 일정은 모두 가상입니다.</span></p>
+
+      <section id="knowledge" class="section" aria-labelledby="knowledge-heading">
+        <div class="section-header">
+          <h2 id="knowledge-heading" tabindex="-1">업무 지식맵</h2>
+          <p>맵에서 업무를 선택하고, 해당하는 상황을 열어 절차와 체크리스트를 확인하세요.</p>
+        </div>
+        <div class="panel">
+          <div class="knowledge-map" role="group" aria-label="종합 검사 시스템을 중심으로 연결된 업무">
+            <p class="map-system">종합 검사 시스템</p>
+            <div class="map-groups" id="knowledge-areas">
+              <div class="map-group" role="group" aria-labelledby="map-inspection-label">
+                <p class="map-link-label" id="map-inspection-label">점검 결과와 후속 조치</p>
+                <div class="map-areas">
+                  <div class="map-node"><button class="button" type="button" data-knowledge-area="branch" aria-pressed="true" aria-controls="knowledge-guide">자점감사</button></div>
+                  <div class="map-node"><button class="button" type="button" data-knowledge-area="inspection" aria-pressed="false" aria-controls="knowledge-guide">검사</button></div>
+                </div>
+              </div>
+              <div class="map-group" role="group" aria-labelledby="map-compliance-label">
+                <p class="map-link-label" id="map-compliance-label">점검 기준과 준법 결과</p>
+                <div class="map-areas">
+                  <div class="map-node"><button class="button" type="button" data-knowledge-area="compliance" aria-pressed="false" aria-controls="knowledge-guide">준법</button></div>
+                  <div class="map-node"><button class="button" type="button" data-knowledge-area="global" aria-pressed="false" aria-controls="knowledge-guide">글로벌 준법</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="map-guide" id="knowledge-guide" aria-labelledby="knowledge-area-name">
+            <h3 id="knowledge-area-name" aria-live="polite"></h3>
+            <p id="knowledge-connection"></p>
+            <div id="knowledge-scenarios"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pms" class="section" aria-labelledby="pms-heading">
+        <div class="section-header">
+          <h2 id="pms-heading" tabindex="-1">PMS 개발 요청</h2>
+          <p>개발 요청의 상세 요건과 담당자, 개발자를 확인합니다.</p>
+        </div>
+        <div class="panel">
+          <div class="search-bar">
+            <form id="pms-form" role="search" aria-label="PMS 개발 요청 검색">
+              <label for="pms-search">PMS 번호 또는 요청 내용</label>
+              <div class="search-controls">
+                <input id="pms-search" type="search" placeholder="예: PMS-DEMO-001 또는 조회" autocomplete="off">
+                <button type="reset" class="button">초기화</button>
+              </div>
+            </form>
+            <p id="pms-count" class="count" role="status" aria-atomic="true"></p>
+          </div>
+          <table class="pms-table" id="pms-table" aria-label="PMS 개발 요청 목록">
+            <thead><tr><th scope="col">PMS 번호</th><th scope="col">요청 내용</th><th scope="col">상세 요건</th><th scope="col">담당자</th><th scope="col">개발자</th></tr></thead>
+            <tbody id="pms-rows"></tbody>
+          </table>
+          <div class="pms-list" id="pms-list"></div>
+          <p class="empty" id="pms-empty" hidden>검색 결과가 없습니다. 검색어를 바꾸거나 초기화를 눌러 주세요.</p>
+        </div>
+      </section>
+
+      <section id="inquiries" class="section" aria-labelledby="inquiries-heading">
+        <div class="section-header">
+          <h2 id="inquiries-heading" tabindex="-1">문의 사례</h2>
+          <p>주제별로 이전 질문과 답변을 찾아볼 수 있습니다.</p>
+        </div>
+        <div id="inquiry-filters" class="filters" role="group" aria-label="문의 주제"></div>
+        <p id="inquiry-count" class="sr-only" role="status" aria-atomic="true"></p>
+        <div id="inquiry-list" class="inquiry-list"></div>
+        <p class="panel empty" id="inquiry-empty" hidden>이 주제에 등록된 문의가 없습니다. 전체 보기를 눌러 주세요.</p>
+      </section>
+
+      <section id="schedule" class="section" aria-labelledby="schedule-heading">
+        <div class="section-header">
+          <h2 id="schedule-heading" tabindex="-1">월간 업무 일정</h2>
+          <p>달력에서 회의·휴가·연수 일정을 선택하면 시간과 상세 내용을 볼 수 있습니다.</p>
+        </div>
+        <div class="panel">
+          <div class="calendar-toolbar">
+            <h3 id="month-label" aria-live="polite" aria-atomic="true"></h3>
+            <div class="month-controls" role="group" aria-label="달력 월 이동">
+              <button class="button" type="button" id="prev-month">이전 달</button>
+              <button class="button" type="button" id="current-month">이번 달</button>
+              <button class="button" type="button" id="next-month">다음 달</button>
+            </div>
+          </div>
+          <table class="calendar" aria-labelledby="month-label">
+            <thead><tr><th scope="col">일</th><th scope="col">월</th><th scope="col">화</th><th scope="col">수</th><th scope="col">목</th><th scope="col">금</th><th scope="col">토</th></tr></thead>
+            <tbody id="calendar-days"></tbody>
+          </table>
+          <p class="empty schedule-empty" id="schedule-empty" hidden>이 달에 표시할 일정이 없습니다.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="wrap">종검 · 종합 검사 시스템 운영팀</div></footer>
+
+  <dialog id="event-dialog" aria-labelledby="event-name" aria-describedby="event-when">
+    <span id="event-type" class="tag"></span>
+    <h2 id="event-name"></h2>
+    <p id="event-when"></p>
+    <p id="event-memo"></p>
+    <form method="dialog"><button type="submit" class="button" autofocus>닫기</button></form>
+  </dialog>
+
+  <template id="inquiry-template">
+    <article class="panel inquiry-card">
+      <div class="inquiry-main">
+        <span class="tag" data-field="topic"></span>
+        <h3>질문 <span data-field="question"></span></h3>
+        <p class="answer"><strong>답변</strong> <span data-field="answer"></span></p>
+      </div>
+      <dl class="inquirer">
+        <div><dt>질의자 이름</dt><dd data-field="name"></dd></div>
+        <div><dt>행번</dt><dd data-field="employee"></dd></div>
+        <div><dt>지점</dt><dd data-field="branch"></dd></div>
+        <div><dt>지점번호</dt><dd data-field="branchCode"></dd></div>
+      </dl>
+    </article>
+  </template>
+
+  <script>
+    const pmsRequests = [
+      { number: 'PMS-DEMO-001', request: '검사 결과 조회에 기간 조건 추가', requirement: '시작일과 종료일을 지정하면 해당 기간의 결과만 표시합니다. 종료일이 시작일보다 빠르면 안내를 표시합니다.', owner: '가상 담당 A', developer: '가상 개발 A' },
+      { number: 'PMS-DEMO-002', request: '점검 항목 목록에 처리 상태 표시', requirement: '목록에 미처리·진행 중·완료 상태를 표시하고, 선택한 상태에 해당하는 항목만 모아볼 수 있게 합니다.', owner: '가상 담당 B', developer: '가상 개발 A' },
+      { number: 'PMS-DEMO-003', request: '지점별 점검 결과 표 내려받기', requirement: '조회 조건에 맞는 결과만 표로 내려받고, 파일명에 조회 기준일을 포함합니다.', owner: '가상 담당 A', developer: '가상 개발 B' },
+      { number: 'PMS-DEMO-004', request: '검사 보고서 임시 저장 안내 개선', requirement: '임시 저장이 완료되면 확인 시각을 화면에 표시합니다. 저장에 실패한 경우 입력 내용을 유지하고 다시 시도할 수 있도록 안내합니다.', owner: '가상 담당 C' },
+      { number: 'PMS-DEMO-005', request: '점검 메뉴와 조회 권한 확인 안내', requirement: '접근할 수 없는 점검 메뉴나 거점을 선택하면 조회 권한 확인 방법을 안내합니다.', owner: '가상 담당 B', developer: '가상 개발 B' },
+      { number: 'PMS-DEMO-006', request: '해외 거점별 점검 자료 제출 현황 표시', requirement: '선택한 기준월의 제출·미제출·보완 요청 현황을 해외 거점별로 표시합니다.', owner: '가상 담당 C', developer: '가상 개발 A' }
+    ];
+
+    const inquiryTopics = ['시스템 사용 방법', '권한·접속', '오류·장애'];
+    const inquiries = [
+      { id: 'results-period', topic: inquiryTopics[0], question: '지난달 검사 결과는 어떻게 찾나요?', answer: '예시 조회 화면에서 시작일과 종료일을 지난달 범위로 설정한 뒤 조회를 누릅니다.', name: '가상직원 A', employee: 'DEMO-101', branch: '예시중앙지점', branchCode: 'DEMO-B01' },
+      { id: 'menu-access', topic: inquiryTopics[1], question: '점검 화면 메뉴가 보이지 않아요.', answer: '예시 권한 화면에서 담당 업무의 조회 권한을 확인합니다. 권한이 없으면 소속 부서의 권한 담당자에게 확인합니다.', name: '가상직원 B', employee: 'DEMO-102', branch: '예시서부지점', branchCode: 'DEMO-B02' },
+      { id: 'save-error', topic: inquiryTopics[2], question: '보고서를 저장하면 오류가 표시돼요.', answer: '오류 문구와 발생 시각을 기록한 뒤 필수 입력 항목을 확인합니다. 다시 시도해도 오류가 발생하면 문의 시 기록한 내용을 함께 전달합니다.', name: '가상직원 C', employee: 'DEMO-103', branch: '예시동부지점', branchCode: 'DEMO-B03' }
+    ];
+
+    const knowledgeAreas = {
+      branch: {
+        connection: '연결 업무는 검사입니다. 지점에서 정리한 자점감사 결과와 미조치 항목을 검사 담당자가 검토에 참고하는 예시입니다.',
+        scenarios: [
+          {
+            title: '월간 자점감사 결과를 제출하려면',
+            procedure: ['점검 대상 지점과 기준월을 확인합니다.', '항목별 결과를 적고 보완에 필요한 증빙을 정리합니다.', '예시 보고서를 저장하고 제출 전 미조치 항목을 다시 확인합니다.'],
+            checklist: ['기준월과 지점 정보 확인', '필수 입력 항목과 증빙 확인', '미조치 항목의 담당자와 기한 확인'],
+            inquiry: 'save-error', pms: 'PMS-DEMO-004'
+          },
+          {
+            title: '미처리 점검 항목만 모아보려면',
+            procedure: ['해당 지점의 점검 목록을 엽니다.', '처리 상태별로 항목을 확인하고 미처리 건을 정리합니다.', '후속 조치 담당자와 확인 기한을 기록합니다.'],
+            checklist: ['조회 대상 지점 확인', '미처리와 진행 중 상태 구분'],
+            inquiry: 'menu-access', pms: 'PMS-DEMO-002'
+          }
+        ]
+      },
+      compliance: {
+        connection: '연결 업무는 글로벌 준법입니다. 공통 점검 항목을 공유하고 해외 점검 결과와 비교하는 예시입니다.',
+        scenarios: [
+          {
+            title: '준법 점검 메뉴가 보이지 않을 때',
+            procedure: ['소속과 담당 업무가 맞는지 확인합니다.', '필요한 점검 메뉴와 권한 범위를 확인합니다.', '예시 권한 담당자에게 메뉴명과 확인 결과를 전달합니다.'],
+            checklist: ['올바른 소속과 업무 범위 확인', '표시되지 않는 메뉴명 기록', '다른 사용자의 정보 없이 문의 작성'],
+            inquiry: 'menu-access', pms: 'PMS-DEMO-005'
+          },
+          {
+            title: '이전 점검 결과와 이번 결과를 비교하려면',
+            procedure: ['지난 점검의 기준월을 정합니다.', '같은 항목과 범위로 이전 결과를 조회합니다.', '변경된 항목과 후속 확인이 필요한 사항을 정리합니다.'],
+            checklist: ['두 기간의 점검 범위가 같은지 확인', '항목별 차이와 확인 필요 사항 기록'],
+            inquiry: 'results-period', pms: 'PMS-DEMO-001'
+          }
+        ]
+      },
+      inspection: {
+        connection: '연결 업무는 자점감사입니다. 검사에서 확인한 보완 사항과 후속 조치 결과를 지점 점검에 참고하는 예시입니다.',
+        scenarios: [
+          {
+            title: '지난달 검사 결과를 조회하고 내려받으려면',
+            procedure: ['조회 기간을 지난달의 첫날부터 마지막 날까지 지정합니다.', '검사 대상 지점을 선택하고 화면의 결과 범위를 확인합니다.', '예시 결과 표를 내려받고 기준일과 포함 범위를 살펴봅니다.'],
+            checklist: ['시작일과 종료일 확인', '지점과 결과 건수 확인', '공유 전에 포함 범위 확인'],
+            inquiry: 'results-period', pms: 'PMS-DEMO-003'
+          },
+          {
+            title: '검사 보고서 저장 오류가 날 때',
+            procedure: ['오류 문구와 발생 시각을 적습니다.', '필수 입력칸을 확인한 뒤 저장을 다시 시도합니다.', '오류가 반복되면 재현 순서와 함께 문의합니다.'],
+            checklist: ['오류 메시지와 발생 시각 기록', '다시 시도하기 전 입력 내용 확인'],
+            inquiry: 'save-error', pms: 'PMS-DEMO-004'
+          }
+        ]
+      },
+      global: {
+        connection: '연결 업무는 준법입니다. 공통 점검 기준을 참고하고 해외 거점의 별도 항목과 결과를 구분해 공유하는 예시입니다.',
+        scenarios: [
+          {
+            title: '해외 거점의 월간 점검 자료를 취합하려면',
+            procedure: ['거점별 제출 대상과 한 가지 기준월을 정합니다.', '거점별 자료를 취합하고 공통 항목과 별도 항목을 나눕니다.', '미제출 거점과 추가 확인 사항을 표시합니다.'],
+            checklist: ['거점별 기준월과 제출 범위 확인', '공통 항목과 별도 항목 구분', '미제출 또는 보완 항목 기록'],
+            inquiry: 'results-period', pms: 'PMS-DEMO-006'
+          },
+          {
+            title: '다른 거점의 점검 결과가 보이지 않을 때',
+            procedure: ['조회하려는 거점과 기준월을 확인합니다.', '해당 거점의 조회 권한 범위를 확인합니다.', '결과가 보이지 않으면 거점명과 조회 조건을 정리해 문의합니다.'],
+            checklist: ['조회 조건과 권한 범위 확인', '문의에 필요한 예시 정보만 포함'],
+            inquiry: 'menu-access', pms: 'PMS-DEMO-005'
+          }
+        ]
+      }
+    };
+
+    const byId = id => document.getElementById(id);
+
+    function appendText(parent, tag, value, className) {
+      const element = document.createElement(tag);
+      element.textContent = value;
+      if (className) element.className = className;
+      parent.append(element);
+      return element;
+    }
+
+    const menu = byId('menu-toggle');
+    const nav = byId('site-nav');
+
+    function setMenu(open) {
+      nav.classList.toggle('is-open', open);
+      menu.setAttribute('aria-expanded', String(open));
+    }
+
+    menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') === 'false'));
+    document.querySelector('.header').addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+        setMenu(false);
+        menu.focus();
+      }
+    });
+
+    function updateNav() {
+      const current = location.hash || '#intro';
+      for (const link of nav.querySelectorAll('a')) {
+        if (link.hash === current) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      }
+    }
+
+    nav.addEventListener('click', event => {
+      const target = event.target.closest('a');
+      if (!target) return;
+      setMenu(false);
+      document.querySelector(`${target.hash} h1, ${target.hash} h2`)?.focus({ preventScroll: true });
+    });
+    window.addEventListener('hashchange', updateNav);
+    updateNav();
+
+    const search = byId('pms-search');
+
+    function pmsFields(record) {
+      return [
+        ['PMS 번호', record.number], ['요청 내용', record.request], ['상세 요건', record.requirement],
+        ['담당자', record.owner || '미지정'], ['개발자', record.developer || '미지정']
+      ];
+    }
+
+    function renderPms() {
+      const query = search.value.trim().toLocaleLowerCase('ko');
+      const records = pmsRequests.filter(record => [record.number, record.request].some(value => value.toLocaleLowerCase('ko').includes(query)));
+      const rows = byId('pms-rows');
+      const list = byId('pms-list');
+      rows.replaceChildren();
+      list.replaceChildren();
+
+      for (const record of records) {
+        const row = rows.insertRow();
+        const card = appendText(list, 'dl', '', 'pms-card');
+        const fields = pmsFields(record);
+        const [[, number], [, request], ...remaining] = fields;
+        appendText(row, 'th', number).scope = 'row';
+        appendText(row, 'td', request, 'request');
+        for (const [, value] of remaining) appendText(row, 'td', value);
+        for (const [label, value] of fields) {
+          appendText(card, 'dt', label);
+          appendText(card, 'dd', value);
+        }
+      }
+
+      byId('pms-count').textContent = `${records.length}건`;
+      byId('pms-table').hidden = records.length === 0;
+      byId('pms-empty').hidden = records.length > 0;
+    }
+
+    search.addEventListener('input', renderPms);
+    byId('pms-form').addEventListener('submit', event => event.preventDefault());
+    byId('pms-form').addEventListener('reset', event => {
+      event.preventDefault();
+      search.value = '';
+      renderPms();
+      search.focus();
+    });
+    renderPms();
+
+    const filters = byId('inquiry-filters');
+
+    function inquiryCard(record) {
+      const card = byId('inquiry-template').content.cloneNode(true);
+      for (const field of card.querySelectorAll('[data-field]')) field.textContent = record[field.dataset.field];
+      return card;
+    }
+
+    function renderInquiries(topic) {
+      const list = byId('inquiry-list');
+      const records = topic ? inquiries.filter(record => record.topic === topic) : inquiries;
+      list.replaceChildren();
+
+      for (const record of records) {
+        list.append(inquiryCard(record));
+      }
+
+      byId('inquiry-count').textContent = `문의 ${records.length}건`;
+      byId('inquiry-empty').hidden = records.length > 0;
+      for (const button of filters.children) button.setAttribute('aria-pressed', String(button.dataset.topic === topic));
+    }
+
+    for (const topic of ['', ...inquiryTopics]) {
+      const button = appendText(filters, 'button', topic || '전체 보기', 'button');
+      button.type = 'button';
+      button.dataset.topic = topic;
+      button.addEventListener('click', () => renderInquiries(topic));
+    }
+    renderInquiries('');
+
+    const mapButtons = [...byId('knowledge-areas').querySelectorAll('button')];
+    const scenarioList = byId('knowledge-scenarios');
+
+    function renderKnowledgeArea(button) {
+      const key = button.dataset.knowledgeArea;
+      const area = knowledgeAreas[key];
+      byId('knowledge-area-name').textContent = button.textContent;
+      byId('knowledge-connection').textContent = area.connection;
+      for (const option of mapButtons) option.setAttribute('aria-pressed', String(option === button));
+      const previousView = byId(`knowledge-scenarios-${key}`);
+      for (const view of scenarioList.children) view.hidden = view !== previousView;
+      if (previousView) return;
+
+      const view = appendText(scenarioList, 'div', '');
+      view.id = `knowledge-scenarios-${key}`;
+
+      for (const [index, scenario] of area.scenarios.entries()) {
+        const section = appendText(view, 'details', '', 'scenario');
+        section.setAttribute('name', `knowledge-scenario-${key}`);
+        section.open = index === 0;
+        appendText(section, 'summary', scenario.title);
+        const body = appendText(section, 'div', '', 'scenario-body');
+        const columns = appendText(body, 'div', '', 'scenario-columns');
+        const procedure = appendText(columns, 'div', '');
+        appendText(procedure, 'h4', '업무 절차');
+        const steps = appendText(procedure, 'ol', '');
+        for (const step of scenario.procedure) appendText(steps, 'li', step);
+
+        const checks = appendText(columns, 'div', '');
+        appendText(checks, 'h4', '체크리스트');
+        const checklist = appendText(checks, 'ul', '', 'scenario-checklist');
+        for (const item of scenario.checklist) {
+          const row = appendText(checklist, 'li', '');
+          const label = appendText(row, 'label', '');
+          appendText(label, 'input', '').type = 'checkbox';
+          appendText(label, 'span', item);
+        }
+
+        const related = appendText(body, 'div', '', 'scenario-related');
+        appendText(related, 'h4', '관련 기록');
+        const inquiry = inquiries.find(record => record.id === scenario.inquiry);
+        const inquiryDetails = appendText(related, 'details', '', 'related-record');
+        appendText(inquiryDetails, 'summary', `문의 사례 · ${inquiry.question}`);
+        inquiryDetails.append(inquiryCard(inquiry));
+
+        const pms = pmsRequests.find(record => record.number === scenario.pms);
+        const pmsDetails = appendText(related, 'details', '', 'related-record');
+        appendText(pmsDetails, 'summary', `PMS · ${pms.number} · ${pms.request}`);
+        const fields = appendText(pmsDetails, 'dl', '', 'related-pms');
+        for (const [label, value] of pmsFields(pms)) {
+          appendText(fields, 'dt', label);
+          appendText(fields, 'dd', value);
+        }
+      }
+    }
+
+    for (const button of mapButtons) button.addEventListener('click', () => renderKnowledgeArea(button));
+    renderKnowledgeArea(mapButtons[0]);
+
+    // Treat calendar dates as day values in Seoul, independent of the browser's timezone.
+    const seoulDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+    const monthFormatter = new Intl.DateTimeFormat('ko-KR', { timeZone: 'UTC', year: 'numeric', month: 'long' });
+    const dayFormatter = new Intl.DateTimeFormat('ko-KR', { timeZone: 'UTC', month: 'long', day: 'numeric' });
+    const todayParts = Object.fromEntries(seoulDate.formatToParts(new Date()).map(({ type, value }) => [type, value]));
+    const today = Date.UTC(Number(todayParts.year), Number(todayParts.month) - 1, Number(todayParts.day));
+    const currentMonth = monthStart(today);
+    let shownMonth = currentMonth;
+
+    function monthStart(timestamp, offset = 0) {
+      const date = new Date(timestamp);
+      return Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + offset, 1);
+    }
+
+    function sampleDay(day, monthOffset = 0) {
+      const month = new Date(monthStart(currentMonth, monthOffset));
+      return Date.UTC(month.getUTCFullYear(), month.getUTCMonth(), day);
+    }
+
+    // Keep fictional examples visible in the current month whenever the page is opened.
+    const schedule = [
+      { type: '회의', style: 'meeting', title: '월간 운영 회의', start: sampleDay(6), end: sampleDay(6), time: '10:00–11:00', memo: '다음 달 점검 항목을 확인합니다.' },
+      { type: '휴가', style: 'leave', title: '운영 담당 휴가', start: sampleDay(12), end: sampleDay(13), time: '종일', memo: '' },
+      { type: '연수', style: 'training', title: '검사 시스템 운영 연수', start: sampleDay(20), end: sampleDay(21), time: '종일', memo: '조회·점검 기능을 실습합니다.' },
+      { type: '기타', style: 'other', title: '월말 점검', start: sampleDay(0, 1), end: sampleDay(1, 1), time: '종일', memo: '월말과 다음 달 초에 이어지는 예시 일정입니다.' },
+      { type: '회의', style: 'meeting', title: '개발 요청 검토 회의', start: sampleDay(7, 1), end: sampleDay(7, 1), time: '14:00–15:00', memo: '' }
+    ];
+
+    function eventWhen(event) {
+      const dates = event.start === event.end ? dayFormatter.format(event.start) : `${dayFormatter.format(event.start)} ~ ${dayFormatter.format(event.end)}`;
+      return `${dates} · ${event.time}`;
+    }
+
+    function showEvent(event) {
+      const dialog = byId('event-dialog');
+      byId('event-type').className = `tag event-${event.style}`;
+      byId('event-type').textContent = event.type;
+      byId('event-name').textContent = event.title;
+      byId('event-when').textContent = eventWhen(event);
+      byId('event-memo').textContent = event.memo;
+      byId('event-memo').hidden = !event.memo;
+      dialog.showModal();
+    }
+
+    function renderSchedule() {
+      const nextMonth = monthStart(shownMonth, 1);
+      const records = schedule.filter(event => event.start < nextMonth && event.end >= shownMonth);
+      const days = byId('calendar-days');
+      days.replaceChildren();
+      byId('month-label').textContent = monthFormatter.format(shownMonth);
+      byId('schedule-empty').hidden = records.length > 0;
+
+      const firstWeekday = new Date(shownMonth).getUTCDay();
+      const dayLength = 86_400_000;
+      const cellCount = Math.ceil((firstWeekday + (nextMonth - shownMonth) / dayLength) / 7) * 7;
+      let row;
+
+      for (let index = 0; index < cellCount; index++) {
+        if (index % 7 === 0) row = days.insertRow();
+        const cell = row.insertCell();
+        const date = shownMonth + (index - firstWeekday) * dayLength;
+        if (date < shownMonth || date >= nextMonth) {
+          cell.className = 'outside';
+          continue;
+        }
+
+        const number = appendText(cell, 'time', new Date(date).getUTCDate(), 'day-number');
+        number.dateTime = new Date(date).toISOString().slice(0, 10);
+        if (date === today) number.setAttribute('aria-current', 'date');
+
+        const dayEvents = records.filter(event => date >= event.start && date <= event.end);
+        if (!dayEvents.length) continue;
+        const list = appendText(cell, 'ul', '', 'day-events');
+        for (const event of dayEvents) {
+          const item = appendText(list, 'li', '');
+          const button = appendText(item, 'button', '', `event event-${event.style}`);
+          button.type = 'button';
+          button.setAttribute('aria-label', `${dayFormatter.format(date)} ${event.type} ${event.title}, ${event.time}`);
+          appendText(button, 'span', event.type, 'event-type');
+          appendText(button, 'span', event.title, 'event-title');
+          appendText(button, 'span', event.time, 'event-time');
+          button.addEventListener('click', () => showEvent(event));
+        }
+      }
+
+    }
+
+    const monthPreview = byId('schedule-preview');
+    for (const event of schedule.slice(0, 3)) {
+      const item = appendText(monthPreview, 'li', '');
+      const link = appendText(item, 'a', '');
+      link.href = '#schedule';
+      const date = new Date(event.start);
+      appendText(link, 'time', `${date.getUTCMonth() + 1}.${date.getUTCDate()}`).dateTime = date.toISOString().slice(0, 10);
+      appendText(link, 'span', event.title);
+      link.addEventListener('click', () => {
+        shownMonth = currentMonth;
+        renderSchedule();
+      });
+    }
+
+    for (const [id, offset] of [['prev-month', -1], ['current-month', 0], ['next-month', 1]]) {
+      byId(id).addEventListener('click', () => {
+        shownMonth = offset ? monthStart(shownMonth, offset) : currentMonth;
+        renderSchedule();
+      });
+    }
+    renderSchedule();
+  </script>
+</body>
+</html>
