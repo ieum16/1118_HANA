@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TODO List</title>
+  <link rel="preload" href="assets/fonts/Jua-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="popup.css?v=1.2.1">
+  <script src="popup.js" defer></script>
+  <script src="fx-core.js" defer></script>
+  <script src="fx.js" defer></script>
+</head>
+<body>
+  <header>
+    <img class="dance-trio" src="assets/octopus-trio-reference.png" alt="점박이 머리띠와 빨간 문어옷을 입고 손잡고 춤추는 우사기, 치이카와, 하치와레" width="312" height="140">
+    <div class="header-copy">
+      <p class="eyebrow">다 같이 신나게, 하나씩!</p>
+      <h1>할 일 목록</h1>
+      <p id="today" class="subtitle"></p>
+    </div>
+    <div class="cheer"><span aria-hidden="true">✦</span> 작은 일도 해내면 멋진 하루!</div>
+  </header>
+  <main>
+    <form id="add-form">
+      <label for="task-input">새로운 할 일</label>
+      <div class="input-row">
+        <input id="task-input" type="text" placeholder="무엇을 해 볼까요?" maxlength="200" autocomplete="off" required disabled>
+        <button id="add-button" type="submit" disabled>추가</button>
+      </div>
+    </form>
+    <p id="status" role="status" aria-live="polite">목록을 불러오는 중이에요.</p>
+    <section aria-labelledby="today-heading">
+      <div class="section-heading"><h2 id="today-heading">오늘 할 일</h2><span id="today-count" class="count">0</span></div>
+      <ul id="today-list"></ul>
+      <p id="today-empty" class="empty" hidden><span class="empty-sparkle" aria-hidden="true">✧</span>오늘은 어떤 일을 해 볼까요?<br>친구들과 함께 시작해요!</p>
+    </section>
+    <section aria-labelledby="later-heading">
+      <div class="section-heading"><h2 id="later-heading">내일 할 일</h2><span id="later-count" class="count">0</span></div>
+      <ul id="later-list"></ul>
+      <p id="later-empty" class="empty" hidden>내일의 나에게 맡긴 일이 없어요 ☁</p>
+    </section>
+    <section class="fx-card" aria-labelledby="fx-heading">
+      <p class="eyebrow">여행 준비도, 하나씩!</p>
+      <h2 id="fx-heading">환율 계산기</h2>
+      <p class="fx-help">환율을 직접 입력하거나, JPY 환율을 불러와 계산해요.</p>
+      <fieldset id="fx-fields" disabled>
+        <legend class="sr-only">환율 입력 및 은행 표 가져오기</legend>
+        <label for="fx-currency">통화</label>
+        <select id="fx-currency"></select>
+        <button id="fx-fetch-button" class="fx-fetch" type="button">오늘 환율 불러오기</button>
+        <p class="fx-help">버튼을 누르면 JPY로 전환하고 100엔당 환율을 채워요.</p>
+        <p id="fx-fetch-status" class="fx-help" role="status" aria-live="polite"></p>
+        <p id="fx-source" class="fx-help" aria-live="polite">직접 입력한 기준환율이에요.</p>
+        <div class="fx-grid">
+          <div><label for="fx-base">기준환율 (원)</label><input id="fx-base" type="text" inputmode="decimal" placeholder="예: 900" maxlength="24" autocomplete="off"></div>
+          <div><label for="fx-unit">환율 기준 단위</label><select id="fx-unit"><option value="1">1단위당</option><option value="100" selected>100단위당</option><option value="1000">1,000단위당</option></select></div>
+        </div>
+        <p id="fx-unit-note" class="fx-help">100 JPY당 원화 기준환율이에요.</p>
+        <label for="fx-amount">외화 금액</label>
+        <input id="fx-amount" type="text" inputmode="decimal" placeholder="예: 10,000" maxlength="24" autocomplete="off">
+        <div class="fx-grid">
+          <div><label for="fx-buy-spread">살 때 스프레드 %</label><input id="fx-buy-spread" type="text" inputmode="decimal" value="0" maxlength="12" autocomplete="off"></div>
+          <div><label for="fx-sell-spread">팔 때 스프레드 %</label><input id="fx-sell-spread" type="text" inputmode="decimal" value="0" maxlength="12" autocomplete="off"></div>
+        </div>
+        <label for="fx-preference">우대율 %</label>
+        <input id="fx-preference" type="text" inputmode="decimal" value="0" maxlength="12" autocomplete="off">
+        <p class="fx-help">우대율은 스프레드에만 적용돼요. 스프레드가 없으면 0을 입력하세요.</p>
+        <p id="fx-error" class="fx-error" role="status"></p>
+        <div id="fx-result" class="fx-result" aria-live="polite" hidden>
+          <p>기준환율로 환산<strong id="fx-base-result"></strong></p>
+          <p>외화 살 때 · 내는 원화<strong id="fx-buy-result"></strong></p>
+          <p>외화 팔 때 · 받는 원화<strong id="fx-sell-result"></strong></p>
+          <p id="fx-rate-note" class="fx-help"></p>
+        </div>
+        <p class="fx-help">금액은 1원 단위로 반올림한 예상값이에요.</p>
+        <details class="fx-import">
+          <summary>은행 환율표 붙여넣기</summary>
+          <label for="fx-table">은행 표</label>
+          <textarea id="fx-table" rows="5" maxlength="50000" placeholder="통화&#9;매매기준율&#10;JPY(100)&#9;900&#10;USD&#9;1,400" spellcheck="false"></textarea>
+          <p class="fx-help">통화코드와 ‘매매기준율’ 제목을 포함해 복사하세요. ‘JPY 900’처럼 한 줄에 통화와 기준환율 하나만 넣어도 돼요. JPY·VND·IDR은 기본 100단위이며 변경할 수 있어요.</p>
+          <div class="fx-import-actions"><button id="fx-preview-button" type="button">표 읽기</button><button id="fx-apply-button" type="button" disabled>확인 후 적용</button></div>
+          <p id="fx-import-status" class="fx-help" role="status"></p>
+          <ul id="fx-preview" class="fx-preview"></ul>
+          <p class="fx-help">‘현찰 사실 때·파실 때’ 열이 있으면 스프레드도 계산해 채워요. 같은 통화의 기존 환율은 덮어쓰고, 금액과 우대율은 유지해요.</p>
+        </details>
+        <div class="fx-save"><p id="fx-save-status" role="status">저장값 불러오는 중…</p><button id="fx-save-button" type="button">다시 저장</button></div>
+      </fieldset>
+      <p id="fx-load-error" class="fx-error" role="status"></p>
+    </section>
+  </main>
+  <footer>목록과 입력값은 자동으로 저장돼요.<span id="font-status" class="font-status" role="status">주아체 불러오는 중 · v1.2.1</span></footer>
+</body>
+</html>

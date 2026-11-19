@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "TODO List",
+  "version": "1.2.1",
+  "description": "할 일을 추가하고, 완료하고, 내일로 미루는 간편한 할 일 목록",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.frankfurter.dev/*"],
+  "action": {
+    "default_title": "TODO List",
+    "default_popup": "popup.html"
+  }
+}
