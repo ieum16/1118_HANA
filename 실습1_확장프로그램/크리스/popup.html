@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+  <script src="fx-core.js" defer></script>
+  <script src="fx.js" defer></script>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">하나씩, 차근차근</p>
+    <h1>오늘 할 일 작성기<span aria-hidden="true"> 🍀</span></h1>
+    <p id="today" class="today"></p>
+    <div class="summary" aria-live="polite">
+      <span>남은 할 일 <strong id="remaining">0</strong>개</span>
+      <span id="completed">전체 0개 · 완료 0개</span>
+    </div>
+  </header>
+  <main>
+    <form id="todo-form">
+      <fieldset id="composer" disabled>
+        <label for="todo-input">어떤 일을 할까요?</label>
+        <input id="todo-input" type="text" maxlength="300" placeholder="예: 책 10쪽 읽기" autocomplete="off" required>
+        <div class="deadline-row">
+          <label for="deadline-date">마감일</label>
+          <input id="deadline-date" type="date" min="1900-01-01" max="9999-12-31" aria-label="캘린더에서 마감일 선택">
+          <button type="button" id="clear-deadline" class="preset">해제</button>
+        </div>
+        <div class="deadline-presets" role="group" aria-label="마감일 빠른 선택">
+          <button type="button" class="preset" data-days="0" aria-pressed="false">당일</button>
+          <button type="button" class="preset" data-days="2" aria-pressed="false">2일</button>
+          <button type="button" class="preset" data-days="3" aria-pressed="false">3일</button>
+          <button type="button" class="preset" data-days="7" aria-pressed="false">7일</button>
+          <button type="button" class="preset" data-days="30" aria-pressed="false">30일</button>
+        </div>
+        <p class="hint">날짜 칸을 누르면 캘린더가 열려요. 비우면 마감 없이 추가돼요.</p>
+        <button id="add-button" class="add-button" type="submit">＋ 할 일 추가</button>
+      </fieldset>
+    </form>
+    <p id="message" role="status" aria-live="polite"></p>
+    <div class="list-heading"><h2>나의 할 일</h2><span>작은 실천이 쌓이는 곳</span></div>
+    <ul id="todo-list" aria-label="할 일 목록"></ul>
+    <div id="empty" hidden><span aria-hidden="true">🌱</span><p>아직 할 일이 없어요</p><span>오늘의 첫 할 일을 적어 보세요.</span></div>
+    <section class="fx-panel" aria-labelledby="fx-heading">
+      <div class="fx-title-row"><h2 id="fx-heading">USD/KRW 자동 환율</h2><button id="fx-refresh" type="button" class="preset" disabled>새로고침</button></div>
+      <p class="hint">네이버 제공 · 하나은행 고시 · 1 USD당 원화</p>
+      <p id="fx-status" class="fx-status" role="status" aria-live="polite">환율을 불러오는 중…</p>
+      <div class="fx-results" aria-live="polite">
+        <p>매매기준율 <strong id="fx-base-rate">—</strong></p>
+        <p>달러 살 때 · 현찰 매수 <strong id="fx-buy-rate">—</strong></p>
+        <p>달러 팔 때 · 현찰 매도 <strong id="fx-sell-rate">—</strong></p>
+      </div>
+      <p id="fx-quote-date" class="hint"></p>
+      <p id="fx-fetched-at" class="hint"></p>
+      <label class="fx-amount-label" for="fx-amount">달러 금액 · USD</label>
+      <input id="fx-amount" type="number" min="0" step="any" placeholder="예: 100" inputmode="decimal" disabled>
+      <div class="fx-results fx-totals" aria-live="polite">
+        <p>살 때 · 낼 원화 <strong id="fx-buy-result">—</strong></p>
+        <p>팔 때 · 받을 원화 <strong id="fx-sell-result">—</strong></p>
+      </div>
+      <p id="fx-error" class="fx-error" role="status"></p>
+      <p class="hint">팝업을 열 때와 열린 동안 60초마다 조회해요. 은행 고시 갱신에 따라 반영되며, 휴일에는 최근 영업일 값이 표시될 수 있어요. 합계는 원 단위로 반올림해요.</p>
+      <a class="fx-source" href="https://m.stock.naver.com/marketindex/exchange/FX_USDKRW" target="_blank" rel="noopener noreferrer">네이버 원본 환율 보기 ↗</a>
+      <p id="fx-save-status" class="hint" role="status"></p>
+    </section>
+  </main>
+  <footer>이 브라우저에 자동으로 저장돼요</footer>
+  <template id="todo-template">
+    <li class="todo-card">
+      <div class="task-row">
+        <input class="task-check" type="checkbox">
+        <span class="task-text"></span>
+        <button class="delete-button" type="button">삭제</button>
+      </div>
+      <div class="task-details"><span class="created"></span><span class="deadline-badge"></span></div>
+      <label class="edit-deadline">마감일 <input class="deadline-date" type="date" aria-label="마감일 변경"></label>
+    </li>
+  </template>
+</body>
+</html>
