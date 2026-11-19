@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header><p class="eyebrow">하나씩, 차근차근 🌱</p><h1>오늘 할 일 작성기</h1></header>
+  <main>
+    <section class="calendar" aria-label="할 일 달력">
+      <div class="month-bar"><button id="prev" aria-label="이전 달">‹</button><h2 id="month"></h2><button id="next" aria-label="다음 달">›</button><button id="today">오늘</button></div>
+      <div class="week" aria-hidden="true"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+      <div id="days" class="days" role="group" aria-label="날짜 선택"></div>
+      <p class="legend"><span>✓</span> 모두 완료한 날 <b>·</b> 할 일이 있는 날</p>
+    </section>
+    <section class="tasks" aria-labelledby="selected-date">
+      <div class="date-bar"><h2 id="selected-date"></h2><span id="remaining" aria-live="polite"></span></div>
+      <p id="encouragement" class="encouragement"></p>
+      <form id="form" novalidate><label class="sr-only" for="task">할 일 입력</label><div class="input-row"><input id="task" placeholder="어떤 일을 해볼까요?" maxlength="200" autocomplete="off" aria-describedby="message"><button id="add" type="submit">추가</button></div></form>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+      <ul id="list"></ul>
+      <p id="empty" class="empty">아직 할 일이 없어요.<br><span>작은 일 하나부터 적어보세요.</span></p>
+    </section>
+    <section class="exchange" aria-labelledby="exchange-title">
+      <h2 id="exchange-title">환율 계산기</h2>
+      <fieldset id="exchange-fields" disabled>
+        <legend class="sr-only">환율 계산 입력</legend>
+        <div class="exchange-grid">
+          <label>통화<select id="exchange-currency"><option value="USD">USD · 미국 달러</option></select></label>
+          <label>외화 금액<input id="exchange-amount" inputmode="decimal" maxlength="24" placeholder="100"></label>
+          <label>기준환율 (원)<input id="exchange-rate" inputmode="decimal" maxlength="24" placeholder="1,400"></label>
+          <label>환율 기준 단위<input id="exchange-unit" inputmode="numeric" maxlength="8" aria-describedby="exchange-unit-hint"></label>
+        </div>
+        <p id="exchange-unit-hint" class="exchange-hint">외화 <span id="exchange-unit-label">1 USD</span>당 원화 환율을 입력하세요.</p>
+        <div class="exchange-fetch">
+          <button id="exchange-fetch" type="button">오늘 환율 불러오기</button>
+          <p id="exchange-fetch-status" class="message" role="status"></p>
+          <p id="exchange-reference" class="exchange-hint" role="status"></p>
+        </div>
+        <div class="exchange-grid">
+          <label>스프레드 (%)<input id="exchange-spread" inputmode="decimal" maxlength="12" placeholder="1.75"></label>
+          <label>우대율 (%)<input id="exchange-discount" inputmode="decimal" maxlength="12" placeholder="0"></label>
+        </div>
+        <p id="exchange-error" class="message" role="status"></p>
+        <dl class="exchange-results" aria-live="polite">
+          <div><dt>기준 원화 금액</dt><dd id="exchange-base">—</dd></div>
+          <div><dt>외화를 살 때</dt><dd id="exchange-buy">—</dd></div>
+          <div><dt>외화를 팔 때</dt><dd id="exchange-sell">—</dd></div>
+        </dl>
+        <details class="exchange-import">
+          <summary>은행 환율표 붙여넣기</summary>
+          <label for="exchange-table" class="sr-only">은행 환율표</label>
+          <p id="exchange-table-hint" class="exchange-hint">통화 코드와 매매기준율 열 제목을 함께 복사하세요. 간단히 입력할 때는 한 줄에 USD 1400처럼 적으세요.</p>
+          <textarea id="exchange-table" rows="4" maxlength="60000" aria-describedby="exchange-table-hint" placeholder="통화와 매매기준율을 붙여넣으세요"></textarea>
+          <button id="exchange-apply" type="button">환율표 적용</button>
+          <p id="exchange-import-status" class="exchange-hint" role="status"></p>
+        </details>
+      </fieldset>
+      <p id="exchange-save-status" class="message" role="status"></p>
+    </section>
+    <footer id="save-status" role="status">이 기기에 자동으로 저장돼요</footer>
+  </main>
+  <script src="popup.js"></script>
+  <script src="exchange.js"></script>
+</body>
+</html>
