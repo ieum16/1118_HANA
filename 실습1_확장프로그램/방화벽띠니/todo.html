@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할일</title>
+  <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+  <header><div><p id="dateLabel" class="eyebrow"></p><h1>오늘 할일<span>●</span></h1></div><div class="header-actions"><button id="soundToggle" class="icon-button sound-toggle" type="button" aria-label="효과음 끄기" aria-pressed="true" title="효과음 끄기">🔊</button><button id="openFull" class="icon-button" aria-label="새 탭에서 크게 보기" title="크게 보기">↗</button></div></header>
+  <main>
+    <section class="cat-stage" aria-label="고양이 응원">
+      <div class="stage-top"><span id="moodLabel">오늘의 일정</span><span class="tiny">나의 시간표</span></div>
+      <div class="character-space">
+        <span class="character-shadow" aria-hidden="true"></span>
+        <img id="cat" src="img/cat-neutral.png" alt="오늘 할 일을 함께하는 기본 고양이" width="210" height="210">
+        <canvas id="happyCat" width="600" height="600" role="img" aria-label="기쁘게 뛰는 해피캣" hidden></canvas>
+      </div>
+      <video id="happyVideo" src="media/happy-cat.mp4" preload="auto" muted playsinline hidden aria-hidden="true" tabindex="-1"></video>
+      <video id="huhVideo" src="media/huh-cat.mp4" preload="auto" muted playsinline hidden aria-hidden="true" tabindex="-1"></video>
+      <audio id="happySound" src="media/happy-cat.mp4" preload="auto"></audio>
+      <audio id="cryingSound" src="media/crying-cat.mp3" preload="auto"></audio>
+      <audio id="gagSound" src="media/gag-cat.mp3" preload="auto"></audio>
+      <audio id="huhSound" src="media/huh-cat.mp3" preload="auto"></audio>
+      <p id="message" role="status">오늘 할 일을 적어보세요.</p>
+    </section>
+    <section class="progress-section" aria-label="오늘의 달성률">
+      <div class="section-line"><h2>오늘의 페이스</h2><span id="progressText">0 / 0 완료</span></div>
+      <progress id="progress" max="1" value="0" aria-label="할 일 완료 비율"></progress>
+    </section>
+    <form id="form" autocomplete="off">
+      <label for="taskInput">어떤 일을 할까?</label>
+      <input id="taskInput" placeholder="예: 산책하며 머리 식히기" maxlength="80" required>
+      <div class="form-bottom"><label for="duration">예상 시간 <select id="duration"><option value="10">10분</option><option value="15">15분</option><option value="30" selected>30분</option><option value="45">45분</option><option value="60">1시간</option><option value="90">1시간 30분</option><option value="120">2시간</option></select></label><button type="submit" class="primary">＋ 추가</button></div>
+    </form>
+    <section class="schedule-section">
+      <div class="section-line"><h2>오늘의 시간표</h2><span id="remaining" class="tiny">0분 남음</span></div>
+      <div class="schedule-tools"><label for="startTime">시작 <input id="startTime" type="time" required></label><button id="reschedule" class="text-button">지금부터 재배치 ↻</button></div>
+      <p class="hint">추가한 순서대로 빈틈없이 배치해요.<br>순서를 바꾸거나 지금부터 다시 시작할 수 있어요.</p>
+      <ul id="list" aria-label="진행할 할 일"></ul>
+      <div id="empty" class="empty"><span>✧</span><p>아직 비어 있는 하루.<br>첫 번째 할 일을 적어보세요.</p></div>
+      <p id="overflow" class="notice" hidden></p>
+    </section>
+    <details id="completed"><summary>완료한 일 <span id="doneCount">0</span></summary><ul id="doneList" aria-label="완료한 할 일"></ul></details>
+    <section id="fxCalculator" class="fx-section" aria-labelledby="fxTitle">
+      <div class="section-line"><h2 id="fxTitle">환율 계산기</h2><span>직접 입력</span></div>
+      <p class="hint">입력한 환율로 계산해요. JPY는 기본 100엔 기준이에요.</p>
+      <div class="fx-tabs" role="group" aria-label="계산할 통화">
+        <button type="button" data-fx-currency="USD" aria-pressed="true">USD 달러</button>
+        <button type="button" data-fx-currency="JPY" aria-pressed="false">JPY 엔</button>
+        <button type="button" data-fx-currency="EUR" aria-pressed="false">EUR 유로</button>
+      </div>
+      <fieldset id="fxFields" disabled>
+        <legend class="visually-hidden">환율과 외화 금액</legend>
+        <label class="fx-wide" for="fxAmount">외화 금액 <span id="fxAmountUnit">USD</span><input id="fxAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="예: 100" maxlength="24"></label>
+        <div class="fx-grid">
+          <label for="fxBase">기준환율 (원)<input id="fxBase" type="text" inputmode="decimal" autocomplete="off" placeholder="직접 입력" maxlength="20"></label>
+          <label for="fxUnit">고시 단위<select id="fxUnit"><option value="1">1 USD당</option></select></label>
+          <label for="fxBuySpread">살 때 스프레드 (%)<input id="fxBuySpread" type="text" inputmode="decimal" autocomplete="off" maxlength="12"></label>
+          <label for="fxSellSpread">팔 때 스프레드 (%)<input id="fxSellSpread" type="text" inputmode="decimal" autocomplete="off" maxlength="12"></label>
+          <label class="fx-wide" for="fxPreference">환율 우대율 (%)<input id="fxPreference" type="text" inputmode="decimal" autocomplete="off" maxlength="12"></label>
+        </div>
+      </fieldset>
+      <div class="fx-results" aria-live="polite" aria-atomic="true">
+        <div><span>기준 환산</span><output id="fxBaseResult">—</output></div>
+        <div><span>외화 살 때 <small>내는 원화</small></span><output id="fxBuyResult">—</output></div>
+        <div><span>외화 팔 때 <small>받는 원화</small></span><output id="fxSellResult">—</output></div>
+        <p id="fxRateDetail" class="hint"></p>
+      </div>
+      <p id="fxValidation" class="hint" role="status">외화 금액과 기준환율을 입력해 주세요.</p>
+      <details class="fx-import"><summary>은행 환율표 붙여넣기</summary>
+        <label class="visually-hidden" for="fxPaste">은행 환율표</label>
+        <textarea id="fxPaste" rows="5" maxlength="30000" placeholder="은행 표를 제목 행과 함께 복사해 붙여넣으세요.&#10;통화&#9;매매기준율&#9;현찰 살 때&#9;현찰 팔 때&#10;USD&#9;1400&#9;1424.5&#9;1375.5"></textarea>
+        <p class="hint">USD·JPY·EUR만 읽어요. 기준환율만 있다면 “USD 1400”처럼 한 줄에 하나씩 입력해도 돼요.</p>
+        <button id="fxReadTable" type="button" class="fx-secondary">표 확인</button>
+        <div id="fxPreview" hidden><table><caption>적용할 환율 미리보기</caption><thead><tr><th>통화</th><th>기준환율</th><th>살 때 %</th><th>팔 때 %</th></tr></thead><tbody id="fxPreviewRows"></tbody></table><button id="fxApplyTable" type="button" class="primary">확인한 값 적용</button></div>
+        <p id="fxImportStatus" class="hint" role="status"></p>
+      </details>
+      <p class="hint">우대율은 스프레드에만 적용해요. 금액은 원 단위 반올림이며, 별도 수수료는 포함하지 않아요.</p>
+      <p id="fxSaveStatus" class="hint" role="status">환율 입력값도 이 브라우저에 저장돼요.</p>
+    </section>
+    <div class="footer-row"><label class="reminder"><input id="reminders" type="checkbox"> 시작 시간 알림</label><button id="carry" class="text-button" hidden>이전 할 일 가져오기</button></div>
+    <p id="storageStatus" class="hint" role="status">이 브라우저에 자동 저장돼요.</p>
+  </main>
+  <script src="core.js"></script><script src="cat-animation.js"></script><script src="cat-sound.js"></script><script src="todo.js"></script><script src="fx-core.js"></script><script src="fx.js"></script>
+</body>
+</html>
