@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "체크리스트",
+  "version": "1.6.0",
+  "description": "여러 날짜의 할 일을 같이하는 사람별로 정리하고 완료와 만료기한을 관리하세요.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.kebhana.com/*"],
+  "action": {
+    "default_title": "체크리스트",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png"
+    }
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "32": "icon-32.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}

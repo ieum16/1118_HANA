@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>체크리스트</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="exchange.css">
+  <script src="popup.js" defer></script>
+  <script src="exchange.js" defer></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-icon" aria-hidden="true">✓</div>
+    <h1>체크리스트</h1>
+  </header>
+
+  <main>
+    <details id="composer">
+      <summary>할 일 추가</summary>
+      <form id="task-form">
+        <div class="field">
+          <label for="title">할 일 <span id="count">0 / 20</span></label>
+          <input id="title" name="title" type="text" placeholder="예: 회의 준비" required>
+        </div>
+
+        <div class="field">
+          <label for="person">같이하는 사람 <span>선택</span></label>
+          <input id="person" name="person" type="text" placeholder="비워 두면 혼자 하는 일">
+        </div>
+
+        <div class="field">
+          <label for="date">해야 할 날짜</label>
+          <div class="date-field">
+            <input id="date" name="date" type="date">
+            <button id="add-date" class="secondary" type="button">＋ 날짜</button>
+          </div>
+          <ul id="dates" class="chips" aria-label="선택한 날짜"></ul>
+        </div>
+
+        <div class="field">
+          <label for="time">해야 할 시간</label>
+          <input id="time" name="time" type="time" required>
+        </div>
+
+        <div class="field">
+          <label for="deadline">만료기한 <span>선택</span></label>
+          <input id="deadline" name="deadline" type="datetime-local">
+        </div>
+
+        <button class="primary" type="submit">저장</button>
+        <button id="cancel-edit" class="secondary" type="button" hidden>수정 취소</button>
+      </form>
+    </details>
+
+    <p id="message" role="status" aria-live="polite" hidden></p>
+    <div class="list-heading">
+      <h2>할 일 목록</h2>
+      <span id="progress"></span>
+    </div>
+    <p id="empty">등록한 할 일이 없어요.</p>
+    <div id="groups"></div>
+    <details id="exchange">
+      <summary>환율 계산기</summary>
+      <div class="exchange-fields">
+        <div class="amount-pair">
+          <label class="field">원화 (KRW)
+            <input id="won" type="text" inputmode="numeric" placeholder="원화 입력" autocomplete="off">
+          </label>
+          <label class="field"><span id="fx-label">외화</span>
+            <input id="foreign-amount" type="text" inputmode="decimal" placeholder="외화 입력" autocomplete="off">
+          </label>
+        </div>
+        <label class="field">외화 통화 <select id="currency" disabled></select></label>
+        <label class="field">적용 환율 <select id="quote" disabled></select></label>
+        <p id="basis"></p>
+        <output id="converted" aria-live="polite"></output>
+        <p id="fx-status" role="status"></p>
+        <button id="reload-fx" class="secondary" type="button">최신 환율 조회</button>
+        <a href="https://www.kebhana.com/cont/mall/mall15/mall1501/index.jsp" target="_blank" rel="noopener noreferrer">하나은행 현재환율 ↗</a>
+      </div>
+    </details>
+  </main>
+</body>
+</html>
