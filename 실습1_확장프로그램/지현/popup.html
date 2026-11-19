@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>토벌? 무서워랏~</title>
+  <link rel="stylesheet" href="popup.css?v=2">
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <header><p id="today"></p><p id="remaining" aria-live="polite">불러오는 중…</p><img id="status-image" alt="" hidden><p id="image-caption" hidden><span id="caption-text" aria-hidden="true"></span></p></header>
+  <main>
+    <form id="add-form" novalidate>
+      <div class="input-row">
+        <input id="task-text" type="text" placeholder="갖고 싶은 건 전부 손에 넣는 거라고!" aria-label="갖고 싶은 건 전부 손에 넣는 거라고!" aria-describedby="message" required>
+        <button type="submit">추가</button>
+      </div>
+    </form>
+    <p id="message" role="status" aria-live="polite"></p>
+    <ul id="tasks" aria-label="위대 목록"></ul>
+    <p id="empty">내가 위대하단 걸 아냔 말이야!!!</p>
+  </main>
+  <template id="task-template">
+    <li class="task">
+      <button class="remove secondary" type="button" title="위대 삭제"><img src="쓰레기통.png" alt="" width="24" height="28"></button>
+      <div class="task-content"><p class="task-title task-text"></p></div>
+      <button class="finish secondary" type="button">완료</button>
+    </li>
+  </template>
+</body>
+</html>
+
+
