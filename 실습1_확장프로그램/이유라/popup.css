@@ -1,0 +1,357 @@
+:root {
+  --ink: #392531;
+  --muted: #705667;
+  --line: #ecdde6;
+  --surface: #fff7fb;
+  --white: #fff;
+  --accent: #f5cde2;
+  --accent-hover: #efbad5;
+  --focus: #86516e;
+  --danger: #a33035;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  width: 380px;
+  margin: 0;
+  padding: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 14px/1.5 system-ui, "Malgun Gothic", sans-serif;
+}
+
+h1, h2, p, dl, dd { margin: 0; }
+h1 {
+  color: #d41475;
+  font-size: 22px;
+}
+h2 { font-size: 16px; }
+
+.masthead,
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.masthead-icon {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.masthead-icon img { display: block; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .masthead-icon img { animation: heart-pulse 3s ease-in-out infinite; }
+
+  .masthead-icon::before,
+  .masthead-icon::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: 10px;
+    height: 10px;
+    background: #b11263;
+    clip-path: polygon(50% 0, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0 50%, 37% 37%);
+    opacity: 0;
+    pointer-events: none;
+    animation: heart-sparkle 3s ease-out infinite;
+  }
+
+  .masthead-icon::before { top: -3px; right: -3px; }
+  .masthead-icon::after { bottom: 0; left: -4px; animation-delay: 180ms; }
+}
+
+@keyframes heart-pulse {
+  0%, 35%, 100% { transform: scale(1); }
+  15% { transform: scale(1.09); }
+}
+
+@keyframes heart-sparkle {
+  0%, 35%, 100% { opacity: 0; transform: scale(0.45) rotate(-15deg); }
+  15% { opacity: 1; transform: scale(1.1) rotate(10deg); }
+}
+
+.section-heading { justify-content: space-between; }
+
+main {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+main > section + section {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+button, input { font: inherit; color: inherit; }
+
+button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:disabled { opacity: 0.7; cursor: wait; }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.count, .status, .rate-source {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.count { margin-bottom: 8px; font-weight: 650; }
+
+#add-form {
+  display: flex;
+  gap: 8px;
+}
+
+#todo-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+#todo-input::placeholder { color: var(--muted); }
+
+.primary {
+  padding-inline: 14px;
+  background: var(--accent);
+  border-color: #e8b7d2;
+  font-weight: 700;
+}
+
+.primary:hover { background: var(--accent-hover); }
+
+.secondary, .open {
+  background: #f9edf4;
+  border-color: var(--line);
+}
+
+.secondary:not(:disabled):hover, .open:hover { background: #f3e0eb; }
+
+.error {
+  margin-top: 8px;
+  color: var(--danger);
+}
+
+#todo-list {
+  display: grid;
+  gap: 6px;
+  max-height: 340px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 3px;
+  margin: 9px -3px -3px;
+}
+
+#todo-list:empty { display: none; }
+
+#todo-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 8px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+#todo-list input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  margin: 0 2px;
+  flex: none;
+  accent-color: var(--focus);
+  cursor: pointer;
+}
+
+#todo-list .text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#todo-list .done .text {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+#todo-list button {
+  padding: 3px 7px;
+  font-size: 12px;
+}
+
+.delete {
+  background: transparent;
+  color: var(--danger);
+}
+
+.delete:hover { background: #faebeb; }
+
+.empty {
+  margin-top: 12px;
+  padding: 16px 8px;
+  color: var(--muted);
+  text-align: center;
+  border: 1px dashed #e6cadb;
+  border-radius: 9px;
+}
+
+.status { margin-top: 10px; }
+
+#rate-list {
+  margin-top: 10px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.rate-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.rate-row + .rate-row { border-top: 1px solid var(--line); }
+.rate-row dt, .rate-row dd { font-weight: 700; }
+.rate-row dd { text-align: right; font-variant-numeric: tabular-nums; }
+.rate-row.is-usd { color: #852857; }
+.rate-row.is-usd dd { font-size: 16px; }
+
+.rate-meta {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.rate-source { margin-top: 10px; }
+.rate-source a { color: inherit; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.rate-calculator {
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+
+#calculator-fields { min-width: 0; margin: 10px 0 0; padding: 0; border: 0; }
+
+.calculator-currencies, .calculator-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calculator-currencies button { padding: 5px; border-color: var(--line); background: var(--surface); }
+.calculator-currencies button span { font-size: 11px; }
+.calculator-currencies [data-currency="USD"] { color: #852857; font-weight: 800; border-color: #e8b7d2; }
+.calculator-currencies button[aria-pressed="true"] { border-color: var(--focus); background: var(--accent); font-weight: 800; }
+
+.calculator-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: 5px 8px;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.calculator-inputs input, #bank-rate-table {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--white);
+  color: inherit;
+  font: inherit;
+}
+
+.calculator-inputs input[aria-invalid="true"] { border-color: var(--danger); }
+.calculator-results { text-align: center; }
+.calculator-results div { padding: 5px; border-radius: 6px; background: var(--surface); }
+.rate-calculator.is-usd .calculator-results div:first-child { background: #fae5f0; color: #852857; }
+.calculator-results dt { font-size: 11px; }
+.calculator-results dd { font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+.calculator-import { margin-top: 9px; font-size: 12px; }
+.calculator-import summary { cursor: pointer; color: var(--muted); }
+.calculator-import textarea { display: block; margin: 6px 0; resize: vertical; }
+
+#weather-city {
+  max-width: 130px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: inherit;
+  font: inherit;
+}
+
+.weather-card {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.weather-current {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+#weather-condition { font-weight: 700; }
+#weather-date { color: var(--muted); font-size: 12px; }
+#weather-temperature { font-size: 28px; font-weight: 700; }
+
+.weather-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.weather-summary dt { color: var(--muted); font-size: 12px; }
+.weather-summary dd { margin-top: 2px; font-weight: 700; }
+.weather-footer { margin-top: 10px; }
+.weather-footer .rate-source { margin-top: 0; }

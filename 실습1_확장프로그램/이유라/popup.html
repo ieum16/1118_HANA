@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기 ♡</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="masthead">
+    <span class="masthead-icon" aria-hidden="true">
+      <img src="icons/icon-48.png" alt="" width="32" height="32">
+    </span>
+    <h1>오늘 할 일 <span aria-hidden="true">♡</span></h1>
+  </header>
+
+  <main>
+    <section id="todo-panel" aria-label="할 일 목록">
+      <p id="count" class="count" aria-live="polite">남은 할 일 0개</p>
+      <form id="add-form">
+        <input id="todo-input" type="text" aria-label="할 일" placeholder="할 일을 입력하세요" maxlength="100" autocomplete="off" autofocus>
+        <button class="primary" type="submit">추가</button>
+      </form>
+      <p id="error" class="error" role="alert" hidden>할 일을 입력해 주세요.</p>
+      <ul id="todo-list"></ul>
+      <p id="empty" class="empty">아직 할 일이 없어요.</p>
+    </section>
+
+    <section id="rates-panel" aria-labelledby="rates-heading">
+      <section class="rate-calculator" aria-labelledby="calculator-heading">
+        <h2 id="calculator-heading">환율 계산기</h2>
+        <fieldset id="calculator-fields" disabled>
+          <legend class="visually-hidden">환율 계산 입력</legend>
+          <div class="calculator-currencies" role="group" aria-label="계산할 통화">
+            <button type="button" data-currency="USD" aria-pressed="true">USD <span>달러</span></button>
+            <button type="button" data-currency="JPY" aria-pressed="false">JPY <span>엔</span></button>
+            <button type="button" data-currency="EUR" aria-pressed="false">EUR <span>유로</span></button>
+          </div>
+          <div class="calculator-inputs">
+            <label for="calculator-amount">외화 금액 (<span id="calculator-unit">USD</span>)</label>
+            <input id="calculator-amount" data-field="amount" inputmode="decimal" autocomplete="off" placeholder="100">
+            <label for="calculator-rate">기준환율 (<span id="calculator-rate-unit">1 USD당 원</span>)</label>
+            <input id="calculator-rate" data-field="rate" inputmode="decimal" autocomplete="off" placeholder="직접 입력">
+            <label for="calculator-buy-spread">살 때 스프레드 (%)</label>
+            <input id="calculator-buy-spread" data-field="buySpread" inputmode="decimal" autocomplete="off" placeholder="예: 1.75">
+            <label for="calculator-sell-spread">팔 때 스프레드 (%)</label>
+            <input id="calculator-sell-spread" data-field="sellSpread" inputmode="decimal" autocomplete="off" placeholder="비우면 살 때와 동일">
+            <label for="calculator-preference">우대율 (%)</label>
+            <input id="calculator-preference" data-field="preference" inputmode="decimal" autocomplete="off" placeholder="0">
+          </div>
+          <dl class="calculator-results" aria-label="원화 환산 결과" aria-live="polite">
+            <div><dt>기준 환산</dt><dd id="calculator-base-total">—</dd></div>
+            <div><dt>외화 살 때</dt><dd id="calculator-buy-total">—</dd></div>
+            <div><dt>외화 팔 때</dt><dd id="calculator-sell-total">—</dd></div>
+          </dl>
+          <details class="calculator-import">
+            <summary>은행 환율표 붙여넣기</summary>
+            <label class="visually-hidden" for="bank-rate-table">은행 환율표</label>
+            <textarea id="bank-rate-table" rows="3" placeholder="매매기준율 열 제목과 통화별 행을 함께 복사해 붙여넣으세요."></textarea>
+            <button class="secondary" id="apply-bank-rates" type="button">환율표 적용</button>
+          </details>
+        </fieldset>
+        <p id="bank-rate-status" class="status" role="status" hidden></p>
+        <p id="calculator-storage-status" class="status" role="status" hidden></p>
+      </section>
+
+      <div class="section-heading">
+        <h2 id="rates-heading">원화 기준 환율</h2>
+        <button class="secondary" id="refresh-rates" type="button">새로고침</button>
+      </div>
+      <p id="rates-status" class="status" role="status" hidden></p>
+      <dl id="rate-list" aria-label="통화별 환율" hidden></dl>
+      <p class="rate-source">참고 환율 · <a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter</a></p>
+    </section>
+
+    <section id="weather-panel" aria-labelledby="weather-heading">
+      <div class="section-heading">
+        <h2 id="weather-heading">오늘의 날씨</h2>
+        <select id="weather-city" aria-label="날씨 지역"></select>
+      </div>
+      <p id="weather-status" class="status" role="status" hidden></p>
+      <div id="weather-details" class="weather-card" hidden>
+        <div class="weather-current">
+          <div><p id="weather-condition"></p><time id="weather-date"></time></div>
+          <p id="weather-temperature"></p>
+        </div>
+        <dl class="weather-summary">
+          <div><dt>최저</dt><dd id="weather-low"></dd></div>
+          <div><dt>최고</dt><dd id="weather-high"></dd></div>
+          <div><dt>최대 강수확률</dt><dd id="weather-rain"></dd></div>
+        </dl>
+      </div>
+      <div class="section-heading weather-footer">
+        <p class="rate-source">날씨 제공 · <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a></p>
+        <button class="secondary" id="refresh-weather" type="button">새로고침</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="popup.js"></script>
+  <script src="rates.js"></script>
+  <script src="rate-calculator.js"></script>
+  <script src="weather.js"></script>
+</body>
+</html>

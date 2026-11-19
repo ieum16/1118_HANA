@@ -1,0 +1,44 @@
+#todo-ext-add {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 99999;
+  padding: 12px 18px;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  font-size: 17px;
+  font-weight: bold;
+  color: #392531;
+  background: #f5cde2;
+  border: 1px solid #e8b7d2;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(57, 37, 49, 0.15);
+  cursor: pointer;
+}
+
+#todo-ext-add:hover {
+  background: #efbad5;
+}
+
+#todo-ext-add:focus-visible {
+  outline: 2px solid #86516e;
+  outline-offset: 2px;
+}
+
+#todo-ext-add[hidden],
+#todo-ext-toast[hidden] {
+  display: none;
+}
+
+#todo-ext-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 80px;
+  z-index: 99999;
+  padding: 10px 16px;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  font-size: 16px;
+  color: #392531;
+  background: #f9edf4;
+  border: 1px solid #ecdde6;
+  border-radius: 10px;
+}
