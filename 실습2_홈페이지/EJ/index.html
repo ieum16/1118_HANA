@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>데이터마케팅팀 · 캠페인 스튜디오</title>
+<style>
+:root { --teal:#008485; --teal-dark:#00696a; --teal-light:#e7f4f3; --pink:#E90061; --gray:#B5B5B5; --ink:#182b31; --muted:#586d73; --line:#dfe7e9; --bg:#f3f7f8; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+button,input,textarea,select { font:inherit; }
+button,a,input,textarea,select { -webkit-tap-highlight-color:transparent; }
+button { cursor:pointer; }
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible { outline:3px solid var(--teal); outline-offset:3px; }
+button { border:0; }
+a { color:var(--teal-dark); }
+[hidden] { display:none !important; }
+.shell { display:grid; grid-template-columns:240px minmax(0,1fr); min-height:100vh; }
+.sidebar { background:white; border-right:1px solid var(--line); padding:30px 22px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; }
+.brand { display:flex; align-items:center; gap:11px; margin-bottom:48px; }
+.monogram { width:43px; height:43px; flex-shrink:0; border-radius:12px; background:var(--teal); color:white; display:grid; place-items:center; font-size:17px; font-weight:800; letter-spacing:-1px; }
+.brand strong { font-size:17px; letter-spacing:-.6px; display:block; }
+.brand small { font-size:12px; color:var(--muted); }
+.nav { display:grid; gap:8px; }
+.nav button { text-align:left; padding:12px 15px; background:transparent; color:var(--muted); border-radius:9px; font-size:15px; font-weight:600; }
+.nav button[aria-current="page"] { background:var(--teal-light); color:var(--teal-dark); }
+.nav button:hover { background:#f0f6f6; }
+.side-bottom { margin-top:auto; padding-top:24px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+.side-bottom strong { display:block; color:var(--ink); font-size:14px; }
+.workspace { min-width:0; }
+.topbar { min-height:76px; background:#ffffffd9; border-bottom:1px solid var(--line); padding:16px 38px; display:flex; justify-content:space-between; align-items:center; gap:15px; }
+.topbar span { font-size:14px; color:var(--muted); }
+.topbar strong { font-size:14px; font-weight:500; }
+.menu-button { display:none; background:white; border:1px solid var(--line); border-radius:8px; padding:6px 10px; color:var(--ink); }
+main { max-width:1550px; margin:auto; padding:32px 38px 50px; }
+.page-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:26px; }
+h1 { font-size:30px; line-height:1.3; letter-spacing:-1px; margin:0 0 8px; }
+.page-heading p { margin:0; color:var(--muted); font-size:15px; }
+.btn { padding:10px 17px; border-radius:9px; background:var(--teal); color:white; font-weight:600; font-size:14px; white-space:nowrap; min-height:43px; }
+.btn:hover { background:var(--teal-dark); }
+.btn.secondary { background:white; color:var(--ink); border:1px solid var(--line); }
+.btn.secondary:hover { background:var(--teal-light); }
+.editor-layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; align-items:start; gap:24px; }
+.editor { display:grid; gap:20px; min-width:0; }
+.card { background:white; border:1px solid var(--line); border-radius:16px; padding:24px; box-shadow:0 4px 15px #173b4703; }
+.card-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; }
+h2 { font-size:18px; letter-spacing:-.4px; margin:0; }
+.card-heading small { font-size:12px; color:var(--muted); }
+label,.field-title { display:block; font-size:14px; font-weight:600; margin:0 0 7px; }
+input[type="text"],input[type="number"],input[type="date"],input[type="time"],select,textarea { width:100%; border:1px solid #cfdcdf; border-radius:8px; padding:10px 12px; background:#fff; color:var(--ink); min-height:43px; min-width:0; }
+input::placeholder,textarea::placeholder { color:#7b8e94; }
+textarea { resize:vertical; }
+select { appearance:none; padding-right:34px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='m3 5 4 4 4-4' fill='none' stroke='%23586d73' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+.field { margin-bottom:18px; min-width:0; }
+.field:last-child { margin-bottom:0; }
+.grid-two { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+fieldset { border:0; margin:0 0 18px; padding:0; min-width:0; }
+legend { padding:0; font-size:14px; font-weight:600; margin-bottom:9px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { margin:0; font-weight:500; position:relative; }
+.chip input { position:absolute; opacity:0; width:1px; height:1px; }
+.chip span { display:block; padding:7px 13px; border:1px solid var(--line); border-radius:7px; font-size:14px; cursor:pointer; }
+.chip input:checked + span { background:var(--teal-light); border-color:var(--teal); color:var(--teal-dark); }
+.chip input:focus-visible + span { outline:3px solid var(--teal); outline-offset:3px; }
+.help { font-size:12px; color:var(--muted); margin:6px 0 0; line-height:1.6; }
+.audience-strip { padding:15px 17px; border-radius:10px; background:var(--teal-light); display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px; }
+.audience-strip span { font-size:14px; color:var(--teal-dark); }
+.audience-strip strong { font-size:24px; color:var(--teal-dark); }
+.title-counter { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.title-counter small { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.push-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(180px,.85fr); gap:20px; align-items:start; }
+.phone-preview { background:linear-gradient(155deg,#dfe9ed,#d0dddf); border:5px solid #e6edef; border-radius:23px; padding:16px 10px 25px; min-height:250px; }
+.phone-clock { text-align:center; font-size:30px; font-weight:300; color:#324d55; margin:9px 0 17px; }
+.notification { background:#fffffff2; border-radius:13px; padding:12px; box-shadow:0 4px 15px #20373f08; }
+.notification-app { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--muted); margin-bottom:6px; }
+.app-mark { width:16px; height:16px; display:grid; place-items:center; background:var(--teal); color:white; border-radius:4px; font-size:9px; font-weight:700; }
+.notification strong { display:block; font-size:13px; overflow-wrap:anywhere; }
+.notification p { font-size:12px; margin:4px 0 0; overflow-wrap:anywhere; white-space:pre-wrap; }
+.preview-caption { text-align:center; color:var(--muted); font-size:12px; margin-top:8px; }
+.forecast { position:sticky; top:24px; display:grid; gap:18px; }
+.forecast-card { border-top:3px solid var(--teal); }
+.forecast-card h2 { margin-bottom:5px; }
+.forecast-card > p { font-size:12px; color:var(--muted); margin:0 0 20px; }
+.metric { padding-bottom:17px; margin-bottom:17px; border-bottom:1px solid var(--line); }
+.metric-label { font-size:14px; color:var(--muted); display:block; }
+.metric-number { font-size:38px; font-weight:750; letter-spacing:-1.5px; line-height:1.5; font-variant-numeric:tabular-nums; }
+.metric-number small { font-size:15px; margin-left:5px; font-weight:500; letter-spacing:0; color:var(--muted); }
+.metric.pink .metric-number { color:var(--pink); }
+.metric.teal .metric-number { color:var(--teal); }
+.rate-label { display:flex; justify-content:space-between; align-items:center; }
+.rate-input { position:relative; }
+.rate-input input { padding-right:32px; }
+.rate-input span { position:absolute; right:13px; top:10px; font-size:14px; color:var(--muted); }
+.funnel { margin:18px 0; display:grid; gap:11px; }
+.funnel-row { display:grid; grid-template-columns:45px 1fr 35px; align-items:center; gap:8px; font-size:11px; color:var(--muted); }
+.track { height:7px; background:#edf1f2; border-radius:10px; overflow:hidden; }
+.bar { background:var(--teal); border-radius:10px; height:100%; width:100%; transition:width .2s; }
+.bar.pink { background:var(--pink); }
+.actions { display:flex; align-items:center; justify-content:space-between; gap:14px; padding-top:2px; flex-wrap:wrap; }
+#save-state { font-size:12px; color:var(--muted); margin:0; }
+.feedback { border-radius:9px; font-size:14px; margin:12px 0 0; }
+.feedback:not(:empty) { padding:10px 13px; background:var(--teal-light); color:var(--teal-dark); }
+.feedback.error:not(:empty) { background:#fff0f5; color:#a00042; }
+#rate-error { color:#a00042; font-size:13px; margin:8px 0 0; }
+.plans { display:grid; gap:16px; }
+.plan { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:20px; }
+.plan h2 { overflow-wrap:anywhere; }
+.plan p { margin:7px 0; color:var(--muted); font-size:14px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.plan-meta { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:12px; font-size:13px; }
+.status { font-size:12px; display:inline-block; padding:3px 9px; border-radius:6px; color:var(--teal-dark); background:var(--teal-light); margin-bottom:8px; }
+.status.past { color:#69455a; background:#f4eaf0; }
+.empty-state { text-align:center; padding:55px 24px; }
+.empty-state p { color:var(--muted); }
+.about-hero { padding:45px; background:var(--teal); color:white; border-radius:18px; margin-bottom:20px; }
+.about-hero h2 { font-size:30px; margin-bottom:12px; }
+.about-hero p { max-width:600px; margin:0; opacity:.94; }
+.about-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.about-cards p { font-size:15px; color:var(--muted); }
+@media(min-width:1600px) { .editor-layout { grid-template-columns:minmax(0,1fr) 340px; } }
+@media(max-width:1190px) { .shell { grid-template-columns:205px minmax(0,1fr); } .sidebar { padding:28px 16px; } main { padding:28px 24px; } .topbar { padding:15px 24px; } .editor-layout { grid-template-columns:minmax(0,1fr) 280px; gap:18px; } .card { padding:20px; } .push-layout { grid-template-columns:1fr; } .phone-preview { min-height:200px; max-width:310px; width:100%; margin:auto; } }
+@media(max-width:960px) { .editor-layout { grid-template-columns:minmax(0,1fr); } .forecast { position:static; } .forecast-card { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; } .forecast-head,.forecast-foot { grid-column:1/-1; } .forecast-card > p { grid-column:1/-1; } .push-layout { grid-template-columns:1fr 1fr; } }
+@media(max-width:700px) { .shell { display:block; } .sidebar { height:auto; position:static; padding:16px 20px; border-right:0; border-bottom:1px solid var(--line); } .brand { margin:0; } .brand small { display:none; } .side-bottom { display:none; } .nav { display:none; margin-top:15px; } .nav.open { display:grid; } .menu-button { display:block; margin-left:auto; } .topbar { min-height:50px; padding:10px 20px; } .topbar span { font-size:12px; } main { padding:24px 16px 35px; } .page-heading { align-items:flex-start; } h1 { font-size:25px; } .page-heading p { font-size:14px; } .card { padding:19px; } .grid-two,.push-layout { grid-template-columns:1fr; gap:0; } .grid-two > .field { margin-bottom:16px; } .phone-preview { margin-top:8px; } .forecast-card { display:block; } .metric-number { font-size:35px; } .plan { grid-template-columns:1fr; gap:10px; } .plan .btn { justify-self:start; } .about-cards { grid-template-columns:1fr; } .about-hero { padding:28px; } .about-hero h2 { font-size:25px; } .page-heading .btn { font-size:13px; padding:9px 12px; } }
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><span class="monogram" aria-hidden="true">DM</span><div><strong>데이터마케팅팀</strong><small>CAMPAIGN STUDIO</small></div><button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation">메뉴</button></div>
+  <nav class="nav" id="navigation" aria-label="주 메뉴">
+    <button type="button" data-view="campaign" aria-current="page">캠페인 만들기</button>
+    <button type="button" data-view="schedule">캠페인 일정 <span id="plan-count">0</span></button>
+    <button type="button" data-view="about">팀 소개</button>
+  </nav>
+  <div class="side-bottom"><strong>EJ의 워크스페이스</strong>가상 고객 데이터로 기획하는<br>디지털 마케팅 캠페인</div>
+</aside>
+<div class="workspace">
+<header class="topbar"><span>데이터마케팅팀 / <span id="breadcrumb">캠페인 만들기</span></span><strong id="today-label"></strong></header>
+<main>
+<section id="campaign-view" aria-labelledby="campaign-heading">
+  <div class="page-heading"><div><h1 id="campaign-heading">다음 방문을 만드는 캠페인</h1><p>고객을 이해하고, 메시지를 설계하고, 기대 성과를 확인하세요.</p></div><button id="new-campaign" class="btn secondary" type="button">새 캠페인</button></div>
+  <form id="campaign-form" novalidate>
+  <div class="editor-layout">
+    <div class="editor">
+      <section class="card" aria-labelledby="basic-heading">
+        <div class="card-heading"><h2 id="basic-heading">캠페인 기획</h2><small id="editing-label">새 계획</small></div>
+        <div class="field"><label for="campaign-name">캠페인명</label><input id="campaign-name" type="text" placeholder="예. 앱 다시 만나기" required></div>
+        <div class="field"><label for="campaign-goal">캠페인 목표</label><textarea id="campaign-goal" rows="2" placeholder="이번 캠페인으로 만들고 싶은 고객 행동" required></textarea></div>
+      </section>
+      <section class="card" aria-labelledby="target-heading">
+        <div class="card-heading"><h2 id="target-heading">고객 타깃 설정</h2><small>가상 고객 1,000명</small></div>
+        <fieldset><legend>연령대</legend><div class="chips" id="age-options"></div></fieldset>
+        <div class="grid-two">
+          <div class="field"><label for="last-active">최근 앱 접속일</label><select id="last-active"><option value="all">전체</option><option value="week">최근 7일</option><option value="month">8~30일 전</option><option value="quarter">31~90일 전</option><option value="dormant">91일 이상 전</option></select></div>
+          <div class="field"><label for="frequency">앱 이용 빈도 · 최근 30일</label><select id="frequency"><option value="all">전체</option><option value="none">0회</option><option value="low">1~3회</option><option value="medium">4~9회</option><option value="high">10회 이상</option></select></div>
+        </div>
+        <fieldset><legend>보유 금융상품</legend><div class="chips" id="product-options"></div><p class="help">선택한 상품 중 하나 이상 보유한 고객을 포함합니다. 연령대·상품을 모두 해제하면 해당 조건은 전체로 적용합니다.</p></fieldset>
+        <div class="audience-strip"><span>조건에 맞는 고객 <span id="audience-percent"></span></span><strong id="audience-inline">1,000명</strong></div>
+        <p class="help">예시 고객 데이터 기준입니다. 서로 다른 조건은 모두 충족하는 고객을 집계합니다.</p>
+      </section>
+      <section class="card" aria-labelledby="push-heading">
+        <div class="card-heading"><h2 id="push-heading">푸시 메시지</h2><small>모바일 알림 미리보기</small></div>
+        <div class="push-layout">
+          <div><div class="field"><div class="title-counter"><label for="push-title">제목</label><small id="title-counter">0 / 30</small></div><input id="push-title" type="text" required aria-describedby="title-counter"></div>
+          <div class="field"><div class="title-counter"><label for="push-body">본문</label><small id="body-counter">0 / 100</small></div><textarea id="push-body" rows="4" required aria-describedby="body-counter"></textarea></div></div>
+          <div><div class="phone-preview" aria-label="푸시 알림 미리보기"><div class="phone-clock" id="preview-clock">09:00</div><div class="notification"><div class="notification-app"><span class="app-mark">D</span>데이터마케팅 앱 · 지금</div><strong id="preview-title"></strong><p id="preview-body"></p></div></div><p class="preview-caption">작성한 메시지의 표시 예시</p></div>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="date-heading">
+        <div class="card-heading"><h2 id="date-heading">발송 일정 계획</h2><small>한국 시간 · KST</small></div>
+        <div class="grid-two"><div class="field"><label for="send-date">예정 날짜</label><input id="send-date" type="date" required></div><div class="field"><label for="send-time">예정 시각</label><input id="send-time" type="time" required></div></div>
+        <p class="help">계획을 저장해 일정 목록에서 관리합니다. 실제 발송은 사용하는 발송 시스템에서 진행하세요.</p>
+      </section>
+      <div><div class="actions"><p id="save-state" role="status">입력값 자동 저장</p><button class="btn" id="save-campaign" type="submit">캠페인 계획 저장</button></div><p id="form-feedback" class="feedback" role="status" aria-live="polite"></p></div>
+    </div>
+    <aside class="forecast" aria-labelledby="forecast-heading">
+      <section class="card forecast-card">
+        <div class="forecast-head"><h2 id="forecast-heading">예상 성과</h2><p class="help">입력한 비율을 적용한 예상치</p></div>
+        <div style="grid-column:1/-1;height:15px" aria-hidden="true"></div>
+        <div class="metric"><span class="metric-label">타깃 고객 수</span><div class="metric-number"><span id="target-count">1,000</span><small>명</small></div></div>
+        <div class="metric pink"><span class="metric-label">예상 푸시 클릭 수</span><div class="metric-number"><span id="click-count">50</span><small>명</small></div></div>
+        <div class="metric teal"><span class="metric-label">예상 앱 방문 수</span><div class="metric-number"><span id="visit-count">40</span><small>명</small></div></div>
+        <div class="field"><label for="click-rate">예상 푸시 클릭률</label><div class="rate-input"><input id="click-rate" type="number" min="0" max="100" step="0.1" required><span>%</span></div></div>
+        <div class="field"><label for="visit-rate">클릭 후 앱 방문율</label><div class="rate-input"><input id="visit-rate" type="number" min="0" max="100" step="0.1" required><span>%</span></div></div>
+        <div class="forecast-foot"><p id="rate-error" role="status"></p><div class="funnel" aria-label="타깃 대비 예상 클릭과 앱 방문 비율">
+          <div class="funnel-row"><span>타깃</span><div class="track"><div class="bar"></div></div><span>100%</span></div>
+          <div class="funnel-row"><span>클릭</span><div class="track"><div class="bar pink" id="click-bar"></div></div><span id="click-percent">5%</span></div>
+          <div class="funnel-row"><span>앱 방문</span><div class="track"><div class="bar" id="visit-bar"></div></div><span id="visit-percent">4%</span></div>
+        </div><p class="help">앱 방문 수는 푸시를 클릭한 뒤 앱에 도달하는 예상 인원입니다. 예시 클릭률과 방문율을 캠페인 가정에 맞게 바꿔 보세요.</p></div>
+      </section>
+    </aside>
+  </div>
+  </form>
+</section>
+<section id="schedule-view" hidden aria-labelledby="schedule-heading"><div class="page-heading"><div><h1 id="schedule-heading">캠페인 일정</h1><p>저장한 계획을 한국 시간의 예정 일정순으로 확인합니다.</p></div><button class="btn" id="schedule-new" type="button">새 캠페인</button></div><div class="plans" id="plans"></div></section>
+<section id="about-view" hidden aria-labelledby="about-heading"><div class="page-heading"><div><h1 id="about-heading">데이터마케팅팀</h1><p>고객 이해에서 더 나은 앱 경험까지</p></div></div><div class="about-hero"><h2>데이터로 이해하고,<br>마케팅으로 연결합니다.</h2><p>고객 데이터를 분석해 마케팅 성과를 높이는 팀입니다. 고객의 앱 이용 맥락을 살펴보고, 필요한 순간에 닿는 캠페인을 설계합니다.</p></div><div class="about-cards"><article class="card"><h2>디지털 마케팅 담당자</h2><p>기획부터 타깃·메시지·일정까지 캠페인 준비를 이어갑니다.</p></article><article class="card"><h2>경영진·리더</h2><p>대상 규모와 예상 클릭·방문으로 캠페인의 기대 성과를 검토합니다.</p></article><article class="card"><h2>협업 부서</h2><p>캠페인 목표와 메시지, 예정 일정을 함께 확인합니다.</p></article></div></section>
+</main>
+</div>
+</div>
+<script>
+(() => {
+  'use strict';
+  const storageKey = 'ej:campaign-studio:v1';
+  const $ = id => document.getElementById(id);
+  const ageValues = ['20','30','40','50','60'];
+  const productValues = ['예금','적금','대출','펀드','카드'];
+  let randomSeed = 281119;
+  function random() {
+    randomSeed = (randomSeed * 1664525 + 1013904223) >>> 0;
+    return randomSeed / 4294967296;
+  }
+  const customers = Array.from({length:1000}, (_, index) => {
+    const lastActive = Math.floor(random() * 121);
+    const products = productValues.filter(() => random() > .55);
+    return {id:index + 1, age:20 + Math.floor(random() * 60), lastActive,
+      frequency:lastActive > 30 ? 0 : 1 + Math.floor(random() * 19),
+      products:products.length ? products : [productValues[index % productValues.length]]};
+  });
+  const fields = {
+    name:$('campaign-name'), goal:$('campaign-goal'), lastActive:$('last-active'),
+    frequency:$('frequency'), title:$('push-title'), body:$('push-body'),
+    date:$('send-date'), time:$('send-time'), clickRate:$('click-rate'), visitRate:$('visit-rate')
+  };
+  function koreanDate(date) {
+    const parts = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(date);
+    const part = type => parts.find(item => item.type === type).value;
+    return part('year') + '-' + part('month') + '-' + part('day');
+  }
+  function defaults() {
+    return {id:null, name:'앱 다시 만나기', goal:'앱 방문이 뜸해진 고객의 재방문과 서비스 탐색 유도',
+      ages:[], products:[], lastActive:'all', frequency:'all', title:'오늘, 앱에서 새로운 소식을 만나보세요',
+      body:'나에게 필요한 서비스와 새로운 소식을 앱에서 확인해 보세요.', date:koreanDate(new Date(Date.now()+86400000)), time:'09:00', clickRate:'5', visitRate:'80'};
+  }
+  function readStored() {
+    const text = localStorage.getItem(storageKey);
+    if (!text) return {draft:defaults(), campaigns:[]};
+    const stored = JSON.parse(text);
+    if (!stored || !Array.isArray(stored.campaigns)) throw new Error('invalid storage');
+    return stored;
+  }
+  let campaigns = [];
+  let editingId = null;
+  let draft = defaults();
+  let storageReady = true;
+  try {
+    const stored = readStored();
+    campaigns = stored.campaigns.filter(item => item && typeof item.id === 'string' && item.draft && Number.isFinite(Date.parse(item.scheduledAt)));
+    draft = {...draft, ...stored.draft};
+  } catch {
+    storageReady = false;
+    $('save-state').textContent = '이전 입력을 불러오지 못했어요. 현재 입력은 화면에서 유지됩니다.';
+  }
+  function addChips(container, values, name, label) {
+    for (const value of values) {
+      const wrapper = document.createElement('label');
+      wrapper.className = 'chip';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.name = name;
+      checkbox.value = value;
+      const text = document.createElement('span');
+      text.textContent = label(value);
+      wrapper.append(checkbox, text);
+      container.append(wrapper);
+    }
+  }
+  addChips($('age-options'), ageValues, 'ages', value => value === '60' ? '60대 이상' : value + '대');
+  addChips($('product-options'), productValues, 'products', value => value);
+  function selected(name) {
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'), input => input.value);
+  }
+  function collectDraft() {
+    const current = {id:editingId, ages:selected('ages'), products:selected('products')};
+    for (const [key, input] of Object.entries(fields)) current[key] = input.value;
+    return current;
+  }
+  function applyDraft(value) {
+    const current = {...defaults(), ...value};
+    editingId = typeof current.id === 'string' ? current.id : null;
+    for (const [key, input] of Object.entries(fields)) input.value = typeof current[key] === 'string' ? current[key] : defaults()[key];
+    for (const name of ['ages','products']) {
+      const values = Array.isArray(current[name]) ? current[name] : [];
+      for (const input of document.querySelectorAll('input[name="' + name + '"]')) input.checked = values.includes(input.value);
+    }
+    $('editing-label').textContent = editingId ? '계획 수정 중' : '새 계획';
+    $('save-campaign').textContent = editingId ? '변경한 계획 저장' : '캠페인 계획 저장';
+    update();
+  }
+  function targetCustomers(current) {
+    const recency = {all:() => true, week:days => days <= 7, month:days => days >= 8 && days <= 30,
+      quarter:days => days >= 31 && days <= 90, dormant:days => days >= 91};
+    const frequency = {all:() => true, none:count => count === 0, low:count => count >= 1 && count <= 3,
+      medium:count => count >= 4 && count <= 9, high:count => count >= 10};
+    return customers.filter(customer =>
+      (!current.ages.length || current.ages.includes(String(Math.min(60, Math.floor(customer.age / 10) * 10)))) &&
+      recency[current.lastActive](customer.lastActive) &&
+      frequency[current.frequency](customer.frequency) &&
+      (!current.products.length || current.products.some(product => customer.products.includes(product))));
+  }
+  function validRate(text) {
+    return String(text).trim() !== '' && Number.isFinite(Number(text)) && Number(text) >= 0 && Number(text) <= 100;
+  }
+  function forecast(count, clickRate, visitRate) {
+    const clicks = count * Number(clickRate) / 100;
+    return {clicks:Math.round(clicks), visits:Math.round(clicks * Number(visitRate) / 100)};
+  }
+  const format = number => number.toLocaleString('ko-KR');
+  function update() {
+    const current = collectDraft();
+    const count = targetCustomers(current).length;
+    $('audience-inline').textContent = format(count) + '명';
+    $('audience-percent').textContent = '· 전체의 ' + (count / 10).toFixed(1) + '%';
+    $('target-count').textContent = format(count);
+    $('preview-title').textContent = current.title || '푸시 제목을 입력해 주세요';
+    $('preview-body').textContent = current.body || '메시지 본문이 여기에 표시됩니다.';
+    $('preview-clock').textContent = current.time || '09:00';
+    $('title-counter').textContent = Array.from(current.title).length + ' / 30';
+    $('body-counter').textContent = Array.from(current.body).length + ' / 100';
+    const valid = validRate(current.clickRate) && validRate(current.visitRate);
+    $('rate-error').textContent = valid ? '' : '클릭률과 앱 방문율을 0~100%로 입력해 주세요.';
+    const result = valid ? forecast(count, current.clickRate, current.visitRate) : {clicks:null, visits:null};
+    $('click-count').textContent = valid ? format(result.clicks) : '—';
+    $('visit-count').textContent = valid ? format(result.visits) : '—';
+    const clickPercent = valid && count ? Number(current.clickRate) : 0;
+    const visitPercent = valid && count ? Number(current.clickRate) * Number(current.visitRate) / 100 : 0;
+    $('click-bar').style.width = clickPercent + '%';
+    $('visit-bar').style.width = visitPercent + '%';
+    $('click-percent').textContent = valid ? clickPercent.toLocaleString('ko-KR',{maximumFractionDigits:1}) + '%' : '—';
+    $('visit-percent').textContent = valid ? visitPercent.toLocaleString('ko-KR',{maximumFractionDigits:1}) + '%' : '—';
+  }
+  function persistDraft() {
+    if (!storageReady) return;
+    try {
+      const latest = readStored();
+      campaigns = latest.campaigns;
+      localStorage.setItem(storageKey, JSON.stringify({draft:collectDraft(), campaigns}));
+      $('save-state').textContent = '입력값 저장됨 · 이 브라우저';
+    } catch {
+      $('save-state').textContent = '입력값 저장에 실패했어요. 다음 입력 시 다시 시도합니다.';
+    }
+  }
+  function feedback(text, error = false) {
+    $('form-feedback').textContent = text;
+    $('form-feedback').classList.toggle('error', error);
+  }
+  function showView(name) {
+    for (const view of ['campaign','schedule','about']) $(view + '-view').hidden = view !== name;
+    for (const button of document.querySelectorAll('[data-view]')) {
+      if (button.dataset.view === name) button.setAttribute('aria-current','page');
+      else button.removeAttribute('aria-current');
+    }
+    $('breadcrumb').textContent = {campaign:'캠페인 만들기',schedule:'캠페인 일정',about:'팀 소개'}[name];
+    $('navigation').classList.remove('open');
+    $('menu-toggle').setAttribute('aria-expanded','false');
+    if (name === 'schedule') renderPlans();
+  }
+  function startNew() {
+    const blank = {...defaults(), name:'', goal:'', title:'', body:''};
+    applyDraft(blank);
+    persistDraft();
+    feedback('');
+    showView('campaign');
+    fields.name.focus();
+  }
+  function planParagraph(text) {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = text;
+    return paragraph;
+  }
+  function renderPlans() {
+    $('plan-count').textContent = campaigns.length;
+    const list = $('plans');
+    list.replaceChildren();
+    if (!campaigns.length) {
+      const empty = document.createElement('div');
+      empty.className = 'card empty-state';
+      const heading = document.createElement('h2');
+      heading.textContent = '아직 저장한 캠페인이 없어요';
+      empty.append(heading, planParagraph('캠페인을 기획하고 예정 일정을 저장해 보세요.'));
+      list.append(empty);
+      return;
+    }
+    for (const campaign of [...campaigns].sort((a,b) => Date.parse(a.scheduledAt)-Date.parse(b.scheduledAt))) {
+      const card = document.createElement('article');
+      card.className = 'card plan';
+      const content = document.createElement('div');
+      const status = document.createElement('span');
+      const past = Date.parse(campaign.scheduledAt) <= Date.now();
+      status.className = past ? 'status past' : 'status';
+      status.textContent = past ? '예정 시각 지남' : '예정';
+      const title = document.createElement('h2');
+      title.textContent = campaign.draft.name;
+      const date = new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(campaign.scheduledAt));
+      const meta = document.createElement('div');
+      meta.className = 'plan-meta';
+      for (const text of ['대상 ' + format(campaign.targetCount) + '명', '예상 클릭 ' + format(campaign.clicks) + '명', '예상 앱 방문 ' + format(campaign.visits) + '명']) {
+        const item = document.createElement('span');
+        item.textContent = text;
+        meta.append(item);
+      }
+      content.append(status,title,planParagraph(date + ' · 한국 시간'),planParagraph(campaign.draft.goal),
+        planParagraph(campaign.draft.title + '\n' + campaign.draft.body), meta);
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'btn secondary';
+      edit.textContent = '계획 수정';
+      edit.setAttribute('aria-label', campaign.draft.name + ' 계획 수정');
+      edit.addEventListener('click', () => {
+        applyDraft({...campaign.draft, id:campaign.id});
+        persistDraft();
+        showView('campaign');
+        feedback('저장된 계획을 불러왔어요. 수정 후 저장해 주세요.');
+        fields.name.focus();
+      });
+      card.append(content,edit);
+      list.append(card);
+    }
+  }
+  $('campaign-form').addEventListener('input', () => { update(); persistDraft(); feedback(''); });
+  $('campaign-form').addEventListener('change', () => { update(); persistDraft(); });
+  $('campaign-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const current = collectDraft();
+    const required = [['name','캠페인명을 입력해 주세요.'],['goal','캠페인 목표를 입력해 주세요.'],['title','푸시 제목을 입력해 주세요.'],['body','푸시 본문을 입력해 주세요.']];
+    for (const [key, text] of required) {
+      if (!current[key].trim()) { feedback(text,true); fields[key].focus(); return; }
+    }
+    if (Array.from(current.title).length > 30 || Array.from(current.body).length > 100) {
+      feedback('푸시 제목은 30자, 본문은 100자 이내로 작성해 주세요.',true);
+      (Array.from(current.title).length > 30 ? fields.title : fields.body).focus();
+      return;
+    }
+    if (!validRate(current.clickRate) || !validRate(current.visitRate)) {
+      feedback('클릭률과 앱 방문율을 0~100%로 입력해 주세요.',true);
+      (!validRate(current.clickRate) ? fields.clickRate : fields.visitRate).focus();
+      return;
+    }
+    const scheduledAt = current.date + 'T' + current.time + ':00+09:00';
+    if (!current.date || !current.time || !Number.isFinite(Date.parse(scheduledAt)) || Date.parse(scheduledAt) <= Date.now()) {
+      feedback('현재보다 늦은 예정 날짜와 시각을 선택해 주세요.',true);
+      fields.date.focus();
+      return;
+    }
+    const count = targetCustomers(current).length;
+    if (!count) { feedback('대상 고객이 0명이에요. 타깃 조건을 조정해 주세요.',true); return; }
+    if (!storageReady) { feedback('브라우저 저장소를 읽을 수 없어 계획을 저장하지 못했어요. 브라우저 저장 권한을 확인해 주세요.',true); return; }
+    try {
+      const latest = readStored().campaigns;
+      const existing = latest.find(item => item.id === editingId);
+      const id = editingId || (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+      const result = forecast(count,current.clickRate,current.visitRate);
+      const item = {id, draft:{...current,id}, scheduledAt, targetCount:count, ...result,
+        createdAt:existing?.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()};
+      const next = latest.filter(plan => plan.id !== id).concat(item);
+      localStorage.setItem(storageKey,JSON.stringify({draft:item.draft,campaigns:next}));
+      campaigns = next;
+      editingId = id;
+      $('editing-label').textContent = '계획 수정 중';
+      $('save-campaign').textContent = '변경한 계획 저장';
+      $('save-state').textContent = '계획과 입력값 저장됨 · 이 브라우저';
+      renderPlans();
+      feedback(existing ? '캠페인 계획을 수정했어요. 캠페인 일정에서 확인할 수 있습니다.' : '캠페인 계획을 저장했어요. 캠페인 일정에서 확인할 수 있습니다.');
+    } catch {
+      feedback('저장하지 못했어요. 현재 입력을 유지했으니 브라우저 저장 공간을 확인하고 다시 시도해 주세요.',true);
+    }
+  });
+  for (const button of document.querySelectorAll('[data-view]')) button.addEventListener('click', () => showView(button.dataset.view));
+  $('new-campaign').addEventListener('click', startNew);
+  $('schedule-new').addEventListener('click', startNew);
+  $('menu-toggle').addEventListener('click', () => {
+    const open = $('navigation').classList.toggle('open');
+    $('menu-toggle').setAttribute('aria-expanded', String(open));
+  });
+  window.addEventListener('storage', event => {
+    if (event.key !== storageKey) return;
+    try { campaigns = readStored().campaigns; renderPlans(); } catch { $('save-state').textContent = '다른 창의 저장 내용을 읽지 못했어요.'; }
+  });
+  $('today-label').textContent = new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric',weekday:'short'}).format(new Date());
+  applyDraft(draft);
+  renderPlans();
+})();
+</script>
+</body>
+</html>
