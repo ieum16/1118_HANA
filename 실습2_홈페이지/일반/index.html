@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="운영팀의 업무 시스템 안내. 겪고 있는 상황을 골라 먼저 확인할 일과 지원이 필요한 경우를 알아보세요.">
+  <title>운영팀 | 상황별 해결 방법</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="images/logo-icon.png?v=2">
+  <style>
+    @font-face {
+      font-family: "Gowun Dodum";
+      src: url("fonts/GowunDodum-Regular.woff2") format("woff2");
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: dark;
+      --bg: #08090b;
+      --panel: #232323;
+      --border: rgb(255 255 255 / 10%);
+      --control-border: #6e6e73;
+      --heading: #fff;
+      --text: #ddd;
+      --secondary: #b3b3b5;
+      --hero: #fff;
+      --hero-ink: #141416;
+      --hero-muted: #515156;
+      --green: #62c772;
+      --orange: #ec592e;
+      --focus: #2f6eeb;
+      --link: #a5c2ff;
+      --radius: .875rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--hero);
+      font: 400 1rem/1.6 "Gowun Dodum", "Nanum Gothic", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-synthesis: none;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    a { color: inherit; }
+    h1, h2, p { margin: 0; }
+    h1, h2 { font-weight: 400; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+    .container { width: min(72.5rem, calc(100% - 2 * clamp(1.125rem, 5vw, 4rem))); margin-inline: auto; }
+    .skip {
+      position: fixed;
+      top: .5rem;
+      left: 1rem;
+      z-index: 3;
+      padding: .5rem 1rem;
+      color: var(--hero-ink);
+      background: var(--hero);
+      transform: translateY(-200%);
+    }
+    .skip:focus { transform: none; }
+    .site-header { position: sticky; top: .75rem; z-index: 2; padding-top: .75rem; pointer-events: none; }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      min-height: 3.25rem;
+      padding: .35rem clamp(.55rem, 2vw, 1.1rem);
+      border: 1px solid #dedee1;
+      border-radius: 999px;
+      color: var(--hero-ink);
+      background: var(--hero);
+      pointer-events: auto;
+    }
+    .brand { display: inline-flex; align-items: center; gap: .38rem; font-size: 1.1rem; white-space: nowrap; }
+    .brand img { display: block; width: 1.5rem; height: 1.5rem; }
+    .header-inner nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.25rem;
+      padding: .25rem .8rem;
+      border-radius: 999px;
+      color: var(--hero);
+      background: var(--bg);
+      font-size: .9rem;
+      line-height: 1.4;
+      text-decoration: none;
+    }
+    .header-inner nav a:hover { background: var(--panel); }
+
+    .intro { color: var(--hero-ink); background: var(--hero); }
+    .intro-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(1.75rem, 6vw, 5rem);
+      padding-block: clamp(3.5rem, 9vw, 8.5rem);
+    }
+    h1 {
+      font-size: clamp(2.6rem, 6.4vw, 5rem);
+      line-height: 1.04;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+    .intro p { margin-top: 1.05rem; max-width: 31rem; color: var(--hero-muted); font-size: clamp(1rem, 1.7vw, 1.15rem); }
+    .hero-illustration { position: relative; display: grid; place-items: center; min-height: 12.5rem; border-block: 1px dashed #ceced2; }
+    .hero-illustration::before { content: ""; position: absolute; inset: 0 13%; border-inline: 1px dashed #ceced2; pointer-events: none; }
+    .illustration-panel {
+      z-index: 1;
+      width: min(68%, 15rem);
+      padding: .95rem;
+      border: 1px solid #29292c;
+      border-radius: var(--radius);
+      background: #fafafa;
+      transform: rotate(-8deg);
+    }
+    .illustration-panel > span { display: flex; align-items: center; gap: .65rem; padding-block: .5rem; }
+    .illustration-panel > span + span { border-top: 1px solid #dadadd; }
+    .illustration-panel i { width: .75rem; height: .75rem; border: 1px solid #454548; border-radius: .2rem; }
+    .illustration-panel b { width: 54%; height: 1px; background: #6b6b70; }
+    .illustration-panel > span:nth-child(2) b { width: 36%; }
+    .illustration-panel > span:nth-child(3) b { width: 62%; }
+    .illustration-check {
+      position: absolute;
+      z-index: 1;
+      top: 13%;
+      right: 10%;
+      display: grid;
+      width: 2.6rem;
+      height: 2.6rem;
+      place-items: center;
+      border: 1px solid #29292c;
+      border-radius: 50%;
+      background: #fff;
+      transform: rotate(8deg);
+    }
+    .illustration-check::after { content: ""; width: 1rem; height: .52rem; border: solid #29292c; border-width: 0 0 1px 1px; transform: translateY(-.13rem) rotate(-45deg); }
+
+    .guide-surface { background: var(--bg); }
+    .keywords { padding-block: clamp(2.65rem, 6vw, 5rem); }
+    .keywords h2, .help h2 { color: var(--heading); font-size: clamp(1.5rem, 3.5vw, 2.15rem); line-height: 1.2; letter-spacing: -.018em; }
+    .keyword-list { display: flex; flex-wrap: wrap; align-items: center; gap: .57rem; margin: 1.1rem 0 0; padding: 0; list-style: none; }
+    .keyword-list a, .more-guides {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.28rem;
+      padding: .32rem .85rem;
+      border: 1px solid var(--control-border);
+      border-radius: 999px;
+      color: var(--secondary);
+      font-size: .925rem;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+    .keyword-list a.keyword-medium { color: var(--text); border-color: #838388; font-size: 1rem; }
+    .keyword-list a.keyword-strong { color: var(--heading); border-color: var(--text); font-size: clamp(1.05rem, 2vw, 1.2rem); }
+    .keyword-list a:hover, .more-guides:hover { border-color: var(--heading); color: var(--heading); background: var(--panel); }
+
+    .help { padding-block: clamp(2.4rem, 6vw, 5rem) clamp(3.25rem, 8vw, 6.75rem); border-top: 1px dashed var(--border); scroll-margin-top: 4.6rem; }
+    .help-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+    .more-guides { flex: none; min-width: 4.6rem; justify-content: center; color: var(--heading); }
+    .more-guides[hidden] { display: none; }
+    .section-copy { margin-top: .55rem; color: var(--secondary); }
+    .accordion { margin-top: 1.45rem; border: 1px solid var(--border); border-radius: var(--radius); }
+    .accordion details { scroll-margin-top: 5rem; }
+    .accordion details + details { border-top: 1px solid var(--border); }
+    .accordion details:target > summary, .accordion summary:hover { color: var(--link); }
+    .accordion summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 1.5rem;
+      align-items: center;
+      gap: 1rem;
+      min-height: 4.25rem;
+      padding: .9rem clamp(.9rem, 2.4vw, 1.5rem);
+      list-style: none;
+      cursor: pointer;
+      color: var(--heading);
+      font-size: clamp(1.1rem, 2.3vw, 1.4rem);
+      line-height: 1.35;
+    }
+    .accordion summary::-webkit-details-marker { display: none; }
+    .accordion summary:focus-visible { outline-offset: -3px; }
+    .accordion summary::after {
+      content: "";
+      justify-self: center;
+      width: .58rem;
+      height: .58rem;
+      border: solid currentColor;
+      border-width: 0 1.5px 1.5px 0;
+      transform: translateY(-.15rem) rotate(45deg);
+    }
+    .accordion details[open] > summary::after { transform: translateY(.15rem) rotate(225deg); }
+    .instructions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .95rem 1.5rem;
+      margin: 0 .75rem .75rem;
+      padding: clamp(.85rem, 2vw, 1.25rem);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) - .2rem);
+      background: var(--panel);
+    }
+    .instructions dt { display: flex; align-items: center; gap: .45rem; margin-bottom: .25rem; color: var(--heading); }
+    .instructions dt::before { content: ""; width: .4rem; height: .4rem; border-radius: 50%; background: var(--green); }
+    .instructions .support dt::before { background: var(--orange); }
+    .instructions dd { margin: 0; color: var(--text); }
+    .site-footer { border-top: 1px solid var(--border); color: var(--text); background: var(--bg); }
+    .footer-contact { padding-block: 1.45rem; font-style: normal; }
+    .footer-contact dl { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; margin: 0; }
+    .footer-contact dl div { display: flex; gap: .5rem; }
+    .footer-contact dt { color: var(--secondary); }
+    .footer-contact dd { margin: 0; }
+    .footer-contact .extension { font-family: ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+    @media (max-width: 37rem) {
+      .intro-inner { grid-template-columns: minmax(0, 1fr); padding-block: 3.1rem 3.3rem; }
+      .hero-illustration { display: none; }
+      .accordion summary { min-height: 3.75rem; }
+      .instructions { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#help">상황별 해결 방법으로 바로 가기</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <span class="brand"><img src="images/logo-icon.png" width="24" height="24" alt="">운영팀</span>
+      <nav aria-label="주 메뉴"><a href="#help">상황별 해결 방법</a></nav>
+    </div>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="intro-title">
+      <div class="container intro-inner">
+        <div>
+          <h1 id="intro-title">먼저 확인해주세요!</h1>
+          <p>운영팀은 업무에 필요한 시스템을 관리하고, 현업에서 겪는 문제의 해결 방법을 안내합니다.</p>
+        </div>
+        <div class="hero-illustration" aria-hidden="true">
+          <div class="illustration-panel">
+            <span><i></i><b></b></span>
+            <span><i></i><b></b></span>
+            <span><i></i><b></b></span>
+          </div>
+          <div class="illustration-check"></div>
+        </div>
+      </div>
+    </section>
+    <div class="guide-surface">
+      <nav class="container keywords" aria-labelledby="keyword-title">
+        <h2 id="keyword-title">운영 키워드</h2>
+        <ul class="keyword-list">
+          <li><a href="#screen">#화면접속</a></li>
+          <li><a href="#screen">#화면오류</a></li>
+          <li><a href="#screen">#로딩지연</a></li>
+          <li><a href="#screen">#브라우저</a></li>
+          <li><a href="#permission">#권한신청</a></li>
+          <li><a href="#permission">#접근권한</a></li>
+          <li><a href="#permission">#메뉴권한</a></li>
+          <li><a href="#permission">#권한승인</a></li>
+          <li><a href="#upload">#파일업로드</a></li>
+          <li><a href="#upload">#파일용량</a></li>
+          <li><a href="#upload">#파일형식</a></li>
+          <li><a href="#upload">#업로드오류</a></li>
+          <li><a href="#share">#이미지전달</a></li>
+          <li><a href="#share">#이미지공유</a></li>
+          <li><a href="#share">#공유범위</a></li>
+          <li><a href="#share">#외부전달</a></li>
+          <li><a href="#encryption">#암호화해제</a></li>
+          <li><a href="#encryption">#암호화문서</a></li>
+          <li><a href="#encryption">#문서열람</a></li>
+          <li><a href="#encryption">#해제권한</a></li>
+        </ul>
+      </nav>
+      <section class="container help" id="help" aria-labelledby="help-title">
+        <div class="help-heading">
+          <h2 id="help-title">상황별 해결 방법</h2>
+          <a class="more-guides" href="?view=all#help" aria-label="상황별 해결 방법 전체 목록 더보기">더보기</a>
+        </div>
+        <p class="section-copy">지금 겪고 있는 상황을 골라 보세요.</p>
+        <div class="accordion">
+          <details id="screen" name="operations-guides">
+            <summary>화면이 안 열려요</summary>
+            <dl class="instructions">
+              <div><dt>먼저 할 일</dt><dd>공식 접속 경로를 다시 열고 평소 사용하는 브라우저에서 새로고침해 보세요.</dd></div>
+              <div class="support"><dt>지원이 필요한 경우</dt><dd>계속 열리지 않으면 화면 이름과 오류 문구를 확인해 시스템 지원을 요청하세요.</dd></div>
+            </dl>
+          </details>
+          <details class="permission" id="permission" name="operations-guides">
+            <summary>권한이 필요해요</summary>
+            <dl class="instructions">
+              <div><dt>먼저 할 일</dt><dd>필요한 시스템과 메뉴, 사용 목적을 정리하고 공식 권한 신청 절차를 확인하세요.</dd></div>
+              <div class="support"><dt>지원이 필요한 경우</dt><dd>어떤 권한이 필요한지 또는 누가 승인하는지 모르겠다면 운영팀에 문의하세요.</dd></div>
+            </dl>
+          </details>
+          <details class="upload" id="upload" name="operations-guides">
+            <summary>파일을 업로드하고 싶어요</summary>
+            <dl class="instructions">
+              <div><dt>먼저 할 일</dt><dd>허용되는 파일 종류와 용량을 확인하고, 업무 시스템에서 지정한 화면에 올리세요.</dd></div>
+              <div class="support"><dt>지원이 필요한 경우</dt><dd>규격을 맞춰도 업로드가 실패하면 오류 문구를 확인해 지원을 요청하세요.</dd></div>
+            </dl>
+          </details>
+          <details class="share" id="share" name="operations-guides">
+            <summary>이미지를 전달하고 싶어요</summary>
+            <dl class="instructions">
+              <div><dt>먼저 할 일</dt><dd>받는 사람과 공유 범위를 확인하고, 업무에 승인된 수단으로 전달하세요.</dd></div>
+              <div class="support"><dt>지원이 필요한 경우</dt><dd>외부로 보내거나 추가 승인이 필요한 경우 공식 절차를 확인하세요.</dd></div>
+            </dl>
+          </details>
+          <details class="encryption" id="encryption" name="operations-guides">
+            <summary>암호화를 해제하고 싶어요</summary>
+            <dl class="instructions">
+              <div><dt>먼저 할 일</dt><dd>문서를 열람할 권한이 있는지와 공식 해제 절차를 확인하세요.</dd></div>
+              <div class="support"><dt>지원이 필요한 경우</dt><dd>해제 권한이 필요하거나 절차를 모르겠다면 담당자에게 요청하세요.</dd></div>
+            </dl>
+          </details>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <address class="container footer-contact" aria-label="운영팀 연락처">
+      <dl>
+        <div><dt>대표 담당자</dt><dd>임일반</dd></div>
+        <div><dt>내선번호</dt><dd class="extension">2345</dd></div>
+      </dl>
+    </address>
+  </footer>
+  <script>
+    const keywordList = document.querySelector('.keyword-list');
+    const keywordItems = Array.from(keywordList.children);
+
+    for (let index = keywordItems.length - 1; index > 0; index -= 1) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [keywordItems[index], keywordItems[randomIndex]] = [keywordItems[randomIndex], keywordItems[index]];
+    }
+
+    const strongPositions = new Set([0, 5, 10, 16]);
+    const mediumPositions = new Set([2, 4, 7, 9, 13, 15, 18]);
+    keywordItems.forEach((item, index) => {
+      const link = item.querySelector('a');
+      if (strongPositions.has(index)) link.classList.add('keyword-strong');
+      if (mediumPositions.has(index)) link.classList.add('keyword-medium');
+    });
+    keywordList.append(...keywordItems);
+
+    const guides = Array.from(document.querySelectorAll('.accordion > details'));
+    const moreLink = document.querySelector('.more-guides');
+    const fullList = new URLSearchParams(location.search).get('view') === 'all';
+
+    moreLink.hidden = fullList;
+    if (!fullList) guides.slice(3).forEach((guide) => { guide.hidden = true; });
+
+    function showGuide(hash) {
+      const guide = document.getElementById(hash.slice(1));
+      if (!(guide instanceof HTMLDetailsElement)) return;
+
+      guide.hidden = false;
+      guide.open = true;
+    }
+
+    keywordList.addEventListener('click', (event) => {
+      const link = event.target.closest('a');
+      if (link && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+        showGuide(link.hash);
+      }
+    });
+
+    window.addEventListener('hashchange', () => showGuide(location.hash));
+    showGuide(location.hash);
+  </script>
+</body>
+</html>
