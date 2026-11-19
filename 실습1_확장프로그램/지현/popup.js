@@ -98,7 +98,7 @@ $('#add-form').addEventListener('submit', async event => {
   const rawText = $('#task-text').value;
   const text = normalize(rawText);
   let error = '';
-  if (!text) error = '위대을 입력해 주세요.';
+  if (!text) error = '할 일을 작성하라고!';
   else if (characterCount(rawText) > 50) error = '위대은 50자까지 입력할 수 있습니다.';
   else if (tasks.some(task => normalize(task.text).toLocaleLowerCase('ko') === text.toLocaleLowerCase('ko'))) error = '이미 등록한 위대입니다.';
   if (error) {
