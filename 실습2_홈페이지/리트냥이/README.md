@@ -17,7 +17,7 @@
 
 ## 배포 주소
 
-브라우저에서 [index.html](index.html)을 열어 볼 수 있다.
+https://leetcat-theta.vercel.app
 
 ## 화면
 
