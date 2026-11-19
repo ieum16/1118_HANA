@@ -46,3 +46,4 @@ https://weekly-work-dashboard-taupe.vercel.app/
 
 <!-- "있으면 좋음"에 남겨 둔 것. 한 줄에 하나씩 - -->
 - 기존 Word 회의자료 양식에 맞춘 표와 문단 서식
+- [인수인계 문서와 다음 작업 순서](HANDOFF.md)
