@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "오늘 할 일 작성기",
+  "version": "1.4.0",
+  "description": "데일리 업무와 오늘 할 일을 중요도, 우선순위, 마감 시간, 분류별로 관리합니다.",
+  "permissions": ["storage", "alarms", "notifications"],
+  "host_permissions": ["https://www.kebhana.com/*"],
+  "background": { "service_worker": "background.js" },
+  "icons": { "128": "icon.png" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "오늘 할 일 작성기"
+  }
+}
+
