@@ -20,7 +20,7 @@
 
 ## 배포 주소
 
-로컬 실행용입니다. index.html을 내려받아 브라우저에서 열 수 있습니다.
+https://teampagemarketing-campaign.vercel.app/
 
 ## 화면
 
