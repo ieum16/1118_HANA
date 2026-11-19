@@ -52,10 +52,17 @@
     }
     .primary { margin-top: 1.7rem; background: var(--blue); color: white; }
     .primary:hover { background: #1c50c4; }
+    .cat-carousel { position: relative; min-width: 0; }
     .hero-photo {
-      display: block; width: 100%; aspect-ratio: 1.55; object-fit: cover;
+      display: block; width: 100%; height: auto; aspect-ratio: 1.55; object-fit: cover;
       border-radius: 1.2rem; background: var(--line);
     }
+    .carousel-toggle {
+      position: absolute; right: .75rem; bottom: .75rem;
+      min-height: 2.75rem; padding: .4rem .75rem; border: 1px solid var(--line);
+      border-radius: .65rem; background: white; color: var(--navy); font-size: .875rem; font-weight: 700;
+    }
+    .carousel-toggle:hover { background: var(--sky); }
     .work, .contact { padding-block: clamp(3.25rem, 7vw, 5.5rem); }
     .section-title { margin-bottom: 1.5rem; font-size: clamp(1.85rem, 4vw, 2.7rem); }
     .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
@@ -119,8 +126,15 @@
           <p class="lead">고객 문의를 분석해 서비스 개선점을 찾는 팀</p>
           <a class="primary" href="#contact">반복 문의 공유하기</a>
         </div>
-        <img class="hero-photo" src="images/korean-shorthair.jpg"
-          alt="푸른빛 창가에서 쉬고 있는 갈색 줄무늬 코리안 숏헤어 고양이" fetchpriority="high">
+        <div class="cat-carousel" role="group" aria-label="코리안 숏헤어 사진">
+          <img class="hero-photo" src="images/korean-shorthair.jpg" width="1280" height="853"
+            alt="푸른빛 창가에서 쉬고 있는 갈색 줄무늬 코리안 숏헤어 고양이" fetchpriority="high">
+          <img class="hero-photo" src="images/korean-shorthair-orange.jpg" width="1280" height="826"
+            alt="창밖을 바라보는 주황색 줄무늬 코리안 숏헤어 고양이" fetchpriority="low" hidden>
+          <img class="hero-photo" src="images/korean-shorthair-tuxedo.jpg" width="1280" height="853"
+            alt="창턱에 누워 있는 검은색과 흰색의 코리안 숏헤어 고양이" fetchpriority="low" hidden>
+          <button class="carousel-toggle" type="button" hidden>자동 전환 멈춤</button>
+        </div>
       </div>
     </section>
     <section class="work wrap" id="work" aria-labelledby="work-title" tabindex="-1">
@@ -190,6 +204,40 @@
       }
     });
     matchMedia('(max-width: 639px)').addEventListener('change', () => setMenu(false));
+
+    const catPhotos = [...document.querySelectorAll('.cat-carousel .hero-photo')];
+    const carouselToggle = document.querySelector('.carousel-toggle');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let currentPhoto = 0;
+    let carouselTimer;
+    let autoplay = !reducedMotion.matches;
+
+    function showNextPhoto() {
+      const nextPhoto = (currentPhoto + 1) % catPhotos.length;
+      const nextImage = catPhotos[nextPhoto];
+      if (!nextImage.complete || !nextImage.naturalWidth) return;
+      catPhotos[currentPhoto].hidden = true;
+      nextImage.hidden = false;
+      currentPhoto = nextPhoto;
+    }
+
+    function syncCarousel() {
+      clearInterval(carouselTimer);
+      carouselToggle.textContent = autoplay ? '자동 전환 멈춤' : '자동 전환 시작';
+      if (autoplay && !document.hidden) carouselTimer = setInterval(showNextPhoto, 3000);
+    }
+
+    carouselToggle.hidden = false;
+    carouselToggle.addEventListener('click', () => {
+      autoplay = !autoplay;
+      syncCarousel();
+    });
+    reducedMotion.addEventListener('change', (event) => {
+      autoplay = !event.matches;
+      syncCarousel();
+    });
+    document.addEventListener('visibilitychange', syncCarousel);
+    syncCarousel();
 
     const copyButton = document.querySelector('.copy');
     const copyStatus = document.querySelector('.status');
