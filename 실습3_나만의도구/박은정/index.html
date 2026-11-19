@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>주간업무회의</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #14243d;
+    --muted: #4d6077;
+    --navy: #172f50;
+    --accent: #155b98;
+    --secondary: #1680a8;
+    --line: #dce4ed;
+    --surface: #fff;
+    --background: #f4f6f9;
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--background);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  button, input, textarea { font: inherit; }
+  button, input, textarea { border: 1px solid #aab9c9; border-radius: 7px; }
+  button { background: #fff; color: var(--ink); padding: .55rem .8rem; cursor: pointer; font-weight: 600; }
+  button:hover { background: #edf3f9; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  input, textarea { min-width: 0; padding: .5rem .6rem; background: #fff; color: var(--ink); }
+  textarea { width: 100%; resize: vertical; }
+  [hidden] { display: none !important; }
+  .wrap { width: min(1230px, 100%); padding-inline: clamp(16px, 5vw, 56px); margin-inline: auto; }
+  header { background: var(--surface); border-top: 5px solid var(--accent); border-bottom: 1px solid var(--line); padding: 1.65rem 0; }
+  .hero { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; }
+  .today { color: var(--muted); margin: 0 0 .45rem; font-size: .88rem; }
+  h1 { margin: 0; font-size: clamp(1.85rem, 5vw, 2.65rem); letter-spacing: -.06em; }
+  h2 { margin: 0; font-size: 1.19rem; letter-spacing: -.035em; }
+  .primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .primary:hover { background: #114979; }
+  .toolbar, .card { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; }
+  .toolbar { margin-top: 1rem; padding: .65rem 1rem; display: flex; flex-wrap: wrap; gap: .7rem 1rem; align-items: center; }
+  .toolbar label { font-weight: 700; }
+  .muted { color: var(--muted); font-size: .88rem; }
+  .toolbar .muted { font-variant-numeric: tabular-nums; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .card { min-width: 0; padding: clamp(1rem, 2.5vw, 1.5rem); }
+  #campaign { border-top: 3px solid var(--accent); }
+  .dashboard { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr) minmax(0, 1.5fr); gap: .7rem; margin-bottom: .85rem; }
+  .kpis { display: grid; gap: .55rem; }
+  .kpi, .chart-panel { min-width: 0; border: 1px solid var(--line); border-radius: 4px; }
+  .kpi { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .15rem .6rem; padding: .65rem .7rem; border-left: 4px solid var(--accent); }
+  .kpi:nth-child(2) { border-left-color: var(--secondary); }
+  .kpi strong { font-size: 1.45rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; color: var(--navy); }
+  .kpi span { font-size: .8rem; color: var(--muted); }
+  .chart-panel { padding: .65rem .7rem .7rem; }
+  .chart-panel h3 { margin: 0 0 .55rem; font-size: .94rem; }
+  .channel-row { display: grid; grid-template-columns: minmax(2rem, auto) 1fr minmax(3ch, auto); gap: .45rem; align-items: center; margin: .65rem 0; font-size: .8rem; }
+  .channel-value { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .channel-track { min-width: 0; height: .6rem; background: #eef3f8; }
+  .channel-track span { display: block; height: 100%; width: var(--share); background: var(--accent); }
+  .channel-row:nth-child(2) .channel-track span { background: var(--secondary); }
+  .channel-row:nth-child(3) .channel-track span { background: #477fa9; }
+  .chart-legend { display: flex; gap: .65rem; flex-wrap: wrap; margin: 0 0 .4rem; font-size: .72rem; color: var(--muted); }
+  .chart-legend span::before { content: ""; display: inline-block; width: .63rem; height: .63rem; margin-right: .25rem; background: var(--accent); }
+  .chart-legend span:nth-child(2)::before { background: var(--secondary); }
+  .trend-chart { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .25rem; text-align: center; }
+  .trend-bars { height: 4.6rem; display: flex; justify-content: center; align-items: end; gap: .16rem; border-bottom: 1px solid var(--line); background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), #eef3f8 calc(25% - 1px) 25%); }
+  .trend-bars span { width: min(32%, 1.1rem); height: var(--share); background: var(--accent); }
+  .trend-bars span:nth-child(2) { background: var(--secondary); }
+  .trend-date { color: var(--muted); font-size: .69rem; }
+  .section-head, .actions, .footer { display: flex; flex-wrap: wrap; gap: .5rem .7rem; align-items: center; }
+  .section-head { justify-content: space-between; margin-bottom: .85rem; }
+  .section-head p { margin: .35rem 0 0; }
+  .status { margin: .55rem 0; min-height: 1.3rem; }
+  .error { color: #a1212c; }
+  .records { display: grid; gap: .85rem; }
+  .record { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .45rem; align-items: start; padding: 1rem; border: 1px solid var(--line); border-radius: 9px; background: #f4f7fa; }
+  .record label { min-width: 0; }
+  .record label:not(:first-child) { grid-column: 1 / -1; }
+  .record label span { display: block; font-weight: 600; font-size: .82rem; margin-bottom: .3rem; }
+  .record textarea { font-size: .86rem; line-height: 1.55; }
+  .delete { grid-column: 2; grid-row: 1; align-self: end; font-size: .78rem; color: #a1212c; padding-inline: .48rem; }
+  .metric-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+  .metric-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .metrics { width: 100%; min-width: 685px; border-collapse: collapse; table-layout: fixed; text-align: center; font-size: .86rem; }
+  .metrics th, .metrics td { padding: .65rem; border-right: 1px solid var(--line); }
+  .metrics th:last-child, .metrics td:last-child { border-right: 0; }
+  .metrics th { background: #f1f6fb; padding-block: .75rem; }
+  .metrics th:nth-child(2) { width: 24%; }
+  .metrics th small { display: block; font-size: .73rem; font-weight: 400; color: var(--muted); margin-top: .18rem; }
+  .metrics td { border-top: 1px solid var(--line); }
+  .metrics input { text-align: right; width: 100%; max-width: 8rem; font-variant-numeric: tabular-nums; }
+  .metric-hint { display: none; margin: .4rem 0 0; }
+  [aria-invalid="true"] { border-color: #a1212c; }
+  .footer { padding: 1rem 0 2rem; }
+  .footer p { flex-basis: 100%; margin: .15rem 0 0; }
+  dialog { color: var(--ink); border: 1px solid var(--line); border-radius: 13px; width: min(650px, calc(100% - 32px)); max-height: 90vh; padding: 1.25rem; }
+  dialog::backdrop { background: #12223d99; }
+  dialog .actions { justify-content: flex-end; margin-top: .8rem; }
+  .preview { overflow: auto; max-height: 28vh; }
+  .preview table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+  .preview td, .preview th { border: 1px solid var(--line); padding: .4rem; white-space: pre-line; overflow-wrap: anywhere; text-align: left; }
+  .preview th { background: var(--background); }
+  @media (max-width: 840px) {
+    .metric-hint { display: block; }
+    .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kpis { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 540px) {
+    header { padding-top: 1.5rem; }
+    .dashboard { grid-template-columns: minmax(0, 1fr); }
+    .kpi { padding-inline: .5rem; }
+    .kpi strong { font-size: 1.15rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap hero">
+    <div><p class="today" id="today"></p><h1>주간업무회의</h1></div>
+    <button class="primary" id="export">Word 파일 저장</button>
+  </div>
+</header>
+<main class="wrap">
+  <div class="toolbar">
+    <label for="week">보고 주</label>
+    <input id="week" type="date" aria-describedby="week-range">
+    <span class="muted" id="week-range"></span>
+  </div>
+  <p class="status muted" id="status" role="status"></p>
+  <div class="layout">
+    <section id="campaign" class="card" aria-labelledby="campaign-title">
+      <div class="section-head">
+        <div>
+          <h2 id="campaign-title">전주 캠페인 실행 실적</h2>
+          <p class="muted" id="campaign-range"></p>
+        </div>
+        <button data-paste="campaign">표 붙여넣기</button>
+      </div>
+      <div class="dashboard">
+        <div class="kpis" id="campaign-kpis" role="group" aria-label="주요 캠페인 지표"></div>
+        <section class="chart-panel" aria-labelledby="channels-title">
+          <h3 id="channels-title">채널별 발송 건수</h3>
+          <div id="campaign-channels"></div>
+        </section>
+        <section class="chart-panel" aria-labelledby="trend-title">
+          <h3 id="trend-title">최근 6주 실적</h3>
+          <div class="chart-legend"><span>발송</span><span>실행</span></div>
+          <div id="campaign-trend"></div>
+        </section>
+      </div>
+      <div class="metric-scroll" role="region" aria-label="캠페인 실적 가로표" tabindex="0">
+        <table class="metrics" id="metrics"></table>
+      </div>
+      <p class="muted metric-hint">표를 좌우로 움직여 나머지 지표를 확인할 수 있습니다.</p>
+    </section>
+    <section id="issues" class="card issues" aria-labelledby="issues-title">
+      <div class="section-head">
+        <h2 id="issues-title">이번 주 운영 이슈</h2>
+        <div class="actions">
+          <button data-paste="issues">표 붙여넣기</button>
+          <button data-add="issues">이슈 추가</button>
+        </div>
+      </div>
+      <div data-records="issues"></div>
+    </section>
+    <section class="card tasks" aria-labelledby="tasks-title">
+      <div class="section-head">
+        <div>
+          <h2 id="tasks-title">이번 주 추진 업무</h2>
+          <p class="muted">업무명을 적고 필요한 칸에만 글을 작성하거나 붙여넣으세요.</p>
+        </div>
+        <div class="actions">
+          <button data-paste="tasks">표에서 가져오기</button>
+          <button data-add="tasks">업무 추가</button>
+        </div>
+      </div>
+      <div data-records="tasks"></div>
+    </section>
+  </div>
+  <footer class="footer">
+    <button id="backup">백업</button>
+    <button id="restore">복원</button>
+    <input id="backup-file" type="file" accept=".json,application/json" hidden>
+    <button id="clear-demo" hidden>예시 지우기</button>
+    <p class="muted">이 브라우저에 주차별로 저장됩니다. 브라우저 데이터를 지우기 전에 백업해 주세요.</p>
+  </footer>
+</main>
+<dialog id="paste-dialog" aria-labelledby="paste-title">
+  <h2 id="paste-title"></h2>
+  <p class="muted" id="paste-help"></p>
+  <label for="paste-text">복사한 표</label>
+  <textarea id="paste-text" rows="4" aria-describedby="paste-help"></textarea>
+  <p class="muted" id="paste-result" role="status"></p>
+  <div class="preview" id="paste-preview"></div>
+  <div class="actions">
+    <button id="paste-cancel">취소</button>
+    <button id="paste-apply" class="primary" disabled>반영</button>
+  </div>
+</dialog>
+<script>
+'use strict';
+
+const storageKey = 'myos:weekly-meeting';
+const columns = {
+  issues: ['이슈 제목', '내용 및 대응'],
+  tasks: ['단위 업무명', '현황', '개선 전', '개선 후'],
+  campaign: ['발송 건수', '실행 건수(손님 수 기준·중복 포함)', '문자 발송 건수', '푸시 발송 건수', '인앱 발송 건수', '사용 부서 수']
+};
+const units = ['건', '건', '건', '건', '건', '개'];
+const demoValues = ['1200', '950', '600', '400', '200', '5'];
+const sectionNames = { issues: '운영 이슈', tasks: '추진 업무', campaign: '캠페인 실적' };
+const $ = (selector) => document.querySelector(selector);
+const formatNumber = new Intl.NumberFormat('ko-KR');
+const pasteDialog = $('#paste-dialog');
+let pasteSection;
+let pasteData;
+let storageAvailable = true;
+
+function dateKey(date) {
+  return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+}
+
+function shiftDate(key, days) {
+  const date = new Date(key + 'T12:00:00');
+  date.setDate(date.getDate() + days);
+  return dateKey(date);
+}
+
+function monday(key) {
+  const weekday = new Date(key + 'T12:00:00').getDay();
+  return shiftDate(key, -((weekday + 6) % 7));
+}
+
+function isMonday(value) {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && shiftDate(value, 0) === value && monday(value) === value;
+}
+
+function period(key, previous = false) {
+  return shiftDate(key, previous ? -7 : 0) + ' ~ ' + shiftDate(key, previous ? -1 : 6);
+}
+
+const today = new Date();
+const currentMonday = monday(dateKey(today));
+
+function emptyWeek() {
+  return { issues: [], tasks: [], campaign: columns.campaign.map(() => ''), demoCampaign: [] };
+}
+
+function initialState() {
+  const week = emptyWeek();
+  week.issues = [{ values: ['발송 결과 반영 지연', '반영 시점을 확인해 공유할 예정'], demo: true }];
+  week.tasks = [
+    { values: ['발송 결과 확인', '확인 항목 정리 중', '표 두 곳을 대조', '한 표에서 확인'], demo: true },
+    { values: ['채널 실적 보고', '표 초안 작성', '채널별 수기 입력', '집계표를 한 번에 붙여넣기'], demo: true }
+  ];
+  week.campaign = [...demoValues];
+  week.demoCampaign = demoValues.map((_, index) => index);
+  return { version: 1, selected: currentMonday, weeks: { [currentMonday]: week } };
+}
+
+function isRow(row, width) {
+  return row && Array.isArray(row.values) && row.values.length === width &&
+    row.values.every((value) => typeof value === 'string') && typeof row.demo === 'boolean';
+}
+
+function validateState(data) {
+  return data?.version === 1 && isMonday(data.selected) && data.weeks &&
+    typeof data.weeks === 'object' && !Array.isArray(data.weeks) &&
+    Object.entries(data.weeks).every(([key, week]) =>
+      isMonday(key) && week &&
+      ['issues', 'tasks'].every((section) =>
+        Array.isArray(week[section]) && week[section].every((row) => isRow(row, columns[section].length))) &&
+      Array.isArray(week.campaign) && week.campaign.length === columns.campaign.length &&
+      week.campaign.every((value) => typeof value === 'string') &&
+      Array.isArray(week.demoCampaign) &&
+      week.demoCampaign.every((index) => Number.isInteger(index) && index >= 0 && index < columns.campaign.length));
+}
+
+function loadState() {
+  let saved;
+  try {
+    saved = localStorage.getItem(storageKey);
+  } catch {
+    storageAvailable = false;
+  }
+  if (saved !== null && saved !== undefined) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (validateState(parsed)) return parsed;
+    } catch {
+      // Keep the page usable if saved data cannot be read.
+    }
+    storageAvailable = false;
+  }
+  return initialState();
+}
+
+let state = loadState();
+
+function currentWeek() {
+  state.weeks[state.selected] ??= emptyWeek();
+  return state.weeks[state.selected];
+}
+
+function setStatus(message, error = false) {
+  const status = $('#status');
+  status.textContent = message;
+  status.classList.toggle('error', error);
+}
+
+function persist() {
+  if (storageAvailable) {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      return true;
+    } catch {
+      storageAvailable = false;
+    }
+  }
+  setStatus('브라우저에 저장할 수 없습니다. 백업으로 작성 내용을 보관해 주세요.', true);
+  return false;
+}
+
+function hasDemo(week) {
+  return week.issues.some((row) => row.demo) || week.tasks.some((row) => row.demo) || week.demoCampaign.length > 0;
+}
+
+function refreshStatus() {
+  $('#clear-demo').hidden = !Object.values(state.weeks).some(hasDemo);
+  if (persist()) setStatus(hasDemo(currentWeek()) ? '가상 예시가 포함되어 있습니다.' : '이 브라우저에 저장됐습니다.');
+}
+
+function element(tag, value, className) {
+  const node = document.createElement(tag);
+  if (value !== undefined) node.textContent = value;
+  if (className) node.className = className;
+  return node;
+}
+
+function renderRecords(section, focusLast = false) {
+  const root = $('[data-records="' + section + '"]');
+  const rows = currentWeek()[section];
+  root.replaceChildren();
+  if (rows.length === 0) {
+    root.append(element('p', section === 'issues' ? '등록된 운영 이슈가 없습니다.' : '등록된 추진 업무가 없습니다.', 'muted'));
+    return;
+  }
+  const records = element('div', undefined, 'records');
+  for (const [index, row] of rows.entries()) {
+    const record = element('div', undefined, 'record');
+    for (const [columnIndex, title] of columns[section].entries()) {
+      const label = element('label');
+      const field = element('textarea');
+      field.rows = columnIndex === 0 ? 1 : 3;
+      field.value = row.values[columnIndex];
+      field.setAttribute('aria-label', (index + 1) + '행 ' + title);
+      field.addEventListener('input', () => {
+        row.values[columnIndex] = field.value;
+        row.demo = false;
+        refreshStatus();
+      });
+      label.append(element('span', title), field);
+      record.append(label);
+    }
+    const remove = element('button', '삭제', 'delete');
+    remove.setAttribute('aria-label', sectionNames[section] + ' ' + (index + 1) + '행 삭제');
+    remove.addEventListener('click', () => {
+      if (row.values.some((value) => value.trim()) && !confirm('이 행을 삭제할까요?')) return;
+      rows.splice(index, 1);
+      renderRecords(section);
+      $('[data-add="' + section + '"]').focus();
+      refreshStatus();
+    });
+    record.append(remove);
+    records.append(record);
+  }
+  root.append(records);
+  if (focusLast) records.lastElementChild.querySelector('textarea').focus();
+}
+
+function normalizeCount(value) {
+  const trimmed = value.trim();
+  if (!/^(?:\d+|\d{1,3}(?:,\d{3})+)$/.test(trimmed)) return null;
+  const number = Number(trimmed.replaceAll(',', ''));
+  return Number.isSafeInteger(number) ? String(number) : null;
+}
+
+function campaignCount(week, index) {
+  const value = normalizeCount(week?.campaign[index] ?? '');
+  return value === null ? null : Number(value);
+}
+
+function displayCount(value) {
+  return value === null ? '—' : formatNumber.format(value);
+}
+
+function chartBar(value, maximum) {
+  const bar = element('span');
+  bar.style.setProperty('--share', ((value ?? 0) / maximum * 100) + '%');
+  return bar;
+}
+
+function renderCampaignOverview() {
+  const week = currentWeek();
+  const kpis = [[0, '발송 건수'], [1, '실행 건수'], [5, '사용 부서 수']];
+  $('#campaign-kpis').replaceChildren(...kpis.map(([index, label]) => {
+    const card = element('div', undefined, 'kpi');
+    card.append(element('span', label), element('strong', displayCount(campaignCount(week, index))));
+    return card;
+  }));
+
+  const channels = ['문자', '푸시', '인앱'].map((label, index) => [label, campaignCount(week, index + 2)]);
+  const channelMax = Math.max(1, ...channels.map(([, value]) => value ?? 0));
+  $('#campaign-channels').replaceChildren(...channels.map(([label, value]) => {
+    const row = element('div', undefined, 'channel-row');
+    const track = element('div', undefined, 'channel-track');
+    track.setAttribute('aria-hidden', 'true');
+    track.append(chartBar(value, channelMax));
+    row.append(element('span', label), track, element('span', displayCount(value), 'channel-value'));
+    return row;
+  }));
+
+  const points = Array.from({ length: 6 }, (_, index) => {
+    const reportWeek = shiftDate(state.selected, (index - 5) * 7);
+    const saved = state.weeks[reportWeek];
+    return { date: shiftDate(reportWeek, -7), sent: campaignCount(saved, 0), executed: campaignCount(saved, 1) };
+  });
+  const trend = $('#campaign-trend');
+  if (points.every(({ sent, executed }) => sent === null && executed === null)) {
+    trend.replaceChildren(element('p', '표시할 실적이 없습니다.', 'muted'));
+    return;
+  }
+  const trendMax = Math.max(1, ...points.flatMap(({ sent, executed }) => [sent ?? 0, executed ?? 0]));
+  const chart = element('div', undefined, 'trend-chart');
+  for (const { date, sent, executed } of points) {
+    const point = element('div');
+    const description = date + ' 주 발송 ' + (sent === null ? '미입력' : displayCount(sent) + '건') +
+      ', 실행 ' + (executed === null ? '미입력' : displayCount(executed) + '건');
+    point.setAttribute('role', 'img');
+    point.setAttribute('aria-label', description);
+    point.title = description;
+    const bars = element('div', undefined, 'trend-bars');
+    bars.append(chartBar(sent, trendMax), chartBar(executed, trendMax));
+    point.append(bars, element('span', date.slice(5).replace('-', '.'), 'trend-date'));
+    chart.append(point);
+  }
+  trend.replaceChildren(chart);
+}
+
+function renderMetrics() {
+  const week = currentWeek();
+  const table = $('#metrics');
+  table.replaceChildren();
+  const header = table.createTHead().insertRow();
+  const values = table.createTBody().insertRow();
+  for (const [index, title] of columns.campaign.entries()) {
+    const heading = element('th', index === 1 ? '실행 건수' : title);
+    heading.scope = 'col';
+    if (index === 1) heading.append(element('small', '손님 수 기준 · 중복 포함'));
+    header.append(heading);
+    const field = element('input');
+    field.inputMode = 'numeric';
+    field.setAttribute('aria-label', title);
+    field.placeholder = units[index];
+    field.value = week.campaign[index];
+    function showValidity() {
+      field.setAttribute('aria-invalid', String(field.value.trim() !== '' && normalizeCount(field.value) === null));
+    }
+    showValidity();
+    field.addEventListener('input', () => {
+      week.campaign[index] = field.value;
+      week.demoCampaign = week.demoCampaign.filter((item) => item !== index);
+      showValidity();
+      renderCampaignOverview();
+      refreshStatus();
+    });
+    values.insertCell().append(field);
+  }
+  renderCampaignOverview();
+}
+
+function render() {
+  $('#week').value = state.selected;
+  $('#week-range').textContent = period(state.selected);
+  $('#campaign-range').textContent = period(state.selected, true) + ' (월~일)';
+  renderRecords('issues');
+  renderRecords('tasks');
+  renderMetrics();
+  refreshStatus();
+}
+
+$('#today').textContent = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(today);
+$('#week').addEventListener('change', (event) => {
+  if (!event.target.value || event.target.value.length !== 10) {
+    event.target.value = state.selected;
+    return;
+  }
+  state.selected = monday(event.target.value);
+  render();
+});
+
+for (const button of document.querySelectorAll('[data-add]')) {
+  button.addEventListener('click', () => {
+    const section = button.dataset.add;
+    currentWeek()[section].push({ values: columns[section].map(() => ''), demo: false });
+    renderRecords(section, true);
+    refreshStatus();
+  });
+}
+
+const campaignAliases = [
+  ['발송건수', '전체발송건수', '총발송건수'],
+  ['실행건수', '실행손님수', '실행손님수중복포함', '실행건수손님수기준중복포함'],
+  ['문자', '문자발송건수'],
+  ['푸시', '푸시발송건수'],
+  ['인앱', '인앱발송건수'],
+  ['사용부서수', '사용부서']
+];
+
+function labelKey(value) {
+  return value.toLowerCase().replace(/[\s()·ㆍ:：]/g, '');
+}
+
+function campaignIndex(label) {
+  const key = labelKey(label);
+  return campaignAliases.findIndex((aliases) => aliases.includes(key));
+}
+
+function parseClipboardTable(html) {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const table = template.content.querySelector('table');
+  if (!table) return null;
+  return Array.from(table.rows, (row) => Array.from(row.cells, (cell) => {
+    for (const br of cell.querySelectorAll('br')) br.replaceWith('\n');
+    for (const paragraph of cell.querySelectorAll('p')) paragraph.append('\n');
+    for (const excluded of cell.querySelectorAll('script, style, template')) excluded.remove();
+    return cell.textContent.trim();
+  }));
+}
+
+function parseTabularText(text) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let quoted = false;
+  const normalized = text.replace(/\r\n?/g, '\n');
+  for (let index = 0; index < normalized.length; index++) {
+    const character = normalized[index];
+    if (character === '"' && quoted && normalized[index + 1] === '"') {
+      value += '"';
+      index++;
+    } else if (character === '"' && (quoted || value.length === 0)) {
+      quoted = !quoted;
+    } else if (!quoted && (character === '\t' || character === '\n')) {
+      row.push(value.trim());
+      value = '';
+      if (character === '\n') {
+        rows.push(row);
+        row = [];
+      }
+    } else {
+      value += character;
+    }
+  }
+  row.push(value.trim());
+  rows.push(row);
+  return rows;
+}
+
+function parseCampaign(rows) {
+  let values;
+  if (rows.length === 1 && rows[0].length === columns.campaign.length) {
+    [values] = rows;
+  } else {
+    values = columns.campaign.map(() => '');
+    const headers = rows[0].map(campaignIndex);
+    if (rows.length === 2 && headers.includes(0) && new Set(headers.filter((index) => index >= 0)).size === 6) {
+      headers.forEach((index, position) => {
+        if (index >= 0) values[index] = rows[1][position] ?? '';
+      });
+    } else {
+      const seen = new Set();
+      for (const [label, value] of rows) {
+        const index = campaignIndex(label);
+        if (index < 0) continue;
+        if (seen.has(index)) throw new Error('같은 캠페인 지표가 두 번 나옵니다. 한 기간의 집계표만 복사해 주세요.');
+        seen.add(index);
+        values[index] = value ?? '';
+      }
+    }
+  }
+  return values.map((value, index) => {
+    const count = normalizeCount(value);
+    if (count === null) throw new Error(columns.campaign[index] + ' 값을 확인해 주세요. 0 이상의 정수 6개가 필요합니다.');
+    return count;
+  });
+}
+
+function parseRecords(section, rows) {
+  const names = columns[section].map(labelKey);
+  const header = rows[0].map(labelKey);
+  const indices = names.map((name) => header.indexOf(name));
+  if (indices.every((index) => index >= 0)) rows = rows.slice(1);
+  else if (indices.some((index) => index >= 0)) {
+    throw new Error('표 제목을 확인해 주세요. ' + columns[section].join(' · ') + ' 열이 필요합니다.');
+  }
+  return rows.map((row, index) => {
+    if (indices[0] < 0 && row.length > names.length) {
+      throw new Error((index + 1) + '행의 열이 너무 많습니다. 필요한 열만 복사해 주세요.');
+    }
+    const values = names.map((_, column) => row[indices[column] < 0 ? column : indices[column]] ?? '');
+    if (!values[0]) throw new Error((index + 1) + '행의 ' + columns[section][0] + '을 입력해 주세요.');
+    return values;
+  });
+}
+
+function previewTable(headers, rows) {
+  const table = element('table');
+  const header = table.createTHead().insertRow();
+  header.append(...headers.map((name) => element('th', name)));
+  const body = table.createTBody();
+  for (const row of rows) {
+    body.insertRow().append(...row.map((value) => element('td', value)));
+  }
+  return table;
+}
+
+function previewPaste(rawRows) {
+  const rows = rawRows.filter((row) => row.some((cell) => cell.trim()));
+  const preview = $('#paste-preview');
+  const result = $('#paste-result');
+  pasteData = null;
+  preview.replaceChildren();
+  result.textContent = '';
+  result.classList.remove('error');
+  try {
+    if (rows.length) {
+      if (pasteSection === 'campaign') {
+        pasteData = parseCampaign(rows);
+        preview.append(previewTable(['지표', '집계값'], pasteData.map((value, index) => [
+          columns.campaign[index], formatNumber.format(Number(value)) + ' ' + units[index]
+        ])));
+        result.textContent = '반영하면 선택한 주의 캠페인 수치 6개가 바뀝니다.';
+      } else {
+        pasteData = parseRecords(pasteSection, rows);
+        if (pasteData.length) preview.append(previewTable(columns[pasteSection], pasteData));
+        result.textContent = pasteData.length ? pasteData.length + '행을 기존 표 아래에 추가합니다.' : '추가할 행이 없습니다.';
+      }
+    }
+  } catch (error) {
+    pasteData = null;
+    result.textContent = error.message;
+    result.classList.add('error');
+  }
+  $('#paste-apply').disabled = !pasteData?.length;
+}
+
+for (const button of document.querySelectorAll('[data-paste]')) {
+  button.addEventListener('click', () => {
+    pasteSection = button.dataset.paste;
+    $('#paste-title').textContent = sectionNames[pasteSection] + ' 표 붙여넣기';
+    $('#paste-help').textContent = pasteSection === 'campaign'
+      ? 'Word 표의 지표명과 값을 함께 복사하거나, 집계 수치 6개를 화면에 표시된 순서대로 한 행에 붙여넣으세요.'
+      : 'Word 표에서 다음 순서로 복사해 붙여넣으세요. ' + columns[pasteSection].join(' · ');
+    $('#paste-text').value = '';
+    previewPaste([]);
+    pasteDialog.showModal();
+    $('#paste-text').focus();
+  });
+}
+
+$('#paste-text').addEventListener('input', (event) => previewPaste(parseTabularText(event.target.value)));
+$('#paste-text').addEventListener('paste', (event) => {
+  const html = event.clipboardData?.getData('text/html');
+  const rows = html && parseClipboardTable(html);
+  if (!rows) return;
+  event.preventDefault();
+  event.target.value = rows.map((row) => row.map((value) => /["\t\n]/.test(value)
+    ? '"' + value.replaceAll('"', '""') + '"' : value).join('\t')).join('\n');
+  previewPaste(rows);
+});
+
+$('#paste-cancel').addEventListener('click', () => pasteDialog.close());
+$('#paste-apply').addEventListener('click', () => {
+  if (!pasteData?.length) return;
+  const week = currentWeek();
+  if (pasteSection === 'campaign') {
+    week.campaign = pasteData;
+    week.demoCampaign = [];
+    renderMetrics();
+  } else {
+    week[pasteSection].push(...pasteData.map((values) => ({ values, demo: false })));
+    renderRecords(pasteSection);
+  }
+  pasteDialog.close();
+  refreshStatus();
+});
+
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = element('a');
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+$('#backup').addEventListener('click', () => {
+  download(new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }),
+    '주간업무회의-백업-' + dateKey(new Date()) + '.json');
+});
+
+const backupFile = $('#backup-file');
+$('#restore').addEventListener('click', () => backupFile.click());
+backupFile.addEventListener('change', async () => {
+  const [file] = backupFile.files;
+  backupFile.value = '';
+  if (!file) return;
+  let restored;
+  try {
+    restored = JSON.parse(await file.text());
+    if (!validateState(restored)) throw new Error('Invalid backup');
+  } catch {
+    setStatus('이 대시보드에서 내려받은 JSON 백업 파일을 선택해 주세요.', true);
+    return;
+  }
+  if (!confirm('현재 모든 주차의 데이터를 백업 파일 내용으로 바꿀까요?')) return;
+  storageAvailable = true;
+  state = restored;
+  render();
+  if (storageAvailable) setStatus('백업을 복원했습니다.');
+});
+
+$('#clear-demo').addEventListener('click', () => {
+  if (!confirm('모든 주의 가상 예시를 지울까요? 수정하거나 새로 입력한 내용은 남습니다.')) return;
+  for (const week of Object.values(state.weeks)) {
+    for (const section of ['issues', 'tasks']) {
+      week[section] = week[section].filter((row) => !row.demo);
+    }
+    for (const index of week.demoCampaign) week.campaign[index] = '';
+    week.demoCampaign = [];
+  }
+  render();
+});
+
+const xmlProlog = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+const wordNamespace = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+const docxType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+function xmlText(value) {
+  return Array.from(String(value)).filter((character) => {
+    const code = character.codePointAt(0);
+    return code === 9 || code === 10 || code === 13 ||
+      (code >= 32 && code <= 0xd7ff) || (code >= 0xe000 && code <= 0xfffd) || code >= 0x10000;
+  }).join('').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function wordParagraph(value, { bold = false, size = 20, color = '24354C', after = 95, keepNext = false } = {}) {
+  const text = xmlText(value).split(/\r\n?|\n/).map((line) => '<w:t xml:space="preserve">' + line + '</w:t>').join('<w:br/>');
+  return '<w:p><w:pPr>' + (keepNext ? '<w:keepNext/>' : '') + '<w:spacing w:after="' + after + '"/></w:pPr>' +
+    '<w:r><w:rPr><w:rFonts w:ascii="Malgun Gothic" w:hAnsi="Malgun Gothic" w:eastAsia="Malgun Gothic"/>' +
+    (bold ? '<w:b/>' : '') + '<w:color w:val="' + color + '"/><w:sz w:val="' + size +
+    '"/></w:rPr>' + text + '</w:r></w:p>';
+}
+
+function wordTable(headers, rows, widths) {
+  const border = (side) => '<w:' + side + ' w:val="single" w:sz="5" w:color="CCD7E4"/>';
+  const borders = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(border).join('');
+  const grid = widths.map((width) => '<w:gridCol w:w="' + width + '"/>').join('');
+  const tableRows = [headers, ...rows].map((row, index) => {
+    const isHeader = index === 0;
+    const cells = row.map((cell, column) =>
+      '<w:tc><w:tcPr><w:tcW w:w="' + widths[column] + '" w:type="dxa"/>' +
+      (isHeader ? '<w:shd w:val="clear" w:color="auto" w:fill="E9F0F7"/>' : '') +
+      '</w:tcPr>' + wordParagraph(cell, { bold: isHeader, after: 55 }) + '</w:tc>').join('');
+    return '<w:tr>' + (isHeader ? '<w:trPr><w:tblHeader/></w:trPr>' : '') + cells + '</w:tr>';
+  }).join('');
+  const tableWidth = widths.reduce((sum, width) => sum + width, 0);
+  return '<w:tbl><w:tblPr><w:tblW w:w="' + tableWidth + '" w:type="dxa"/><w:tblBorders>' +
+    borders + '</w:tblBorders><w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid>' +
+    grid + '</w:tblGrid>' + tableRows + '</w:tbl>';
+}
+
+function buildDocument(week, counts, reportWeek) {
+  const title = (value) => wordParagraph(value, { bold: true, size: 25, after: 110, keepNext: true });
+  const gap = wordParagraph('', { after: 120 });
+  const recordRows = (section) => week[section].filter((row) => row.values[0].trim()).map((row) => row.values);
+  const issues = recordRows('issues');
+  const tasks = recordRows('tasks');
+  const campaign = counts.map((count, index) => formatNumber.format(Number(count)) + ' ' + units[index]);
+  const issueNotes = issues.map(([name, note]) =>
+    wordParagraph(name, { after: 55, keepNext: Boolean(note.trim()) }) +
+    (note.trim() ? wordParagraph(note) : '')
+  ).join(gap);
+  const taskNotes = tasks.map(([name, ...notes]) =>
+    wordParagraph(name, { bold: true, size: 22, keepNext: notes.some((note) => note.trim()) }) +
+    notes.map((note, index) => note.trim() ? wordParagraph(columns.tasks[index + 1] + '\n' + note) : '').join('')
+  ).join(gap);
+  const body = [
+    wordParagraph('주간업무회의 자료', { bold: true, size: 38, color: '172F50', after: 190 }),
+    wordParagraph('보고 주  ' + period(reportWeek), { after: 230 }),
+    title('전주 캠페인 실행 실적'),
+    wordParagraph('집계 기간  ' + period(reportWeek, true) + ' (월~일)', { keepNext: true }),
+    wordTable(columns.campaign, [campaign], [1450, 2350, 1490, 1490, 1490, 1090]),
+    gap,
+    title('이번 주 운영 이슈'),
+    issueNotes || wordParagraph('등록된 이슈 없음'),
+    gap,
+    title('이번 주 추진 업무'),
+    taskNotes || wordParagraph('등록된 추진 업무 없음')
+  ].join('');
+  return xmlProlog + '<w:document xmlns:w="' + wordNamespace + '"><w:body>' + body +
+    '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1200" w:right="1273" w:bottom="1200" w:left="1273" ' +
+    'w:header="500" w:footer="500" w:gutter="0"/></w:sectPr></w:body></w:document>';
+}
+
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+// A DOCX is a ZIP package. Store the three XML parts uncompressed for offline export.
+function zipParts(parts) {
+  const encoder = new TextEncoder();
+  const local = [];
+  const directory = [];
+  let localSize = 0;
+  let directorySize = 0;
+  for (const [path, content] of Object.entries(parts)) {
+    const name = encoder.encode(path);
+    const bytes = encoder.encode(content);
+    const checksum = crc32(bytes);
+    const header = new DataView(new ArrayBuffer(30));
+    header.setUint32(0, 0x04034b50, true);
+    header.setUint16(4, 20, true);
+    header.setUint16(12, 33, true); // DOS date for 1980-01-01.
+    header.setUint32(14, checksum, true);
+    header.setUint32(18, bytes.length, true);
+    header.setUint32(22, bytes.length, true);
+    header.setUint16(26, name.length, true);
+    local.push(header.buffer, name, bytes);
+
+    const entry = new DataView(new ArrayBuffer(46));
+    entry.setUint32(0, 0x02014b50, true);
+    entry.setUint16(4, 20, true);
+    entry.setUint16(6, 20, true);
+    entry.setUint16(14, 33, true);
+    entry.setUint32(16, checksum, true);
+    entry.setUint32(20, bytes.length, true);
+    entry.setUint32(24, bytes.length, true);
+    entry.setUint16(28, name.length, true);
+    entry.setUint32(42, localSize, true);
+    directory.push(entry.buffer, name);
+    localSize += header.byteLength + name.length + bytes.length;
+    directorySize += entry.byteLength + name.length;
+  }
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true);
+  end.setUint16(8, directory.length / 2, true);
+  end.setUint16(10, directory.length / 2, true);
+  end.setUint32(12, directorySize, true);
+  end.setUint32(16, localSize, true);
+  return new Blob([...local, ...directory, end.buffer], { type: docxType });
+}
+
+$('#export').addEventListener('click', () => {
+  const week = currentWeek();
+  for (const section of ['issues', 'tasks']) {
+    const incomplete = week[section].findIndex((row) => !row.values[0].trim() && row.values.some((value) => value.trim()));
+    if (incomplete >= 0) {
+      setStatus(sectionNames[section] + ' ' + (incomplete + 1) + '행의 ' + columns[section][0] + '을 입력해 주세요.', true);
+      document.querySelectorAll('[data-records="' + section + '"] .record')[incomplete].querySelector('textarea').focus();
+      return;
+    }
+  }
+  const counts = week.campaign.map(normalizeCount);
+  const invalid = counts.indexOf(null);
+  if (invalid >= 0) {
+    setStatus(columns.campaign[invalid] + ' 값에 0 이상의 정수를 입력해 주세요.', true);
+    $('#metrics').querySelectorAll('input')[invalid].focus();
+    return;
+  }
+  if (hasDemo(week) && !confirm('이 주의 자료에 가상 예시가 들어 있습니다. 예시를 포함해 Word로 저장할까요?')) return;
+  const report = zipParts({
+    '[Content_Types].xml': xmlProlog + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>',
+    '_rels/.rels': xmlProlog + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
+    'word/document.xml': buildDocument(week, counts, state.selected)
+  });
+  download(report, '주간업무회의-' + state.selected + '.docx');
+});
+
+render();
+</script>
+</body>
+</html>
