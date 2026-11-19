@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>문의 처리 안내</title>
+  <style>
+    @font-face { font-family: "Hana Local"; src: local("Hana2-Regular"), local("Hana2 Regular"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Hana Local"; src: local("Hana2-Bold"), local("Hana2 Bold"); font-weight: 700; font-display: swap; }
+    :root {
+      color-scheme: light;
+      --navy: #152b4e;
+      --blue: #244e89;
+      --ink: #172943;
+      --muted: #4e6078;
+      --line: #d7e0ec;
+      --paper: #fff;
+      --background: #f2f6fb;
+      font-family: "Hana Local", "Malgun Gothic", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--background); color: var(--ink); line-height: 1.6; }
+    header { padding: 36px 20px 55px; background: var(--navy); color: white; }
+    .frame { width: min(940px, 100%); margin-inline: auto; }
+    header p { margin: 0; color: #d2e1f7; font-size: .9rem; }
+    h1 { margin: 5px 0 3px; font-size: clamp(1.75rem, 5vw, 2.4rem); }
+    main { position: relative; margin-top: -26px; padding: 0 20px 40px; }
+    h2 { margin: 0 0 12px; font-size: 1.12rem; }
+    .card { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+    .search-card { box-shadow: 0 8px 24px rgb(21 43 78 / 8%); }
+    .search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+    .results { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 14px; margin: 14px 0; }
+    input, textarea, button { font: inherit; }
+    input, textarea { width: 100%; padding: 10px 12px; border: 1px solid #9eafc5; border-radius: 8px; color: var(--ink); background: white; }
+    textarea { display: block; resize: vertical; }
+    textarea[readonly] { background: #f7f9fd; }
+    button { min-height: 43px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; color: var(--navy); background: white; cursor: pointer; font-weight: 700; }
+    button.primary { border-color: var(--blue); background: var(--blue); color: white; }
+    button:hover:enabled { box-shadow: inset 0 0 0 100px rgb(21 43 78 / 7%); }
+    button:disabled { color: #59697e; background: #edf1f6; border-color: var(--line); cursor: default; }
+    :focus-visible { outline: 3px solid #517ed2; outline-offset: 2px; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+    .between { justify-content: space-between; }
+    .row h2 { margin: 0; }
+    .hint, .feedback { color: var(--muted); font-size: .88rem; margin: 9px 0 0; overflow-wrap: anywhere; }
+    .feedback:empty { display: none; }
+    .error { color: #9f2728; }
+    .message-body { margin-top: 10px; }
+    dl { margin: 14px 0 0; }
+    dl div { display: grid; grid-template-columns: 5.2rem minmax(0, 1fr); gap: 7px; padding: 8px 0; border-top: 1px solid var(--line); }
+    dt { color: var(--muted); }
+    dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .88rem; }
+    .waiting { color: #814800; background: #fff1d9; }
+    .working { color: #174a91; background: #e7f0ff; }
+    .complete { color: #145e42; background: #def4e8; }
+    .import-card { margin-top: 14px; }
+    details > summary { cursor: pointer; font-weight: 700; }
+    .import-input { margin: 10px 0; }
+    .table-wrap { margin-top: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { border-bottom: 1px solid var(--line); padding: 7px; text-align: left; overflow-wrap: anywhere; }
+    table { table-layout: fixed; }
+    footer { margin-top: 16px; }
+    .ops { display: grid; gap: 14px; margin-bottom: 20px; }
+    .ops-form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .ops-form label { min-width: 0; font-size: .88rem; font-weight: 700; }
+    .ops-form .wide { grid-column: 1 / -1; }
+    .ops-form input, .ops-form textarea { display: block; margin-top: 3px; }
+    .ops-overview { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 14px; }
+    .ops-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 14px 0; }
+    .ops-metric { min-width: 0; padding: 9px; background: var(--background); border-radius: 9px; text-align: center; }
+    .ops-metric strong { display: block; color: var(--blue); font-size: 1.45rem; }
+    .ops-calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 12px; }
+    .ops-weekday { text-align: center; color: var(--muted); font-size: .78rem; }
+    .ops-day { min-width: 0; min-height: 57px; padding: 3px 1px; font-size: .84rem; line-height: 1.35; }
+    .ops-day[aria-pressed="true"] { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); background: #e7f0ff; }
+    .ops-day small { display: block; font-size: .66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ops-chart { display: grid; gap: 4px; margin-top: 12px; }
+    .ops-bar-row { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr) auto; align-items: center; gap: 7px; font-size: .8rem; }
+    .ops-track { display: flex; height: 10px; border-radius: 9px; overflow: hidden; background: var(--background); }
+    .ops-done { background: #227b60; }
+    .ops-open { background: #bb7b20; }
+    .ops-records { display: grid; gap: 8px; margin: 13px 0 0; padding: 0; list-style: none; }
+    .ops-record { display: grid; gap: 6px; border: 1px solid var(--line); border-radius: 9px; padding: 12px; }
+    .ops-record p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .ops-record strong { overflow-wrap: anywhere; }
+    .ops-record time { color: var(--muted); font-size: .82rem; }
+    .ops-tools { margin-top: 12px; }
+    .ops select { max-width: 100%; font: inherit; color: var(--ink); border: 1px solid #9eafc5; border-radius: 8px; padding: 8px; background: white; }
+    .legacy { margin-top: 22px; }
+    .ops-alert { background: #fff4dc; border-color: #ca9b51; }
+    .ops-nav a { color: var(--blue); font-weight: 700; }
+    .pms-group { margin: 14px 0 0; }
+    .pms-group h3 { font-size: 1rem; margin: 0 0 8px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    [hidden] { display: none !important; }
+    @media (max-width: 620px) {
+      header { padding-inline: 16px; }
+      main { padding-inline: 16px; }
+      .card { padding: 16px; }
+      .results { grid-template-columns: minmax(0, 1fr); }
+      .ops-overview { grid-template-columns: minmax(0, 1fr); }
+      .ops-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="frame">
+      <p><time id="today"></time></p>
+      <h1>문의 처리 안내</h1>
+      <p>영업점 문의의 접수, 답변, 처리 현황을 관리하세요.</p>
+    </div>
+  </header>
+  <main>
+    <div class="frame">
+      <div class="ops" id="ops">
+        <nav class="row ops-nav" aria-label="업무 메뉴"><a href="#ops-list-title">문의 목록</a><a href="#ops-stats-title">처리 통계</a><a href="#pms-title">PMS 업무</a><a href="#pms-report-title">주간 회의자료</a></nav>
+        <section id="ops-reminder" class="card ops-alert" aria-labelledby="ops-reminder-title" hidden>
+          <h2 id="ops-reminder-title">오후 5시 미완료 알림</h2>
+          <p class="hint" id="ops-reminder-text" role="status"></p>
+          <div class="row ops-nav"><a id="ops-reminder-inquiries" href="#ops-list-title">대기 문의 확인</a><a id="ops-reminder-pms" href="#pms-title">미완료 PMS 확인</a></div>
+        </section>
+        <section class="card" aria-labelledby="ops-share-title">
+          <div class="row between">
+            <h2 id="ops-share-title">공용 폴더</h2>
+            <div class="row">
+              <button id="ops-connect" type="button">공용 폴더 연결</button>
+              <button id="ops-sync" type="button" disabled>새로고침</button>
+              <button id="ops-disconnect" type="button" hidden>연결 해제</button>
+              <button id="ops-notify" type="button">PC 알림 켜기</button>
+            </div>
+          </div>
+          <p id="ops-source" class="hint">개인 모드 · 이 브라우저에 저장</p>
+          <p id="ops-sync-info" class="feedback" role="status"></p>
+          <p id="ops-notify-info" class="hint">오후 5시에 페이지가 열려 있으면 미완료 문의와 PMS 업무를 알려드려요.</p>
+        </section>
+
+        <section class="card" aria-labelledby="ops-list-title">
+          <div class="row between">
+            <h2 id="ops-list-title">문의 목록</h2>
+            <button id="ops-new" type="button" class="primary">새 문의 등록</button>
+          </div>
+          <form id="ops-create" class="ops-form ops-tools" hidden>
+            <label>점번호<input name="branchNumber" required maxlength="40" autocomplete="off"></label>
+            <label>점명<input name="branchName" required maxlength="70" autocomplete="off"></label>
+            <label>직원명<input name="employeeName" required maxlength="60" autocomplete="off"></label>
+            <label>직원번호<input name="employeeNumber" required maxlength="40" autocomplete="off"></label>
+            <label class="wide">문의 내용<textarea name="question" required maxlength="4000" rows="3"></textarea></label>
+            <div class="wide row">
+              <button type="submit" class="primary">대기로 등록</button>
+              <button id="ops-cancel" type="button">취소</button>
+            </div>
+          </form>
+          <div class="row ops-tools">
+            <label class="sr-only" for="ops-search">접수번호 또는 문의 내용 검색</label>
+            <input id="ops-search" type="search" style="flex:1 1 240px;min-width:0" placeholder="접수번호, 점명, 직원명, 문의 내용 검색" autocomplete="off">
+            <label class="sr-only" for="ops-filter">문의 상태</label>
+            <select id="ops-filter"><option value="all">상태 전체</option><option value="pending">대기</option><option value="done">완료</option></select>
+          </div>
+          <div id="ops-answer" class="card ops-tools" hidden>
+            <form id="ops-answer-form">
+              <h2 id="ops-answer-title">답변 등록</h2>
+              <p id="ops-answer-question" class="hint"></p>
+              <label for="ops-answer-person">답변 담당자</label>
+              <input id="ops-answer-person" name="responder" maxlength="60" required autocomplete="off">
+              <label for="ops-answer-text">답변 내용</label>
+              <textarea id="ops-answer-text" name="answer" maxlength="4000" required rows="3"></textarea>
+              <div class="row ops-tools">
+                <button type="submit" class="primary">답변 저장 및 완료</button>
+                <button id="ops-answer-close" type="button">취소</button>
+              </div>
+            </form>
+          </div>
+          <p id="ops-action-info" class="feedback" role="status"></p>
+          <ul id="ops-records" class="ops-records"></ul>
+        </section>
+
+        <div class="ops-overview">
+          <section class="card" aria-labelledby="ops-calendar-title">
+            <div class="row between">
+              <h2 id="ops-calendar-title">처리 달력</h2>
+              <div class="row">
+                <button id="ops-prev" type="button" aria-label="이전 달">‹</button>
+                <button id="ops-today" type="button">오늘</button>
+                <button id="ops-next" type="button" aria-label="다음 달">›</button>
+              </div>
+            </div>
+            <p id="ops-month" class="hint"></p>
+            <div class="ops-calendar" id="ops-calendar"></div>
+            <p class="hint">날짜 아래에 총 접수 건수와 완료 / 미완료 건수를 표시해요.</p>
+          </section>
+          <section class="card" aria-labelledby="ops-stats-title">
+            <h2 id="ops-stats-title">처리 통계</h2>
+            <p class="hint" id="ops-picked-date"></p>
+            <div class="ops-metrics">
+              <div class="ops-metric">총 접수<strong id="ops-total">0</strong></div>
+              <div class="ops-metric">완료<strong id="ops-done">0</strong></div>
+              <div class="ops-metric">미완료<strong id="ops-pending">0</strong></div>
+            </div>
+            <p class="hint" id="ops-closed-day"></p>
+            <h2 class="ops-tools">월간 접수와 처리 상태</h2>
+            <p class="hint">막대의 초록색은 완료, 주황색은 미완료예요. 숫자는 완료와 미완료 건수 순서예요.</p>
+            <p class="hint" id="ops-month-summary"></p>
+            <div id="ops-chart" class="ops-chart"></div>
+          </section>
+        </div>
+        <section class="card" aria-labelledby="pms-title">
+          <div class="row between">
+            <h2 id="pms-title">직원별 PMS 업무</h2>
+            <div class="row">
+              <label>담당자 <select id="pms-filter"><option value="">전체</option></select></label>
+              <label>상태 <select id="pms-state"><option value="all">전체</option><option value="pending">미완료</option><option value="done">완료</option></select></label>
+            </div>
+          </div>
+          <details class="ops-tools">
+            <summary>PMS 업무 등록</summary>
+            <p class="hint">사내 PMS 화면에서 확인한 항목을 입력하세요. 같은 PMS 번호는 한 번만 등록할 수 있어요.</p>
+            <form id="pms-create" class="ops-form ops-tools">
+              <label>PMS 번호<input name="reference" required maxlength="80"></label>
+              <label>담당자<input name="assignee" required maxlength="60"></label>
+              <label>중요도<select name="priority"><option value="높음">높음</option><option value="보통" selected>보통</option><option value="낮음">낮음</option></select></label>
+              <label>기한<input name="due" type="date"></label>
+              <label class="wide">업무 제목<input name="title" required maxlength="160"></label>
+              <label class="wide">회의에 공유할 내용<textarea name="notes" rows="2" maxlength="4000"></textarea></label>
+              <div class="wide"><button type="submit" class="primary">업무 등록</button></div>
+            </form>
+          </details>
+          <p id="pms-feedback" class="feedback" role="status"></p>
+          <div id="pms-list"></div>
+        </section>
+        <section class="card" aria-labelledby="pms-report-title">
+          <h2 id="pms-report-title">주간 회의자료</h2>
+          <div class="row">
+            <label>기준일 <input id="pms-week" type="date" required></label>
+            <label>중요도 <select id="pms-priority"><option value="높음">높음</option><option value="보통" selected>보통 이상</option><option value="낮음">전체</option></select></label>
+            <button id="pms-generate" type="button" class="primary">회의자료 만들기</button>
+            <button id="pms-copy" type="button" disabled>자료 복사</button>
+          </div>
+          <p class="hint">기준일이 포함된 월요일~일요일의 완료 업무와, 그 주까지 처리할 미완료 업무를 중요도순으로 정리해요. 작성한 초안은 아래에서 수정할 수 있어요.</p>
+          <label class="sr-only" for="pms-output">회의자료 초안</label>
+          <textarea id="pms-output" class="ops-tools" rows="8" placeholder="회의자료 초안이 여기에 표시돼요."></textarea>
+          <p id="pms-report-feedback" class="feedback" role="status"></p>
+        </section>
+      </div>
+
+      <details class="legacy">
+        <summary>기존 엑셀 접수번호 조회와 안내 문구</summary>
+      <section class="card search-card" aria-labelledby="search-title">
+        <h2 id="search-title">접수번호 검색</h2>
+        <form id="search-form">
+          <label class="sr-only" for="ticket">접수번호</label>
+          <div class="search-row">
+            <input id="ticket" type="search" placeholder="접수번호를 입력하세요" autocomplete="off" spellcheck="false">
+            <button class="primary" type="submit">검색</button>
+          </div>
+        </form>
+        <p id="search-feedback" class="feedback" role="status"></p>
+        <p id="example-hint" class="hint">예시 접수번호 <b>000123</b>, <b>000124</b>, <b>000125</b></p>
+      </section>
+
+      <div class="results">
+        <section class="card" aria-labelledby="record-title">
+          <h2 id="record-title">조회 결과</h2>
+          <p class="hint" id="record-placeholder">접수번호를 검색하면 처리 상태와 처리일이 표시돼요.</p>
+          <dl id="record" hidden>
+            <div><dt>접수번호</dt><dd id="result-ticket"></dd></div>
+            <div><dt>처리 상태</dt><dd><span id="result-status" class="badge"></span></dd></div>
+            <div><dt>처리일</dt><dd id="result-date"></dd></div>
+          </dl>
+        </section>
+        <section class="card" aria-labelledby="message-title">
+          <div class="row between">
+            <h2 id="message-title">안내 문구</h2>
+            <button id="copy" class="primary" type="button" disabled>문구 복사</button>
+          </div>
+          <label class="sr-only" for="message">안내 문구 본문</label>
+          <textarea id="message" class="message-body" rows="4" readonly placeholder="조회한 처리 상태에 맞는 문구가 여기에 표시돼요."></textarea>
+          <p id="copy-feedback" class="feedback" role="status"></p>
+        </section>
+      </div>
+
+      <section class="card import-card" aria-label="엑셀 데이터">
+        <details id="import-panel">
+          <summary>엑셀 데이터 가져오기</summary>
+          <p class="hint" id="paste-help">엑셀에서 ‘접수번호’, ‘처리 상태’, ‘처리일’ 머리글과 데이터 행을 함께 복사해 붙여넣으세요. 가져온 표로 현재 목록 전체가 교체돼요.</p>
+          <label class="sr-only" for="paste">엑셀에서 복사한 표</label>
+          <textarea id="paste" class="import-input" rows="4" aria-describedby="paste-help" placeholder="이곳에 엑셀 표를 붙여넣으세요."></textarea>
+          <div class="row">
+            <button id="preview" type="button">미리보기</button>
+            <button id="import" class="primary" type="button" disabled>이 목록으로 교체</button>
+          </div>
+          <p id="import-feedback" class="feedback" role="status"></p>
+          <div id="preview-wrap" class="table-wrap" hidden>
+            <table aria-label="엑셀 가져오기 미리보기">
+              <thead><tr><th scope="col">접수번호</th><th scope="col">처리 상태</th><th scope="col">처리일</th></tr></thead>
+              <tbody id="preview-body"></tbody>
+            </table>
+          </div>
+        </details>
+        <p id="source-summary" class="hint"></p>
+      </section>
+
+      <footer class="card">
+        <div class="row between">
+          <h2>데이터 관리</h2>
+          <div class="row">
+            <button id="clear-example" type="button">예시 데이터 지우기</button>
+            <button id="backup" type="button">백업 내려받기</button>
+            <button id="restore" type="button">백업 복원</button>
+            <input id="restore-file" type="file" accept=".json,application/json" hidden>
+          </div>
+        </div>
+        <p class="hint">목록은 이 브라우저에 저장됩니다. 브라우저 데이터를 지우면 사라질 수 있으니 필요한 경우 JSON 파일로 백업하세요.</p>
+        <p id="storage-feedback" class="feedback" role="status"></p>
+        <p id="storage-warning" class="feedback error" role="status"></p>
+      </footer>
+      </details>
+    </div>
+  </main>
+
+  <script>
+    'use strict';
+
+    const storageKey = 'myos:inquiry-records';
+    const columns = ['접수번호', '처리 상태', '처리일'];
+    const statuses = new Map([
+      ['접수 대기', 'waiting'], ['처리 중', 'working'], ['완료', 'complete']
+    ]);
+    const example = {
+      version: 1,
+      source: 'example',
+      importedAt: null,
+      records: [
+        { ticket: '000123', status: '완료', date: '2026-11-19' },
+        { ticket: '000124', status: '처리 중', date: '' },
+        { ticket: '000125', status: '접수 대기', date: '' }
+      ]
+    };
+    const byId = (id) => document.getElementById(id);
+    const ticketInput = byId('ticket');
+    const searchFeedback = byId('search-feedback');
+    const message = byId('message');
+    const copy = byId('copy');
+    const copyFeedback = byId('copy-feedback');
+    const paste = byId('paste');
+    const importButton = byId('import');
+    const importFeedback = byId('import-feedback');
+    const previewWrap = byId('preview-wrap');
+    const previewBody = byId('preview-body');
+    const restoreFile = byId('restore-file');
+    const storageFeedback = byId('storage-feedback');
+    const storageWarning = byId('storage-warning');
+    const dayFormat = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' });
+    const timestampFormat = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium', timeStyle: 'short' });
+    let pendingRecords = null;
+    let current = loadData();
+    let recordsByTicket;
+
+    function report(element, text, error = false) {
+      element.textContent = text;
+      element.classList.toggle('error', error);
+    }
+
+    function validateRecords(records) {
+      const seen = new Set();
+      return records.map((record, index) => {
+        const row = `데이터 ${index + 1}행`;
+        if (!record || [record.ticket, record.status, record.date].some(value => typeof value !== 'string')) {
+          throw new Error(`${row}의 접수번호, 처리 상태, 처리일을 확인하세요.`);
+        }
+        const ticket = record.ticket.trim();
+        const status = record.status.trim();
+        const date = record.date.trim();
+        if (!ticket || /[\r\n\t]/.test(ticket)) throw new Error(`${row}의 접수번호를 확인하세요.`);
+        if (seen.has(ticket)) throw new Error(`${row}의 접수번호 ${ticket}이 중복돼요.`);
+        if (!statuses.has(status)) throw new Error(`${row}의 상태는 ‘접수 대기’, ‘처리 중’, ‘완료’ 중 하나여야 해요.`);
+        if ((status === '완료' && !date) || /[\r\n\t]/.test(date)) throw new Error(`${row}의 처리일을 확인하세요.`);
+        seen.add(ticket);
+        return { ticket, status, date };
+      });
+    }
+
+    function validateData(data) {
+      if (!data || data.version !== 1 || !['example', 'excel', 'empty'].includes(data.source) || !Array.isArray(data.records)) {
+        throw new Error('이 도구에서 만든 백업 파일을 선택하세요.');
+      }
+      if (data.source === 'excel') {
+        if (typeof data.importedAt !== 'string' || !Number.isFinite(Date.parse(data.importedAt)) || !data.records.length) {
+          throw new Error('백업의 엑셀 목록 또는 갱신 시각을 확인할 수 없어요.');
+        }
+      } else if (data.importedAt !== null || (data.source === 'empty' && data.records.length)) {
+        throw new Error('백업의 목록 정보가 올바르지 않아요.');
+      }
+      return { version: 1, source: data.source, importedAt: data.importedAt, records: validateRecords(data.records) };
+    }
+
+    function loadData() {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        return stored === null ? example : validateData(JSON.parse(stored));
+      } catch {
+        storageWarning.textContent = '기존 저장 데이터를 읽지 못했어요. 백업 파일이 있으면 복원할 수 있어요.';
+        return example;
+      }
+    }
+
+    function setData(data, successMessage) {
+      current = data;
+      renderSource();
+      clearResult();
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(current));
+        storageWarning.textContent = '';
+      } catch {
+        storageWarning.textContent = '브라우저에 목록을 저장할 수 없어요. 창을 닫기 전에 백업을 내려받으세요.';
+      }
+      report(storageFeedback, successMessage);
+    }
+
+    function renderSource() {
+      recordsByTicket = new Map(current.records.map(record => [record.ticket, record]));
+      byId('example-hint').hidden = current.source !== 'example';
+      byId('clear-example').hidden = current.source !== 'example';
+      const summary = byId('source-summary');
+      if (current.source === 'excel') {
+        const imported = timestampFormat.format(new Date(current.importedAt));
+        summary.textContent = `${current.records.length.toLocaleString('ko-KR')}건 · 마지막 엑셀 갱신 ${imported}`;
+      } else if (current.source === 'example') {
+        summary.textContent = `가짜 예시 ${current.records.length}건을 사용 중이에요.`;
+      } else {
+        summary.textContent = '엑셀에서 가져온 목록이 아직 없어요.';
+      }
+    }
+
+    function clearResult() {
+      byId('record').hidden = true;
+      byId('record-placeholder').hidden = false;
+      message.value = '';
+      copy.disabled = true;
+      report(copyFeedback, '');
+      report(searchFeedback, '');
+    }
+
+    function buildMessage(record) {
+      const opening = `안녕하세요. 문의하신 접수번호 ${record.ticket}의 처리 상태를 안내드립니다.`;
+      const content = {
+        '접수 대기': '현재 접수 대기 상태입니다.',
+        '처리 중': '현재 담당자가 요청 내용을 처리 중입니다.',
+        '완료': `요청하신 건은 ${record.date}에 처리가 완료되었습니다.`
+      };
+      return `${opening}\n\n${content[record.status]}\n\n감사합니다.`;
+    }
+
+    byId('search-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      clearResult();
+      const ticket = ticketInput.value.trim();
+      if (!ticket) {
+        report(searchFeedback, '접수번호를 입력하세요.', true);
+        ticketInput.focus();
+        return;
+      }
+      const record = recordsByTicket.get(ticket);
+      if (!record) {
+        report(searchFeedback, '현재 목록에 해당 접수번호가 없어요. 번호와 마지막 갱신 시각을 확인하세요.', true);
+        return;
+      }
+      byId('result-ticket').textContent = record.ticket;
+      const status = byId('result-status');
+      status.textContent = record.status;
+      status.className = `badge ${statuses.get(record.status)}`;
+      byId('result-date').textContent = record.date || '미기록';
+      byId('record-placeholder').hidden = true;
+      byId('record').hidden = false;
+      message.value = buildMessage(record);
+      copy.disabled = false;
+      report(searchFeedback, `조회 결과 1건 · ${record.status}`);
+    });
+
+    ticketInput.addEventListener('input', clearResult);
+
+    copy.addEventListener('click', async () => {
+      const text = message.value;
+      try {
+        await navigator.clipboard.writeText(text);
+        if (message.value === text) report(copyFeedback, '안내 문구를 복사했어요.');
+      } catch {
+        if (message.value !== text) return;
+        message.focus();
+        message.select();
+        let copied = false;
+        try { copied = document.execCommand('copy'); } catch { /* 수동 복사 안내 */ }
+        if (copied) copy.focus();
+        report(copyFeedback, copied ? '안내 문구를 복사했어요.' : '문구를 선택했어요. Ctrl+C를 눌러 복사하세요.');
+      }
+    });
+
+    function parseExcel(text) {
+      const rows = text.replace(/^\uFEFF/, '').split(/\r\n|\n|\r/).filter(line => line.trim());
+      if (rows.length < 2) throw new Error('머리글과 데이터 행이 한 개 이상 있는 엑셀 표를 붙여넣으세요.');
+      const headers = rows.shift().split('\t').map(cell => cell.trim().replace(/\s+/g, ''));
+      const normalizedColumns = columns.map(column => column.replace(/\s+/g, ''));
+      const indexes = normalizedColumns.map(name => headers.indexOf(name));
+      if (headers.length !== columns.length || indexes.includes(-1)) {
+        throw new Error('머리글이 있는 접수번호, 처리 상태, 처리일 세 열을 복사하세요.');
+      }
+      const records = rows.map((line, index) => {
+        const cells = line.split('\t');
+        // 붙여넣기 환경에 따라 마지막 빈 셀의 탭이 빠질 수 있다.
+        if (cells.length === 2 && indexes[2] === 2) cells.push('');
+        if (cells.length !== columns.length) throw new Error(`데이터 ${index + 1}행의 열 개수를 확인하세요.`);
+        const [ticket, status, date] = indexes.map(column => cells[column]);
+        return { ticket, status, date };
+      });
+      return validateRecords(records);
+    }
+
+    function resetPreview() {
+      pendingRecords = null;
+      previewBody.replaceChildren();
+      previewWrap.hidden = true;
+      importButton.disabled = true;
+      report(importFeedback, '');
+    }
+
+    paste.addEventListener('input', resetPreview);
+    byId('preview').addEventListener('click', () => {
+      resetPreview();
+      try {
+        pendingRecords = parseExcel(paste.value);
+        const preview = pendingRecords.slice(0, 5);
+        preview.forEach(record => {
+          const row = previewBody.insertRow();
+          for (const value of [record.ticket, record.status, record.date || '미기록']) {
+            row.insertCell().textContent = value;
+          }
+        });
+        previewWrap.hidden = false;
+        importButton.disabled = false;
+        report(importFeedback, `${pendingRecords.length.toLocaleString('ko-KR')}건을 확인했어요. 미리보기 ${preview.length}건`);
+      } catch (error) {
+        report(importFeedback, error.message, true);
+      }
+    });
+
+    importButton.addEventListener('click', () => {
+      if (!pendingRecords) return;
+      const count = pendingRecords.length.toLocaleString('ko-KR');
+      setData({ version: 1, source: 'excel', importedAt: new Date().toISOString(), records: pendingRecords }, `엑셀 목록 ${count}건을 가져왔어요.`);
+      paste.value = '';
+      resetPreview();
+      report(importFeedback, `현재 목록을 ${count}건으로 교체했어요.`);
+      ticketInput.focus();
+    });
+
+    byId('clear-example').addEventListener('click', () => {
+      setData({ version: 1, source: 'empty', importedAt: null, records: [] }, '예시 데이터를 지웠어요.');
+      ticketInput.focus();
+    });
+
+    byId('backup').addEventListener('click', () => {
+      const stamp = new Date().toLocaleDateString('sv-SE').replaceAll('-', '');
+      const blob = new Blob([JSON.stringify(current, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `my-os-backup-${stamp}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      report(storageFeedback, '백업 다운로드를 시작했어요.');
+    });
+
+    let restoreAttempt = 0;
+    byId('restore').addEventListener('click', () => restoreFile.click());
+    restoreFile.addEventListener('change', async () => {
+      const file = restoreFile.files[0];
+      restoreFile.value = '';
+      if (!file) return;
+      const attempt = ++restoreAttempt;
+      try {
+        const text = await file.text();
+        if (attempt !== restoreAttempt) return;
+        const data = validateData(JSON.parse(text));
+        const count = data.records.length.toLocaleString('ko-KR');
+        if (window.confirm(`현재 목록을 백업 파일의 ${count}건으로 교체할까요?`)) {
+          resetPreview();
+          paste.value = '';
+          setData(data, `백업에서 ${count}건을 복원했어요.`);
+        }
+      } catch (error) {
+        if (attempt !== restoreAttempt) return;
+        const detail = error instanceof SyntaxError ? 'JSON 형식을 확인할 수 없어요.' : error.message;
+        report(storageFeedback, `백업을 복원할 수 없어요. ${detail}`, true);
+      }
+    });
+
+    byId('today').textContent = dayFormat.format(new Date());
+    renderSource();
+  </script>
+  <script>
+    (() => {
+      'use strict';
+
+      const localPrefix = 'hana-work-os:event:';
+      const sharedSubfolder = '문의-PMS-공유-v1';
+      const filePattern = /^([a-f0-9-]{36})\.json$/;
+      const priorities = ['높음', '보통', '낮음'];
+      const clock = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23'
+      });
+      const stampFormat = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
+      const el = byId;
+      const createInquiry = el('ops-create');
+      const answerForm = el('ops-answer-form');
+      const actionInfo = el('ops-action-info');
+      const syncInfo = el('ops-sync-info');
+      const pmsForm = el('pms-create');
+      const pmsFeedback = el('pms-feedback');
+      let directory = null;
+      let sharedName = '';
+      let events = new Map();
+      let inquiries = new Map();
+      let tasks = new Map();
+      let answering = null;
+      let busy = false;
+      let reminderSent = '';
+      let selectedDate = dateKey();
+      let visibleMonth = selectedDate.slice(0, 7);
+
+      function dateParts(date) {
+        return Object.fromEntries(clock.formatToParts(date).map(({ type, value }) => [type, value]));
+      }
+
+      function dateKey(date = new Date()) {
+        const { year, month, day } = dateParts(date);
+        return `${year}-${month}-${day}`;
+      }
+
+      function node(tag, text = '', className = '') {
+        const element = document.createElement(tag);
+        element.textContent = text;
+        element.className = className;
+        return element;
+      }
+
+      function button(text, action) {
+        const element = node('button', text);
+        element.type = 'button';
+        element.addEventListener('click', action);
+        return element;
+      }
+
+      function fields(form) {
+        return Object.fromEntries([...new FormData(form)].map(([key, value]) => [key, value.trim()]));
+      }
+
+      function validEvent(event, id) {
+        if (!event || event.id !== id || !filePattern.test(`${id}.json`) || typeof event.at !== 'string' || !Number.isFinite(Date.parse(event.at))) return false;
+        const content = event.data;
+        if (!content || typeof content !== 'object') return false;
+        const required = (keys) => keys.every(key => typeof content[key] === 'string' && content[key].trim());
+        switch (event.kind) {
+          case 'inquiry': return required(['branchNumber', 'branchName', 'employeeName', 'employeeNumber', 'question']);
+          case 'answer': return required(['target', 'responder', 'answer']);
+          case 'pms': return required(['reference', 'assignee', 'title']) && priorities.includes(content.priority) &&
+            typeof content.notes === 'string' && typeof content.due === 'string' && (!content.due || /^\d{4}-\d{2}-\d{2}$/.test(content.due));
+          case 'pms-done': return required(['target']);
+          default: return false;
+        }
+      }
+
+      function readLocal() {
+        const result = new Map();
+        let invalid = 0;
+        for (let index = 0; index < localStorage.length; index += 1) {
+          const key = localStorage.key(index);
+          if (!key?.startsWith(localPrefix)) continue;
+          const id = key.slice(localPrefix.length);
+          try {
+            const event = JSON.parse(localStorage.getItem(key));
+            if (!validEvent(event, id)) throw new Error('invalid record');
+            result.set(id, event);
+          } catch { invalid += 1; }
+        }
+        return { result, invalid };
+      }
+
+      async function readShared(folder, cache) {
+        const result = new Map();
+        const uncached = [];
+        let invalid = 0;
+        for await (const entry of folder.values()) {
+          const match = entry.name.match(filePattern);
+          if (entry.kind !== 'file' || !match) continue;
+          const id = match[1];
+          if (cache.has(id)) result.set(id, cache.get(id));
+          else uncached.push({ entry, id });
+        }
+        for (let start = 0; start < uncached.length; start += 16) {
+          await Promise.all(uncached.slice(start, start + 16).map(async ({ entry, id }) => {
+            try {
+              const file = await entry.getFile();
+              const event = JSON.parse(await file.text());
+              if (!validEvent(event, id)) throw new Error('invalid record');
+              result.set(id, event);
+            } catch { invalid += 1; }
+          }));
+        }
+        return { result, invalid };
+      }
+
+      function install(result, force = false) {
+        const changed = force || result.size !== events.size || [...result.keys()].some(id => !events.has(id));
+        events = result;
+        if (changed) rebuild();
+      }
+
+      async function refresh() {
+        const { result, invalid } = directory ? await readShared(directory, events) : readLocal();
+        install(result);
+        if (invalid) report(syncInfo, `기록 ${invalid}건을 읽지 못했어요. 다음 새로고침에 다시 확인합니다.`, true);
+        else if (directory) report(syncInfo, '공용 폴더의 최신 기록을 불러왔어요.');
+      }
+
+      async function run(action, feedback = syncInfo) {
+        if (busy) {
+          if (feedback !== syncInfo) report(feedback, '공용 폴더 작업 중이에요. 잠시 후 다시 눌러 주세요.', true);
+          return;
+        }
+        busy = true;
+        try { await action(); }
+        catch (error) {
+          if (error.name !== 'AbortError') report(feedback, error.userMessage || '기록을 읽거나 저장할 수 없어요. 저장 권한과 폴더 연결을 확인하고 다시 시도하세요.', true);
+        } finally { busy = false; }
+      }
+
+      function userError(message) {
+        return Object.assign(new Error(message), { userMessage: message });
+      }
+
+      async function append(kind, data) {
+        const event = { id: crypto.randomUUID(), kind, at: new Date().toISOString(), data };
+        if (!validEvent(event, event.id)) throw userError('입력한 값을 확인하세요. 필수 항목에는 공백만 넣을 수 없어요.');
+        if (directory) {
+          const handle = await directory.getFileHandle(`${event.id}.json`, { create: true });
+          const writable = await handle.createWritable();
+          try {
+            await writable.write(JSON.stringify(event));
+            await writable.close();
+          } catch (error) {
+            try { await writable.abort(); } catch { /* 이미 닫힌 쓰기 스트림 */ }
+            throw error;
+          }
+        } else {
+          localStorage.setItem(localPrefix + event.id, JSON.stringify(event));
+        }
+        events.set(event.id, event);
+        rebuild();
+      }
+
+      function switchSource(name) {
+        sharedName = name;
+        closeAnswer();
+        createInquiry.reset();
+        createInquiry.hidden = true;
+        pmsForm.reset();
+        el('pms-output').value = '';
+        el('pms-copy').disabled = true;
+        report(el('pms-report-feedback'), '');
+        report(pmsFeedback, '');
+        report(actionInfo, '');
+        el('ops-search').value = '';
+        el('ops-filter').value = 'all';
+        el('pms-filter').value = '';
+        el('pms-state').value = 'all';
+        el('ops-source').textContent = directory ? `공유 모드 · ${sharedName} · 8초마다 갱신` : '개인 모드 · 이 브라우저에 저장';
+        el('ops-sync').disabled = !directory;
+        el('ops-disconnect').hidden = !directory;
+      }
+
+      el('ops-connect').addEventListener('click', () => run(async () => {
+        const root = await window.showDirectoryPicker({ mode: 'readwrite' });
+        const folder = await root.getDirectoryHandle(sharedSubfolder, { create: true });
+        const { result, invalid } = await readShared(folder, new Map());
+        directory = folder;
+        switchSource(root.name);
+        install(result, true);
+        report(syncInfo, invalid ? `연결했어요. 아직 읽을 수 없는 기록이 ${invalid}건 있어요.` : '연결했어요. 팀원도 같은 공용 폴더를 선택하면 됩니다.', Boolean(invalid));
+      }));
+
+      el('ops-disconnect').addEventListener('click', () => run(async () => {
+        const { result } = readLocal();
+        directory = null;
+        switchSource('');
+        install(result, true);
+        report(syncInfo, '개인 모드로 돌아왔어요. 공유 기록은 공용 폴더에 남아 있어요.');
+      }));
+
+      el('ops-sync').addEventListener('click', () => run(refresh));
+      window.addEventListener('storage', (event) => {
+        if (!directory && (!event.key || event.key.startsWith(localPrefix))) void run(refresh);
+      });
+
+      function rebuild() {
+        const ordered = [...events.values()].sort((left, right) => Date.parse(left.at) - Date.parse(right.at) || left.id.localeCompare(right.id));
+        inquiries = new Map();
+        tasks = new Map();
+        const references = new Set();
+        for (const event of ordered) {
+          const { kind, data, id, at } = event;
+          if (kind === 'inquiry') inquiries.set(id, { ...data, id, at });
+          if (kind === 'pms' && !references.has(data.reference)) {
+            references.add(data.reference);
+            tasks.set(id, { ...data, id, at });
+          }
+        }
+        for (const { kind, data, at } of ordered) {
+          if (kind === 'answer') {
+            const inquiry = inquiries.get(data.target);
+            if (inquiry && !inquiry.completion) inquiry.completion = { ...data, at };
+          }
+          if (kind === 'pms-done') {
+            const task = tasks.get(data.target);
+            if (task && !task.doneAt) task.doneAt = at;
+          }
+        }
+        if (answering && (!inquiries.has(answering) || inquiries.get(answering).completion)) {
+          closeAnswer();
+          report(actionInfo, '선택한 문의가 변경되어 목록을 갱신했어요. 완료 상태와 답변을 확인하세요.');
+        }
+        renderInquiries();
+        renderStats();
+        renderPms();
+        checkReminder();
+      }
+
+      function reference(item) {
+        return [item.branchNumber, item.branchName, item.employeeName, item.employeeNumber].join('+');
+      }
+
+      function closeAnswer() {
+        answering = null;
+        answerForm.reset();
+        el('ops-answer').hidden = true;
+      }
+
+      function openAnswer(item) {
+        closeAnswer();
+        answering = item.id;
+        el('ops-answer-title').textContent = `답변 등록 · ${reference(item)}`;
+        el('ops-answer-question').textContent = item.question;
+        el('ops-answer').hidden = false;
+        el('ops-answer-person').focus();
+      }
+
+      function renderInquiries() {
+        const list = el('ops-records');
+        list.replaceChildren();
+        const search = el('ops-search').value.trim().toLocaleLowerCase('ko');
+        const filter = el('ops-filter').value;
+        const matched = [...inquiries.values()].reverse().filter(item => {
+          const state = item.completion ? 'done' : 'pending';
+          return (filter === 'all' || filter === state) && `${reference(item)} ${item.question}`.toLocaleLowerCase('ko').includes(search);
+        });
+        if (!matched.length) list.append(node('li', '표시할 문의가 없어요.', 'hint'));
+        for (const item of matched) {
+          const card = node('li', '', 'ops-record');
+          const heading = node('div', '', 'row between');
+          heading.append(node('strong', reference(item)), node('span', item.completion ? '완료' : '대기', `badge ${item.completion ? 'complete' : 'waiting'}`));
+          card.append(heading, node('time', `접수 ${stampFormat.format(new Date(item.at))}`), node('p', item.question));
+          if (item.completion) {
+            const { responder, answer, at } = item.completion;
+            card.append(node('time', `답변 ${responder} · ${stampFormat.format(new Date(at))}`), node('p', answer));
+          } else card.append(button('답변 등록', () => openAnswer(item)));
+          list.append(card);
+        }
+      }
+
+      el('ops-new').addEventListener('click', () => {
+        createInquiry.hidden = false;
+        createInquiry.elements.branchNumber.focus();
+      });
+      el('ops-cancel').addEventListener('click', () => { createInquiry.reset(); createInquiry.hidden = true; el('ops-new').focus(); });
+      el('ops-answer-close').addEventListener('click', closeAnswer);
+      el('ops-search').addEventListener('input', renderInquiries);
+      el('ops-filter').addEventListener('change', renderInquiries);
+      createInquiry.addEventListener('submit', (event) => {
+        event.preventDefault();
+        void run(async () => {
+          const data = fields(createInquiry);
+          if (Object.entries(data).some(([key, value]) => key !== 'question' && value.includes('+'))) throw userError('점번호, 점명, 직원명, 직원번호에는 + 기호를 넣지 마세요.');
+          await append('inquiry', data);
+          createInquiry.reset();
+          createInquiry.hidden = true;
+          el('ops-filter').value = 'all';
+          el('ops-search').value = reference(data);
+          renderInquiries();
+          report(actionInfo, '문의가 대기 상태로 등록됐어요.');
+        }, actionInfo);
+      });
+
+      answerForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        void run(async () => {
+          const target = answering;
+          const data = fields(answerForm);
+          await refresh();
+          if (!inquiries.has(target) || inquiries.get(target).completion) throw userError('이미 완료됐거나 목록에서 변경된 문의예요.');
+          await append('answer', { ...data, target });
+          closeAnswer();
+          report(actionInfo, '답변을 저장하고 완료로 표시했어요.');
+        }, actionInfo);
+      });
+
+      function renderStats() {
+        const counts = new Map();
+        const answered = new Map();
+        for (const item of inquiries.values()) {
+          const receivedDay = dateKey(new Date(item.at));
+          const count = counts.get(receivedDay) || { done: 0, pending: 0 };
+          if (item.completion) {
+            count.done += 1;
+            const closedDay = dateKey(new Date(item.completion.at));
+            answered.set(closedDay, (answered.get(closedDay) || 0) + 1);
+          } else count.pending += 1;
+          counts.set(receivedDay, count);
+        }
+        const { done, pending } = counts.get(selectedDate) || { done: 0, pending: 0 };
+        el('ops-picked-date').textContent = `${selectedDate} 접수 기준`;
+        el('ops-total').textContent = done + pending;
+        el('ops-done').textContent = done;
+        el('ops-pending').textContent = pending;
+        el('ops-closed-day').textContent = `이날 답변 완료 ${answered.get(selectedDate) || 0}건 · 이전 접수 건 포함`;
+        el('ops-month').textContent = `${visibleMonth.slice(0, 4)}년 ${Number(visibleMonth.slice(5))}월`;
+
+        const [year, month] = visibleMonth.split('-').map(Number);
+        const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+        const offset = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+        const calendar = el('ops-calendar');
+        calendar.replaceChildren(...[...'일월화수목금토'].map(day => node('span', day, 'ops-weekday')));
+        for (let index = 0; index < offset; index += 1) calendar.append(node('span'));
+        for (let day = 1; day <= days; day += 1) {
+          const key = `${visibleMonth}-${String(day).padStart(2, '0')}`;
+          const count = counts.get(key);
+          const cell = button(day, () => {
+            selectedDate = key;
+            renderStats();
+            el('ops-calendar').querySelector('[aria-pressed="true"]').focus();
+          });
+          cell.className = 'ops-day';
+          cell.setAttribute('aria-pressed', String(key === selectedDate));
+          if (key === dateKey()) cell.setAttribute('aria-current', 'date');
+          cell.setAttribute('aria-label', `${key} · 총 접수 ${(count?.done || 0) + (count?.pending || 0)}건 · 완료 ${count?.done || 0}건 · 미완료 ${count?.pending || 0}건`);
+          if (count) cell.append(node('small', `총 ${count.done + count.pending}`), node('small', `${count.done} / ${count.pending}`));
+          calendar.append(cell);
+        }
+
+        const monthCounts = [...counts].filter(([key]) => key.startsWith(visibleMonth)).sort(([a], [b]) => a.localeCompare(b));
+        const max = Math.max(1, ...monthCounts.map(([, count]) => count.done + count.pending));
+        const chart = el('ops-chart');
+        chart.replaceChildren();
+        const total = monthCounts.reduce((sum, [, count]) => sum + count.done + count.pending, 0);
+        const completed = monthCounts.reduce((sum, [, count]) => sum + count.done, 0);
+        el('ops-month-summary').textContent = total ? `총 ${total}건 · 완료 ${completed}건 · 미완료 ${total - completed}건 · 완료율 ${Math.round(completed / total * 100)}%` : '이 달에 접수된 문의가 없어요.';
+        for (const [key, count] of monthCounts) {
+          const row = node('div', '', 'ops-bar-row');
+          const track = node('div', '', 'ops-track');
+          track.setAttribute('aria-hidden', 'true');
+          const doneBar = node('span', '', 'ops-done');
+          const pendingBar = node('span', '', 'ops-open');
+          doneBar.style.width = `${count.done / max * 100}%`;
+          pendingBar.style.width = `${count.pending / max * 100}%`;
+          track.append(doneBar, pendingBar);
+          const label = node('span', `${count.done} / ${count.pending}`);
+          label.setAttribute('aria-label', `완료 ${count.done}건, 미완료 ${count.pending}건`);
+          row.append(node('span', `${key.slice(5, 7)}/${key.slice(8)}`), track, label);
+          chart.append(row);
+        }
+      }
+
+      function shiftMonth(amount) {
+        const [year, month] = visibleMonth.split('-').map(Number);
+        const date = new Date(Date.UTC(year, month - 1 + amount, 1));
+        selectedDate = date.toISOString().slice(0, 10);
+        visibleMonth = selectedDate.slice(0, 7);
+        renderStats();
+      }
+
+      el('ops-prev').addEventListener('click', () => shiftMonth(-1));
+      el('ops-next').addEventListener('click', () => shiftMonth(1));
+      el('ops-today').addEventListener('click', () => {
+        selectedDate = dateKey();
+        visibleMonth = selectedDate.slice(0, 7);
+        renderStats();
+      });
+
+      function compareTasks(left, right) {
+        return priorities.indexOf(left.priority) - priorities.indexOf(right.priority) ||
+          (left.due || '9999').localeCompare(right.due || '9999') || left.title.localeCompare(right.title, 'ko');
+      }
+
+      function renderPms() {
+        const filter = el('pms-filter');
+        const state = el('pms-state').value;
+        const selected = filter.value;
+        const users = [...new Set([...tasks.values()].map(item => item.assignee))].sort((a, b) => a.localeCompare(b, 'ko'));
+        filter.replaceChildren(new Option('전체', ''), ...users.map(name => new Option(name, name)));
+        filter.value = users.includes(selected) ? selected : '';
+        const list = el('pms-list');
+        list.replaceChildren();
+        for (const person of users.filter(user => !filter.value || user === filter.value)) {
+          const group = node('section', '', 'pms-group');
+          const rows = [...tasks.values()].filter(item => item.assignee === person &&
+            (state === 'all' || state === (item.doneAt ? 'done' : 'pending'))).sort(compareTasks);
+          if (!rows.length) continue;
+          const pending = rows.filter(item => !item.doneAt).length;
+          group.append(node('h3', `${person} · ${rows.length}건 · 미완료 ${pending}건`));
+          const entries = node('ul', '', 'ops-records');
+          for (const item of rows) {
+            const card = node('li', '', 'ops-record');
+            const header = node('div', '', 'row between');
+            header.append(node('strong', item.title), node('span', item.doneAt ? '완료' : '미완료', `badge ${item.doneAt ? 'complete' : 'waiting'}`));
+            card.append(header, node('p', `${item.reference} · 중요도 ${item.priority} · ${item.due ? `기한 ${item.due}` : '기한 미정'}`, 'hint'));
+            if (item.notes) card.append(node('p', item.notes));
+            if (item.doneAt) card.append(node('time', `완료 ${stampFormat.format(new Date(item.doneAt))}`));
+            else card.append(button('PMS 완료 처리', () => run(async () => {
+              await refresh();
+              if (!tasks.has(item.id) || tasks.get(item.id).doneAt) throw userError('이미 완료됐거나 목록에서 변경된 PMS 업무예요.');
+              await append('pms-done', { target: item.id });
+              report(pmsFeedback, 'PMS 업무를 완료로 표시했어요.');
+            }, pmsFeedback)));
+            entries.append(card);
+          }
+          group.append(entries);
+          list.append(group);
+        }
+        if (!list.children.length) list.append(node('p', '표시할 PMS 업무가 없어요.', 'hint'));
+      }
+
+      el('pms-filter').addEventListener('change', renderPms);
+      el('pms-state').addEventListener('change', renderPms);
+      pmsForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        void run(async () => {
+          const data = fields(pmsForm);
+          await refresh();
+          if ([...tasks.values()].some(task => task.reference === data.reference)) throw userError('이미 등록된 PMS 번호예요.');
+          await append('pms', data);
+          pmsForm.reset();
+          el('pms-filter').value = '';
+          renderPms();
+          report(pmsFeedback, 'PMS 업무를 등록했어요.');
+        }, pmsFeedback);
+      });
+
+      function weekRange(value) {
+        const date = new Date(`${value}T00:00:00Z`);
+        const weekday = (date.getUTCDay() + 6) % 7;
+        date.setUTCDate(date.getUTCDate() - weekday);
+        const start = date.toISOString().slice(0, 10);
+        date.setUTCDate(date.getUTCDate() + 6);
+        return { start, end: date.toISOString().slice(0, 10) };
+      }
+
+      const output = el('pms-output');
+      const copyReport = el('pms-copy');
+      el('pms-week').value = selectedDate;
+      el('pms-generate').addEventListener('click', () => {
+        const date = el('pms-week');
+        if (!date.reportValidity()) return;
+        const { start, end } = weekRange(date.value);
+        const threshold = priorities.indexOf(el('pms-priority').value);
+        const ranked = [...tasks.values()].filter(task => priorities.indexOf(task.priority) <= threshold).sort(compareTasks);
+        const pending = [];
+        const completed = [];
+        for (const task of ranked) {
+          const added = dateKey(new Date(task.at));
+          const closed = task.doneAt ? dateKey(new Date(task.doneAt)) : '';
+          if (closed >= start && closed <= end) completed.push(task);
+          else if (added <= end && (!closed || closed > end) && (!task.due || task.due <= end || task.priority === '높음')) pending.push(task);
+        }
+        const lines = (items) => items.length ? items.map(task => `- [${task.priority}] ${task.title} · ${task.assignee} · ${task.reference}${task.due ? ` · 기한 ${task.due}` : ''}${task.notes ? `\n  ${task.notes.replaceAll('\n', '\n  ')}` : ''}`) : ['- 해당 없음'];
+        output.value = ['주간 PMS 회의자료', `${start} ~ ${end}`, '', `미완료·논의 ${pending.length}건`, ...lines(pending), '', `이번 주 완료 ${completed.length}건`, ...lines(completed)].join('\n');
+        copyReport.disabled = false;
+        report(el('pms-report-feedback'), '회의자료 초안을 만들었어요.');
+      });
+      output.addEventListener('input', () => { copyReport.disabled = !output.value.trim(); });
+      copyReport.addEventListener('click', async () => {
+        const feedback = el('pms-report-feedback');
+        try {
+          await navigator.clipboard.writeText(output.value);
+          report(feedback, '회의자료를 복사했어요.');
+        } catch {
+          output.focus();
+          output.select();
+          let copied = false;
+          try { copied = document.execCommand('copy'); } catch { /* 수동 복사 안내 */ }
+          report(feedback, copied ? '회의자료를 복사했어요.' : '문구를 선택했어요. Ctrl+C를 눌러 복사하세요.');
+        }
+      });
+
+      const supportsNotification = 'Notification' in window;
+      const notificationInfo = el('ops-notify-info');
+      const notifyButton = el('ops-notify');
+      el('ops-reminder-inquiries').addEventListener('click', () => {
+        el('ops-search').value = '';
+        el('ops-filter').value = 'pending';
+        renderInquiries();
+      });
+      el('ops-reminder-pms').addEventListener('click', () => {
+        el('pms-filter').value = '';
+        el('pms-state').value = 'pending';
+        renderPms();
+      });
+      function checkReminder(now = new Date()) {
+        const day = dateKey(now);
+        const open = [...inquiries.values()].filter(item => !item.completion).length;
+        const outstanding = [...tasks.values()].filter(item => !item.doneAt).length;
+        const show = Number(dateParts(now).hour) >= 17 && open + outstanding > 0;
+        el('ops-reminder').hidden = !show;
+        if (!show) return;
+        const text = `답변 대기 문의 ${open}건과 미완료 PMS 업무 ${outstanding}건이 남아 있어요.`;
+        el('ops-reminder-text').textContent = text;
+        if (!supportsNotification || Notification.permission !== 'granted') return;
+        const key = `hana-work-os:reminder:${directory ? sharedName : 'local'}`;
+        if (reminderSent === key + day) return;
+        try {
+          if (localStorage.getItem(key) === day) return;
+        } catch { /* 현재 화면에서 발송 여부 확인 */ }
+        try {
+          new Notification('오후 5시 미완료 알림', { body: text, tag: key + day });
+          reminderSent = key + day;
+          localStorage.setItem(key, day);
+        } catch { /* 화면 상단의 알림은 계속 표시 */ }
+      }
+
+      notifyButton.disabled = !supportsNotification;
+      notifyButton.addEventListener('click', async () => {
+        try {
+          const permission = await Notification.requestPermission();
+          notificationInfo.textContent = permission === 'granted'
+            ? 'PC 알림이 켜졌어요. 오후 5시(한국 시간)에 이 페이지를 열어 두세요.'
+            : '이 브라우저에서 PC 알림을 사용할 수 없어요. 페이지 위쪽의 오후 5시 알림을 확인하세요.';
+          checkReminder();
+        } catch {
+          notificationInfo.textContent = 'PC 알림을 켤 수 없어요. 페이지 위쪽의 예정 알림은 표시됩니다.';
+        }
+      });
+
+      if (typeof window.showDirectoryPicker !== 'function') {
+        el('ops-connect').disabled = true;
+        report(syncInfo, '공용 폴더 연결이 가능한 PC용 Chrome 또는 Edge에서 이 파일을 열어 주세요.');
+      }
+      try {
+        const { result, invalid } = readLocal();
+        install(result, true);
+        if (invalid) report(syncInfo, `개인 기록 ${invalid}건을 읽지 못했어요.`, true);
+      } catch {
+        rebuild();
+        report(syncInfo, '이 브라우저에서 개인 기록을 저장할 수 없어요. PC용 Chrome 또는 Edge에서 열어 주세요.', true);
+      }
+      setInterval(() => { if (directory) void run(refresh); }, 8000);
+      setInterval(() => checkReminder(), 15000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        checkReminder();
+        if (directory) void run(refresh);
+      });
+    })();
+  </script>
+</body>
+</html>
