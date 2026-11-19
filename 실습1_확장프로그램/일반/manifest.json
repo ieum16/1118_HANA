@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "오늘 할 일 작성기",
+  "version": "1.0.0",
+  "description": "할 일을 추가하고 완료 여부와 남은 개수를 확인하세요.",
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기</title>
+  <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+  <script src="exchange.js" defer></script>
+</head>
+<body>
+  <main>
+    <section class="card" aria-labelledby="tasks-title">
+      <header class="card-heading">
+        <h1 id="tasks-title">오늘 할 일</h1>
+        <p class="task-summary"><time id="task-date"></time><span aria-hidden="true"> · </span><span id="task-completion" role="status">0/0 완료</span></p>
+      </header>
+      <progress id="task-progress" max="1" value="0" aria-label="할 일 완료율"></progress>
+      <p id="empty" class="empty">아직 등록한 할 일이 없어요.</p>
+      <ul id="tasks" aria-label="할 일 목록"></ul>
+      <form id="task-form">
+        <label class="sr-only" for="task-input">새 할 일</label>
+        <input id="task-input" placeholder="할 일을 입력하세요" autocomplete="off" aria-describedby="feedback">
+        <label class="sr-only" for="task-tag">할 일 태그</label>
+        <select id="task-tag">
+          <option value="">태그 없음</option>
+          <option value="deadline">D-1</option>
+          <option value="organize">업무정리</option>
+          <option value="design">디자인</option>
+        </select>
+        <button class="add" type="submit">추가</button>
+      </form>
+      <p id="feedback" class="feedback" role="alert" hidden></p>
+      <p id="remaining" class="remaining">남은 할 일 <strong>0개</strong></p>
+    </section>
+    <section class="card exchange" aria-labelledby="exchange-title">
+      <div class="exchange-heading">
+        <h2 id="exchange-title">환율 계산기</h2>
+        <a href="https://www.kebhana.com/cont/mall/mall15/mall1501/index.jsp?_menuNo=23100" target="_blank" rel="noopener noreferrer">하나은행 현재환율 ↗</a>
+      </div>
+      <div class="exchange-fields">
+        <label>통화<select id="fx-currency"></select></label>
+        <label><span id="fx-amount-label">외화 금액</span>
+          <input id="fx-amount" inputmode="decimal" autocomplete="off" placeholder="0" maxlength="32"></label>
+        <label>매매기준율 (원)
+          <input id="fx-rate" inputmode="decimal" autocomplete="off" placeholder="0" maxlength="32"></label>
+        <label>고시 단위
+          <select id="fx-unit">
+            <option value="1">외화 1단위</option>
+            <option value="100">외화 100단위</option>
+            <option value="1000">외화 1,000단위</option>
+          </select></label>
+        <label>살 때 스프레드 (%)
+          <input id="fx-buy" inputmode="decimal" autocomplete="off" placeholder="예: 1.75" maxlength="32"></label>
+        <label>팔 때 스프레드 (%)
+          <input id="fx-sell" inputmode="decimal" autocomplete="off" placeholder="비우면 살 때와 동일" maxlength="32"></label>
+        <label>우대율 (%)
+          <input id="fx-discount" inputmode="decimal" autocomplete="off" placeholder="0" maxlength="32"></label>
+      </div>
+      <dl class="exchange-results" aria-live="polite">
+        <div><dt>기준환율로 환산</dt><dd id="fx-base-result">—</dd></div>
+        <div><dt>외화 살 때</dt><dd id="fx-buy-result">—</dd></div>
+        <div><dt>외화 팔 때</dt><dd id="fx-sell-result">—</dd></div>
+      </dl>
+      <p id="fx-error" class="feedback" role="status" hidden></p>
+      <details class="exchange-import" id="fx-import">
+        <summary>하나은행 환율표 가져오기</summary>
+        <label for="fx-table">하나은행 페이지에서 열 제목과 통화 행을 함께 복사해 붙여넣으세요.</label>
+        <textarea id="fx-table" rows="4" maxlength="60000" placeholder="하나은행 현재환율 표"></textarea>
+        <button id="fx-apply" type="button">표 적용</button>
+        <p id="fx-import-status" role="status" hidden></p>
+      </details>
+    </section>
+  </main>
+</body>
+</html>
