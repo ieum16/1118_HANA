@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "종검",
+  "version": "1.0.0",
+  "description": "할 일을 기록하고 완료 여부를 관리하세요.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.kebhana.com/*"],
+  "icons": {
+    "16": "icons/checklist-16.png",
+    "32": "icons/checklist-32.png",
+    "48": "icons/checklist-48.png",
+    "128": "icons/checklist-128.png"
+  },
+  "action": {
+    "default_title": "종검",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/checklist-16.png",
+      "32": "icons/checklist-32.png"
+    }
+  }
+}

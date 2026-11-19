@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>종검 TO DO LIST</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js" defer></script>
+  <script src="exchange.js" type="module"></script>
+</head>
+<body>
+  <main>
+    <header class="comic-panel">
+      <img class="character" src="icons/checklist-128.png" alt="" width="152" height="152">
+      <h1>종검 <span>TO DO LIST</span></h1>
+    </header>
+    <form id="task-form">
+      <div class="task-form-header">
+        <label for="task-input">새 할 일</label>
+        <label class="font-size-control">글씨 크기
+          <select id="font-size" disabled>
+            <option value="small">작게</option>
+            <option value="normal" selected>기본</option>
+            <option value="large">크게</option>
+          </select>
+        </label>
+      </div>
+      <div class="entry">
+        <input id="task-input" type="text" placeholder="할 일을 입력하세요" autocomplete="off" aria-describedby="status" disabled>
+        <button id="add-task" type="submit" disabled>추가</button>
+      </div>
+    </form>
+    <p id="status" role="status" aria-atomic="true"></p>
+    <p id="empty-state" hidden>아직 등록한 할 일이 없어요.</p>
+    <ul id="task-list" aria-label="할 일 목록"></ul>
+    <section class="exchange" aria-labelledby="exchange-title">
+      <h2 id="exchange-title">환율 계산기</h2>
+      <div class="exchange-bank">
+        <div class="exchange-bank-heading">
+          <h3>하나은행 고시 매매기준율</h3>
+          <button id="hana-refresh" type="button" disabled>새로고침</button>
+        </div>
+        <dl class="exchange-rates exchange-bank-rates">
+          <div><dt>USD <small>1달러</small></dt><dd id="hana-usd">—</dd></div>
+          <div><dt>JPY <small>100엔</small></dt><dd id="hana-jpy">—</dd></div>
+          <div><dt>EUR <small>1유로</small></dt><dd id="hana-eur">—</dd></div>
+        </dl>
+        <p id="hana-status" class="exchange-note" role="status">고시환율 조회 중…</p>
+        <a class="exchange-source" href="https://www.kebhana.com/cont/mall/mall15/mall1501/index.jsp" target="_blank" rel="noopener noreferrer">하나은행 환율표</a>
+      </div>
+      <fieldset id="exchange-fields" disabled>
+        <div class="exchange-amount">
+          <label>외화 금액<input id="exchange-amount" type="text" inputmode="decimal" maxlength="24"></label>
+          <label>통화<select id="exchange-currency"><option>USD</option><option>JPY</option><option>EUR</option></select></label>
+        </div>
+        <p id="exchange-validation" class="exchange-message" role="status"></p>
+        <dl class="exchange-results" aria-live="polite" aria-atomic="true">
+          <div><dt id="exchange-basis">고시환율 기준 원화</dt><dd id="exchange-base">—</dd></div>
+        </dl>
+        <details id="exchange-manual" class="exchange-manual">
+          <summary>기준환율 직접 입력</summary>
+          <label class="exchange-manual-toggle"><input id="exchange-use-manual" type="checkbox"> 직접 입력한 환율 적용</label>
+          <div class="exchange-rates">
+            <label>USD <small>1달러</small><input id="rate-usd" type="text" inputmode="decimal" maxlength="24"></label>
+            <label>JPY <small>100엔</small><input id="rate-jpy" type="text" inputmode="decimal" maxlength="24"></label>
+            <label>EUR <small>1유로</small><input id="rate-eur" type="text" inputmode="decimal" maxlength="24"></label>
+          </div>
+        </details>
+      </fieldset>
+      <p id="exchange-storage-status" class="exchange-message" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>
