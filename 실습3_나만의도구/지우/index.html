@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>서무 카드 사용내역 정리</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      color: #172b29;
+      background: #f4f6f5;
+      --navy: #172b29;
+      --blue: #12675a;
+      --muted: #50645f;
+      --line: #dce5e1;
+      --soft: #e9f4ef;
+      --white: #fff;
+      --danger: #a33141;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; line-height: 1.55; word-break: keep-all; overflow-wrap: anywhere; }
+    h1, h2, h3, p, dl, dd { margin: 0; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .48; cursor: default; }
+    :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .app-frame { display: grid; grid-template-columns: 192px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar { background: #102b28; color: #fff; }
+    .sidebar-inner { position: sticky; top: 0; padding: 26px 14px; }
+    .brand { display: flex; gap: .65rem; align-items: center; padding: 0 8px 26px; font-weight: 800; letter-spacing: -.025em; }
+    .brand-mark {
+      display: grid; place-items: center; flex: none; width: 34px; height: 34px;
+      border-radius: 10px; background: #bbf0d8; color: #134b3e;
+    }
+    .sidebar nav { display: grid; gap: 4px; padding-top: 16px; border-top: 1px solid #ffffff24; }
+    .sidebar a {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      color: #dcebe6; border-radius: 8px; font-size: .88rem; font-weight: 700; text-decoration: none;
+    }
+    .sidebar a:hover, .sidebar a:focus-visible { background: #25453f; color: #fff; }
+    .sidebar a:focus-visible { outline-color: #bbf0d8; }
+    .icon { width: 17px; height: 17px; flex: none; }
+    .wrap { width: min(100% - 56px, 1440px); margin-inline: auto; }
+    .masthead { padding: 2rem 0 1.35rem; }
+    .masthead-inner, .section-title, .ledger-title, .panel-title, .actions {
+      display: flex; align-items: center; justify-content: space-between; gap: .75rem 1rem; flex-wrap: wrap;
+    }
+    .masthead-inner { border-bottom: 1px solid var(--line); padding-bottom: 1.25rem; }
+    h1 { font-size: clamp(1.7rem, 2.9vw, 2.3rem); letter-spacing: -.055em; line-height: 1.18; }
+    .masthead p { margin-top: .4rem; color: var(--muted); font-size: .9rem; }
+    .actions { justify-content: flex-start; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+      min-height: 40px; padding: .5rem .8rem; border: 1px solid #cfdcd6; border-radius: 8px;
+      background: var(--white); color: var(--navy); font-size: .86rem; font-weight: 760;
+    }
+    .button:hover:not(:disabled) { background: var(--soft); }
+    .button.primary { background: var(--blue); border-color: var(--blue); color: var(--white); }
+    .button.primary:hover:not(:disabled) { background: #0e544c; }
+    main { padding-bottom: 2.5rem; }
+    #budget-section, .ledger { scroll-margin-top: 1rem; }
+    .section-title { margin-bottom: .85rem; }
+    h2 { font-size: 1.2rem; letter-spacing: -.038em; }
+    h3 { font-size: 1.1rem; letter-spacing: -.025em; }
+    .muted { color: var(--muted); font-size: .84rem; }
+    .budget-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .85rem; }
+    .budget, .ledger, .workspace {
+      min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--white);
+      box-shadow: 0 2px 4px #172b2906;
+    }
+    .budget { padding: .95rem; }
+    .budget h3 { margin-bottom: .4rem; color: var(--blue); font-size: .9rem; }
+    label { display: grid; gap: .36rem; font-weight: 730; font-size: .82rem; }
+    input, select, textarea {
+      width: 100%; min-width: 0; min-height: 40px; padding: .46rem .7rem; border: 1px solid #cfdcd6;
+      border-radius: 8px; background: var(--white); color: var(--navy); font-size: .91rem; font-weight: 550;
+    }
+    select {
+      appearance: none;
+      padding-right: 2.55rem;
+      background-image: linear-gradient(45deg, transparent 50%, #50645f 50%), linear-gradient(135deg, #50645f 50%, transparent 50%);
+      background-position: right 20px center, right 15px center;
+      background-size: 5px 5px;
+      background-repeat: no-repeat;
+    }
+    :is(input, select, textarea):hover { border-color: #96b3a8; }
+    :is(input, select, textarea):focus-visible { border-color: var(--blue); outline-offset: 2px; }
+    textarea { resize: vertical; }
+    input[aria-invalid="true"] { border-color: var(--danger); }
+    .budget label { margin-top: .7rem; color: var(--muted); font-size: .76rem; }
+    .budget input { background: #f7f9f8; font-variant-numeric: tabular-nums; }
+    .budget dl { display: grid; gap: .52rem; }
+    .budget dl div { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .1rem .45rem; }
+    .budget dt { color: var(--muted); font-size: .79rem; }
+    .budget dd { font-variant-numeric: tabular-nums; }
+    .budget .remaining {
+      flex-direction: column; align-items: flex-start; padding-bottom: .55rem; border-bottom: 1px solid var(--line);
+      font-size: clamp(1.2rem, 1.9vw, 1.65rem); font-weight: 820; letter-spacing: -.045em; line-height: 1.2;
+    }
+    .budget .remaining dt { order: 1; margin-top: .2rem; font-weight: 600; letter-spacing: 0; }
+    .budget.is-over { border-color: #e5a7b0; }
+    .budget.is-over .remaining dd, .error { color: var(--danger); }
+    .budget-usage { margin: .65rem 0; }
+    .budget-usage-label { display: flex; justify-content: space-between; gap: .4rem; color: var(--muted); font-size: .81rem; }
+    .budget-usage-label strong { color: var(--navy); font-variant-numeric: tabular-nums; }
+    .budget-usage-track { height: 6px; margin-top: .32rem; overflow: hidden; border-radius: 99px; background: #e6eeea; }
+    .budget-usage-fill { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--blue); }
+    .budget.is-over .budget-usage-label strong { color: var(--danger); }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: 1rem; margin-top: 1.25rem; }
+    .layout:has(#mail-view:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.24fr); }
+    .ledger-title, .workspace { padding: 1.05rem; }
+    #row-count { background: #eef3f1; border-radius: 99px; padding: .19rem .58rem; font-weight: 720; }
+    .filters, .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+    .filters { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0 1.05rem 1rem; }
+    .ledger th:nth-child(3) { text-align: right; }
+    .table-wrap { overflow: auto; }
+    .ledger .table-wrap { border-radius: 0 0 13px 13px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: .68rem .6rem; border-top: 1px solid var(--line); vertical-align: middle; }
+    th:first-child, td:first-child { padding-left: 1rem; }
+    th:last-child, td:last-child { padding-right: 1rem; }
+    th { background: #f1f5f3; color: var(--muted); font-size: .79rem; white-space: nowrap; }
+    td { font-size: .86rem; }
+    td:nth-child(3) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    td:nth-child(4), th:nth-child(4) { text-align: right; }
+    tr[data-selected] { background: var(--soft); }
+    .ledger tbody tr:not([data-selected]):hover { background: #f7faf8; }
+    tr[data-selected] td:first-child { box-shadow: inset 3px 0 var(--blue); }
+    .row-title { padding: 0; border: 0; background: transparent; color: var(--navy); font-weight: 780; text-align: left; }
+    .row-title:hover { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; }
+    .row-subtitle { display: block; margin-top: .1rem; color: var(--muted); font-size: .78rem; }
+    .badge { display: inline-block; padding: .2rem .48rem; border-radius: 99px; background: #eef1f6; color: #475a73; font-size: .74rem; font-weight: 750; white-space: nowrap; }
+    .badge[data-status="sent"] { background: #fff2cf; color: #75510c; }
+    .badge[data-status="reviewed"] { background: #e6f4eb; color: #245740; }
+    .switcher { display: flex; border-bottom: 1px solid var(--line); gap: .65rem; margin: -.3rem 0 .95rem; }
+    .switcher button {
+      flex: 1; min-height: 40px; padding: .4rem; border: 0; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted); font-size: .9rem; font-weight: 760;
+    }
+    .switcher button:hover { background: #f4f8f6; }
+    .switcher button[aria-pressed="true"] { border-bottom-color: var(--blue); color: var(--blue); }
+    .panel-title h2 { line-height: 1.25; }
+    .summary { margin-top: .35rem; color: var(--muted); font-size: .88rem; }
+    .record-fields { display: grid; gap: .75rem; margin: 1rem 0 .8rem; }
+    .record-fields textarea { min-height: 70px; }
+    .panel-actions { display: flex; align-items: center; gap: .55rem .8rem; flex-wrap: wrap; margin-top: .85rem; }
+    .mail-body { margin-top: .8rem; }
+    .mail-subject { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .55rem; margin-top: .8rem; }
+    .mail-subject button { align-self: end; }
+    .mail-preview { margin-top: .75rem; padding: .75rem; border: 1px solid var(--line); border-radius: 10px; background: #f6f9f7; }
+    .mail-preview p + p { margin-top: .4rem; }
+    .mail-preview .table-wrap { margin-top: .65rem; }
+    .mail-preview table { min-width: 435px; background: var(--white); }
+    .mail-preview th, .mail-preview td { padding: .45rem .4rem; border: 1px solid var(--line); text-align: left; font-size: .8rem; }
+    .mail-preview td:nth-child(2) { min-width: 4rem; }
+    .mail-preview th:nth-child(3), .mail-preview td:nth-child(3) { text-align: right; }
+    .mail-preview td:empty { min-width: 4.35rem; }
+    .mail-preview th:last-child { white-space: normal; }
+    .empty { padding: .9rem 1rem; color: var(--muted); }
+    .notice { margin-top: .7rem; min-height: 1.25em; color: var(--blue); font-size: .88rem; }
+    .notice.error { color: var(--danger); }
+    .footer { margin-top: 1.35rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+    dialog {
+      width: min(560px, calc(100% - 32px)); max-height: calc(100% - 32px); padding: 1.2rem;
+      border: 1px solid var(--line); border-radius: 16px; color: var(--navy); background: var(--white);
+      box-shadow: 0 18px 75px #102b283d;
+    }
+    dialog::backdrop { background: #102b2880; }
+    dialog label { margin-top: .75rem; }
+    dialog .muted { margin-top: .5rem; }
+    .file-entry { margin-top: .8rem; padding: .8rem; border: 1px dashed #a5c3b5; border-radius: 10px; background: #f5faf8; }
+    .file-entry .panel-actions { margin-top: 0; }
+    #file-result { overflow-wrap: anywhere; }
+    @media (max-width: 1100px) {
+      .budget-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 940px) {
+      .app-frame { grid-template-columns: minmax(0, 1fr); }
+      .sidebar-inner { position: static; display: flex; align-items: center; justify-content: space-between; gap: .45rem; padding: .65rem 1rem; }
+      .brand { padding: 0; }
+      .sidebar nav { display: flex; flex-wrap: wrap; justify-content: end; padding: 0; border: 0; }
+      .sidebar a { padding: .48rem .6rem; }
+      .layout, .layout:has(#mail-view:not([hidden])) { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .wrap { width: calc(100% - 28px); }
+      .sidebar-inner { gap: .3rem; padding-inline: .75rem; }
+      .brand { font-size: .85rem; gap: .4rem; }
+      .brand-mark { width: 28px; height: 28px; border-radius: 8px; }
+      .sidebar nav { gap: 0; }
+      .sidebar a { padding: .46rem; font-size: .76rem; }
+      .sidebar a .icon { display: none; }
+      .masthead { padding-block: 1.3rem 1.05rem; }
+      .masthead-inner { padding-bottom: 1rem; }
+      .budget-grid { gap: .55rem; }
+      .budget { padding: .7rem; }
+      .budget h3 { font-size: .84rem; }
+      .budget .remaining { font-size: 1.15rem; }
+      :is(input, select, textarea) { font-size: 1rem; }
+      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .month-control { grid-column: 1 / -1; }
+      .hide-small { display: none; }
+      th, td { padding-inline: .4rem; }
+      th:first-child, td:first-child { padding-left: .65rem; }
+      th:last-child, td:last-child { padding-right: .65rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="sidebar">
+      <div class="sidebar-inner">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/>
+            </svg>
+          </span>
+          법인카드 관리
+        </div>
+        <nav aria-label="업무 메뉴">
+          <a href="#budget-section">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4v16h16M8 16v-4m5 4V8m5 8V5"/>
+            </svg>
+            예산 현황
+          </a>
+          <a href="#ledger-section">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+              <rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8m-8 6h8"/>
+            </svg>
+            카드 사용내역
+          </a>
+        </nav>
+      </div>
+    </aside>
+    <div>
+      <header class="masthead">
+        <div class="wrap masthead-inner">
+          <div>
+            <h1>법인카드 사용내역 정리</h1>
+            <p>사용자별 확인 요청 · 회신 정리 · 예산 배정</p>
+          </div>
+          <div class="actions">
+            <button class="button" type="button" id="clear-example">예시 지우기</button>
+            <button class="button primary" type="button" id="open-import">
+              <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4"/>
+              </svg>
+              사용내역 가져오기
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="wrap">
+        <section id="budget-section" aria-labelledby="budget-title" tabindex="-1">
+          <div class="section-title">
+            <h2 id="budget-title">예산 잔여한도</h2>
+            <p class="muted">소진율은 기준 잔여한도 대비 모든 달의 최종 배정액 비율이에요.</p>
+          </div>
+          <div id="budgets" class="budget-grid"></div>
+        </section>
+
+        <div class="layout">
+          <section class="ledger" id="ledger-section" aria-labelledby="ledger" tabindex="-1">
+            <div class="ledger-title">
+              <h2 id="ledger">카드 사용내역</h2>
+              <p id="row-count" class="muted"></p>
+            </div>
+            <div class="filters">
+              <label class="month-control">사용 월<select id="month-filter"></select></label>
+              <label>사용자<select id="user-filter"></select></label>
+              <label>회신 상태
+                <select id="stage-filter">
+                  <option value="">전체</option>
+                  <option value="new">요청 전</option>
+                  <option value="sent">회신 대기</option>
+                  <option value="reviewed">회신 확인</option>
+                </select>
+              </label>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">사용내역</th><th scope="col" class="hide-small">사용자</th><th scope="col">금액</th><th scope="col">상태</th></tr></thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+            <p id="table-empty" class="empty" hidden></p>
+          </section>
+
+          <section class="workspace" aria-label="사용내역 처리">
+            <div class="switcher" role="group" aria-label="작업 선택">
+              <button type="button" data-view="detail" aria-pressed="true">회신·배정</button>
+              <button type="button" data-view="mail" aria-pressed="false">메일 초안</button>
+            </div>
+
+            <div id="detail-view">
+              <p id="detail-empty" class="empty" hidden>카드 사용내역에서 결제 건을 선택해 주세요.</p>
+              <div id="detail-record">
+                <div class="panel-title">
+                  <h2 id="detail-title">결제 내역</h2>
+                  <span id="detail-badge" class="badge"></span>
+                </div>
+                <p id="detail-summary" class="summary"></p>
+                <div class="record-fields" id="record-fields">
+                  <label>사용 목적<textarea data-field="purpose" rows="2" placeholder="예: 업무 개선 관련 회의" maxlength="400"></textarea></label>
+                  <div class="field-grid">
+                    <label>회신 유형
+                      <select data-field="replyType">
+                        <option value="">미선택</option>
+                        <option value="meeting">회의비</option>
+                        <option value="promotion">업무추진비</option>
+                      </select>
+                    </label>
+                    <label>사용자 제안 과목<select data-field="suggested"></select></label>
+                  </div>
+                  <label id="meeting-fields" hidden>함께 회의한 사람<input data-field="participants" maxlength="180"></label>
+                  <div id="promotion-fields" class="field-grid" hidden>
+                    <label>접대한 회사<input data-field="company" maxlength="140"></label>
+                    <label>접대한 사람<input data-field="people" maxlength="180"></label>
+                  </div>
+                  <label>최종 예산 과목<select data-field="final"></select></label>
+                </div>
+                <p id="detail-help" class="muted"></p>
+                <div class="panel-actions">
+                  <button class="button primary" type="button" id="mark-reviewed">회신 확인 처리</button>
+                  <button class="button" type="button" id="mark-row-sent">요청 보냄 기록</button>
+                  <button class="button" type="button" id="clear-allocation" hidden>최종 배정 해제</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="mail-view" hidden>
+              <div class="panel-title"><h2>사용자별 확인 요청</h2></div>
+              <p class="summary">표를 복사해 메일에 붙여넣으면, 받는 사람이 각 결제 건의 빈칸에 바로 적을 수 있어요.</p>
+              <label class="mail-body">받는 사용자<select id="mail-user"></select></label>
+              <div class="mail-subject">
+                <label>제목<input id="mail-subject" readonly></label>
+                <button class="button" type="button" id="copy-subject">제목 복사</button>
+              </div>
+              <div id="mail-preview" class="mail-preview" aria-label="메일 초안 미리보기"></div>
+              <label class="mail-body" id="mail-fallback" hidden>복사용 텍스트<textarea id="mail-text" rows="8" readonly></textarea></label>
+              <div class="panel-actions">
+                <button class="button primary" type="button" id="copy-mail">메일 표 복사</button>
+                <button class="button" type="button" id="mark-mail-sent">요청 보냄 기록</button>
+                <button class="button" type="button" id="undo-mail-sent">보냄 기록 취소</button>
+              </div>
+            </div>
+            <p id="workspace-status" class="notice" role="status"></p>
+          </section>
+        </div>
+        <p id="storage-note" class="muted footer">입력과 처리 기록은 이 브라우저에 저장돼요. 잔액은 실제 시스템에 반영하기 전 확인용이에요.</p>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="import-dialog" aria-labelledby="import-title">
+    <div class="panel-title">
+      <h2 id="import-title">사용내역 가져오기</h2>
+      <button type="button" class="button" id="close-import">닫기</button>
+    </div>
+    <div class="file-entry">
+      <div class="panel-actions">
+        <button type="button" class="button" id="pick-import-file">Finder에서 파일 선택</button>
+        <span class="muted">.xlsx · .csv · .tsv</span>
+      </div>
+      <input id="import-file" type="file" accept=".xlsx,.csv,.tsv" hidden>
+      <p id="file-result" class="muted" role="status" hidden></p>
+    </div>
+    <p class="muted">파일을 선택하거나 엑셀에서 열 제목을 포함해 복사하세요.</p>
+    <form id="import-form">
+      <label>엑셀 표<textarea id="import-text" rows="7" required spellcheck="false" placeholder="사용자&#9;사용일시&#9;가맹점&#9;금액"></textarea></label>
+      <p id="import-status" class="notice" role="status"></p>
+      <div class="panel-actions">
+        <button class="button" type="button" id="fill-import-example">예시 표 넣기</button>
+        <button class="button primary" id="import-submit" type="submit">목록에 추가</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="budget-template">
+    <article class="budget">
+      <h3></h3>
+      <dl>
+        <div class="remaining"><dt>예상 잔액</dt><dd class="available"></dd></div>
+        <div><dt>배정 합계</dt><dd class="allocated"></dd></div>
+      </dl>
+      <div class="budget-usage">
+        <p class="budget-usage-label">소진율 <strong class="usage-percent">—</strong></p>
+        <div class="budget-usage-track" aria-hidden="true"><span class="budget-usage-fill"></span></div>
+      </div>
+      <label>기준 잔여한도(원)<input inputmode="numeric" maxlength="20"></label>
+    </article>
+  </template>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const accounts = [
+      { id: "hq-meeting", label: "본점 회의비", type: "meeting" },
+      { id: "hq-promotion", label: "본점 업무추진비", type: "promotion" },
+      { id: "exec-meeting", label: "임원 회의비", type: "meeting" },
+      { id: "exec-promotion", label: "임원 업무추진비", type: "promotion" }
+    ];
+    const labels = { new: "요청 전", sent: "회신 대기", reviewed: "회신 확인" };
+    const key = "card-expense-assistant:v1";
+    const numberFormat = new Intl.NumberFormat("ko-KR");
+    const percentFormat = new Intl.NumberFormat("ko-KR", { style: "percent", maximumFractionDigits: 1 });
+    const byId = id => document.getElementById(id);
+    const money = value => numberFormat.format(value) + "원";
+    const accountOf = id => accounts.find(account => account.id === id);
+    const examples = [
+      ["예시 사용자 A", "2026-11-17 12:10", "예시식당", 28000],
+      ["예시 사용자 A", "2026-11-18 15:40", "예시카페", 42000],
+      ["예시 사용자 B", "2026-11-18 12:35", "샘플 한식당", 65000],
+      ["예시 사용자 C", "2026-11-19 10:20", "샘플 회의 공간", 36000]
+    ];
+    const importExample = [
+      ["카드 번호", "사용자", "사용일시", "사용한 곳", "금액"],
+      ["TEST-A", "샘플 담당자 A", "2026-11-16 11:50", "가상 소담식당", 28000],
+      ["TEST-A", "샘플 담당자 A", "2026-11-17 14:20", "가상 브릿지카페", 42000],
+      ["TEST-B", "샘플 담당자 B", "2026-11-17 12:35", "가상 중앙한식", 65000],
+      ["TEST-C", "샘플 담당자 C", "2026-11-18 10:15", "가상 미팅라운지", 36000],
+      ["TEST-C", "샘플 담당자 C", "2026-11-19 18:10", "가상 파트너식당", 59000]
+    ];
+    const sampleLimits = Object.fromEntries(accounts.map((account, i) =>
+      [account.id, ["100,000", "200,000", "80,000", "160,000"][i]]
+    ));
+
+    function makeRow(id, fields, example = false) {
+      const [user, date, merchant, amount] = fields;
+      return {
+        id, user, date, merchant, amount, example, sent: false, reviewed: false,
+        purpose: "", replyType: "", suggested: "", participants: "", company: "", people: "", final: ""
+      };
+    }
+
+    function load() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(key));
+        if (saved && Array.isArray(saved.rows) && Array.isArray(saved.batches) &&
+            saved.limits && saved.sampleLimits && Number.isSafeInteger(saved.next)) return saved;
+      } catch {}
+      return {
+        rows: examples.map((fields, index) => makeRow(index + 1, fields, true)),
+        limits: { ...sampleLimits }, sampleLimits: Object.keys(sampleLimits),
+        batches: [], next: examples.length + 1
+      };
+    }
+
+    const state = load();
+    let selected = state.rows[0]?.id ?? null;
+    let view = "detail";
+    const monthFilter = byId("month-filter");
+    const userFilter = byId("user-filter");
+    const stageFilter = byId("stage-filter");
+    const mailUser = byId("mail-user");
+    const fields = [...document.querySelectorAll("#record-fields [data-field]")];
+    const budgetCards = new Map();
+
+    function save() {
+      try {
+        localStorage.setItem(key, JSON.stringify(state));
+      } catch {
+        byId("storage-note").textContent = "이 브라우저에 저장하지 못했어요. 새로고침하면 현재 입력이 사라질 수 있어요.";
+      }
+    }
+
+    function notify(message = "", error = false) {
+      const node = byId("workspace-status");
+      node.textContent = message;
+      node.classList.toggle("error", error);
+    }
+
+    function readMoney(raw) {
+      let text = raw.normalize("NFKC").trim().replace(/^₩\s*/, "").replace(/\s*원$/, "");
+      if (text.startsWith("(") && text.endsWith(")")) text = "-" + text.slice(1, -1).trim();
+      if (!/^[+-]?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.0+)?$/.test(text)) return null;
+      const value = Number(text.replaceAll(",", ""));
+      return Number.isSafeInteger(value) ? value : null;
+    }
+
+    function readBudget(raw) {
+      const value = raw.normalize("NFKC").trim();
+      return readMoney(/^[+-]?\d[\d,]*$/.test(value) ? value.replaceAll(",", "") : value);
+    }
+
+    function groupBudgetInput(field) {
+      const value = readBudget(field.value);
+      if (value === null) return;
+      const formatted = numberFormat.format(value);
+      if (formatted === field.value) return;
+      const digitsAfter = (field.value.slice(field.selectionStart ?? field.value.length).match(/[0-9０-９]/g) ?? []).length;
+      let position = formatted.length;
+      for (let digits = 0; position > 0 && digits < digitsAfter;) {
+        if (/\d/.test(formatted[--position])) digits++;
+      }
+      field.value = formatted;
+      field.setSelectionRange(position, position);
+    }
+
+    function replyType(row) {
+      return accountOf(row.final)?.type || row.replyType || accountOf(row.suggested)?.type || "";
+    }
+
+    function missingReply(row) {
+      const missing = [];
+      if (!row.purpose.trim()) missing.push("사용 목적");
+      const type = replyType(row);
+      if (type === "meeting" && !row.participants.trim()) missing.push("함께 회의한 사람");
+      if (type === "promotion") {
+        if (!row.company.trim()) missing.push("접대한 회사");
+        if (!row.people.trim()) missing.push("접대한 사람");
+      }
+      if (!type) missing.push("회신 유형");
+      return missing;
+    }
+
+    function stage(row) {
+      if (row.reviewed && missingReply(row).length === 0) return "reviewed";
+      return row.sent ? "sent" : "new";
+    }
+
+    function buildBudgets() {
+      for (const account of accounts) {
+        const card = byId("budget-template").content.firstElementChild.cloneNode(true);
+        card.querySelector("h3").textContent = account.label;
+        const field = card.querySelector("input");
+        field.setAttribute("aria-label", account.label + " 기준 잔여한도");
+        field.addEventListener("beforeinput", event => {
+          const position = field.selectionStart;
+          if (position === null || position !== field.selectionEnd) return;
+          const backward = event.inputType === "deleteContentBackward" && field.value[position - 1] === ",";
+          const forward = event.inputType === "deleteContentForward" && field.value[position] === ",";
+          if (!backward && !forward) return;
+          event.preventDefault();
+          field.setRangeText("", backward ? position - 2 : position, backward ? position : position + 2, "end");
+          field.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        field.addEventListener("input", () => {
+          groupBudgetInput(field);
+          state.limits[account.id] = field.value;
+          state.sampleLimits = state.sampleLimits.filter(id => id !== account.id);
+          save();
+          renderBudgets();
+        });
+        budgetCards.set(account.id, { card, field });
+        byId("budgets").append(card);
+      }
+    }
+
+    function renderBudgets() {
+      for (const [id, { card, field }] of budgetCards) {
+        const raw = state.limits[id] ?? "";
+        const base = readBudget(raw);
+        const shown = base === null ? raw : numberFormat.format(base);
+        if (field.value !== shown) field.value = shown;
+        const total = state.rows.reduce((sum, row) => row.final === id ? sum + row.amount : sum, 0);
+        const left = base === null ? null : base - total;
+        field.setAttribute("aria-invalid", String(Boolean(raw.trim()) && base === null));
+        card.querySelector(".allocated").textContent = money(total);
+        card.querySelector(".available").textContent = left === null
+          ? (raw.trim() ? "금액 확인" : "잔여한도 입력")
+          : (left < 0 ? money(-left) + " 초과" : money(left));
+        const ratio = base > 0 ? total / base : null;
+        const fill = ratio === null ? Number(left !== null && left < 0) : Math.min(1, Math.max(0, ratio));
+        card.querySelector(".usage-percent").textContent = ratio === null ? "—" : percentFormat.format(ratio);
+        const bar = card.querySelector(".budget-usage-fill");
+        bar.style.width = (fill * 100) + "%";
+        bar.style.backgroundColor = `hsl(${Math.max(0, 156 * (1 - fill / .9))} 65% 42%)`;
+        card.classList.toggle("is-over", left !== null && left < 0);
+      }
+    }
+
+    function usageMonth(date) {
+      const text = date.normalize("NFKC").trim();
+      const parts = text.match(/^(\d{4})\s*[-./년]\s*(\d{1,2})(?=\D|$)/) ??
+        text.match(/^(\d{4})(\d{2})\d{2}(?=\D|$)/);
+      if (!parts || Number(parts[2]) < 1 || Number(parts[2]) > 12) return "unknown";
+      return parts[1] + "-" + parts[2].padStart(2, "0");
+    }
+
+    function fillMonths() {
+      const distinct = new Set(state.rows.map(row => usageMonth(row.date)));
+      const months = [...distinct].filter(month => month !== "unknown").sort().reverse();
+      monthFilter.replaceChildren(new Option("전체 월", ""), ...months.map(month =>
+        new Option(month.slice(0, 4) + "년 " + Number(month.slice(5)) + "월", month)
+      ));
+      if (distinct.has("unknown")) monthFilter.add(new Option("사용 월 확인 필요", "unknown"));
+      state.month = distinct.has(state.month) ? state.month : "";
+      monthFilter.value = state.month;
+    }
+
+    function rowsInMonth() {
+      return monthFilter.value
+        ? state.rows.filter(row => usageMonth(row.date) === monthFilter.value)
+        : state.rows;
+    }
+
+    function fillUsers() {
+      const users = [...new Set(rowsInMonth().map(row => row.user))].sort((a, b) => a.localeCompare(b, "ko"));
+      const ledgerValue = userFilter.value;
+      const mailValue = mailUser.value;
+      userFilter.replaceChildren(new Option("전체 사용자", ""), ...users.map(user => new Option(user, user)));
+      mailUser.replaceChildren(new Option("사용자를 선택하세요", ""), ...users.map(user => new Option(user, user)));
+      userFilter.value = users.includes(ledgerValue) ? ledgerValue : "";
+      mailUser.value = users.includes(mailValue) ? mailValue : (users[0] ?? "");
+    }
+
+    function visibleRows() {
+      return rowsInMonth().filter(row =>
+        (!userFilter.value || row.user === userFilter.value) &&
+        (!stageFilter.value || stage(row) === stageFilter.value)
+      );
+    }
+
+    function renderRows() {
+      const visible = visibleRows();
+      byId("row-count").textContent = visible.length.toLocaleString("ko-KR") + "건";
+      const empty = byId("table-empty");
+      empty.hidden = visible.length > 0;
+      empty.textContent = state.rows.length ? "조건에 맞는 사용내역이 없어요." : "엑셀 표를 붙여넣어 시작하세요.";
+
+      byId("rows").replaceChildren(...visible.map(row => {
+        const tr = document.createElement("tr");
+        tr.toggleAttribute("data-selected", row.id === selected);
+        const item = tr.insertCell();
+        const open = document.createElement("button");
+        open.type = "button";
+        open.dataset.id = String(row.id);
+        open.className = "row-title";
+        open.textContent = row.merchant;
+        if (row.id === selected) open.setAttribute("aria-current", "true");
+        const caption = document.createElement("span");
+        caption.className = "row-subtitle";
+        caption.textContent = "#" + row.id + " · " + row.date;
+        item.append(open, caption);
+        const user = tr.insertCell();
+        user.className = "hide-small";
+        user.textContent = row.user;
+        tr.insertCell().textContent = money(row.amount);
+        const label = document.createElement("span");
+        label.className = "badge";
+        label.dataset.status = stage(row);
+        label.textContent = labels[label.dataset.status];
+        const status = tr.insertCell();
+        status.append(label);
+        if (row.final) {
+          const allocation = document.createElement("span");
+          allocation.className = "row-subtitle";
+          allocation.textContent = accountOf(row.final).label;
+          status.append(allocation);
+        }
+        return tr;
+      }));
+    }
+
+    function selectedRow() {
+      return state.rows.find(row => row.id === selected);
+    }
+
+    function renderDetail() {
+      const row = selectedRow();
+      byId("detail-empty").hidden = Boolean(row);
+      byId("detail-record").hidden = !row;
+      if (!row) return;
+      byId("detail-title").textContent = row.merchant;
+      byId("detail-summary").textContent = "#" + row.id + " · " + row.user + " · " + row.date + " · " + money(row.amount);
+      const badge = byId("detail-badge");
+      badge.dataset.status = stage(row);
+      badge.textContent = labels[badge.dataset.status];
+      for (const field of fields) {
+        if (field.value !== row[field.dataset.field]) field.value = row[field.dataset.field];
+      }
+      const type = replyType(row);
+      byId("meeting-fields").hidden = type !== "meeting";
+      byId("promotion-fields").hidden = type !== "promotion";
+      const sent = byId("mark-row-sent");
+      sent.textContent = row.sent ? "보냄 기록 취소" : "요청 보냄 기록";
+      sent.disabled = !row.sent && stage(row) === "reviewed";
+      byId("mark-reviewed").textContent = row.reviewed ? "회신 확인 취소" : "회신 확인 처리";
+      byId("clear-allocation").hidden = !row.final;
+      const missing = missingReply(row);
+      byId("detail-help").textContent = missing.length
+        ? "회신 확인에 필요한 항목 · " + missing.join(", ")
+        : "회신에 필요한 항목을 모두 입력했어요.";
+    }
+
+    function mailRows() {
+      return mailUser.value
+        ? rowsInMonth().filter(row => row.user === mailUser.value && stage(row) !== "reviewed")
+        : [];
+    }
+
+    function renderMail() {
+      const rows = mailRows();
+      byId("copy-mail").disabled = rows.length === 0;
+      byId("copy-subject").disabled = rows.length === 0;
+      byId("mark-mail-sent").disabled = !rows.some(row => !row.sent);
+      byId("undo-mail-sent").disabled = !rows.some(row => row.sent);
+      const preview = byId("mail-preview");
+      const body = byId("mail-text");
+      const subject = byId("mail-subject");
+      byId("mail-fallback").hidden = true;
+      preview.replaceChildren();
+      if (!rows.length) {
+        preview.textContent = mailUser.value ? "이 사용자는 회신을 확인할 내역이 없어요." : "받는 사용자를 선택해 주세요.";
+        body.value = "";
+        subject.value = "";
+        return;
+      }
+      const months = new Set(rows.map(row => usageMonth(row.date)));
+      const month = usageMonth(rows[0].date);
+      const period = months.size === 1 && month !== "unknown" ? Number(month.slice(5)) + "월 " : "";
+      const topic = period + "법인카드 사용내역";
+      subject.value = topic + " 확인 요청";
+      const intro = "안녕하세요 " + mailUser.value + "님! " + topic + " 회신 부탁드립니다. 감사합니다.";
+      const headers = ["사용일시", "사용처", "금액", "사용 목적", "접대한 회사", "접대한 사람 / 회의 참여 직원"];
+      const data = rows.map(row => [row.date, row.merchant, money(row.amount), "", "", ""]);
+      const description = document.createElement("p");
+      description.textContent = intro;
+      const scroller = document.createElement("div");
+      scroller.className = "table-wrap";
+      const table = document.createElement("table");
+      table.setAttribute("aria-label", "카드 사용내역 회신 표");
+      const header = table.createTHead().insertRow();
+      for (const title of headers) {
+        const cell = document.createElement("th");
+        cell.scope = "col";
+        cell.textContent = title;
+        header.append(cell);
+      }
+      const tableBody = table.createTBody();
+      for (const values of data) {
+        const row = tableBody.insertRow();
+        for (const value of values) row.insertCell().textContent = value;
+      }
+      scroller.append(table);
+      preview.append(description, scroller);
+      body.value = [intro, "", headers.join("\t"), ...data.map(values => values.join("\t"))].join("\n");
+    }
+
+    function mailHtml() {
+      const preview = byId("mail-preview").cloneNode(true);
+      const table = preview.querySelector("table");
+      table.style.cssText = "border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px";
+      for (const cell of table.querySelectorAll("th, td")) {
+        cell.style.cssText = "border:1px solid #b7c5cc;padding:7px 10px;text-align:left;vertical-align:top";
+        if (cell.tagName === "TH") cell.style.backgroundColor = "#e8f5f1";
+        if (!cell.textContent) {
+          cell.textContent = "\u00a0";
+          cell.style.minWidth = "85px";
+        }
+      }
+      return preview.innerHTML;
+    }
+
+    function render() {
+      renderBudgets();
+      renderRows();
+      renderDetail();
+      renderMail();
+      byId("clear-example").hidden = !state.rows.some(row => row.example) && state.sampleLimits.length === 0;
+    }
+
+    function switchView(next) {
+      view = next;
+      byId("detail-view").hidden = view !== "detail";
+      byId("mail-view").hidden = view !== "mail";
+      for (const button of document.querySelectorAll("[data-view]")) {
+        button.setAttribute("aria-pressed", String(button.dataset.view === view));
+      }
+    }
+
+    function parseTable(text, separator = "\t") {
+      const matrix = [];
+      let row = [];
+      let value = "";
+      let quoted = false;
+      const source = text.replace(/\r\n?/g, "\n");
+      for (let i = 0; i < source.length; i++) {
+        const char = source[i];
+        if (quoted && char === '"' && source[i + 1] === '"') {
+          value += '"';
+          i++;
+        } else if (char === '"' && (quoted || !value)) {
+          quoted = !quoted;
+        } else if (!quoted && char === separator) {
+          row.push(value.trim());
+          value = "";
+        } else if (!quoted && char === "\n") {
+          row.push(value.trim());
+          matrix.push(row);
+          row = [];
+          value = "";
+        } else {
+          value += char;
+        }
+      }
+      if (quoted) throw new Error("닫히지 않은 따옴표가 있어요. 엑셀의 표 범위를 다시 복사해 주세요.");
+      row.push(value.trim());
+      matrix.push(row);
+      return matrix;
+    }
+
+    const importNames = ["사용자", "사용일시", "가맹점", "금액"];
+    const importAliases = [
+        ["사용자", "사용자명", "카드사용자", "카드사용자명", "성명", "이름"],
+        ["사용일시", "결제일시", "승인일시", "거래일시", "사용일자", "사용일", "승인일자"],
+        ["가맹점", "가맹점명", "사용한곳", "사용처", "이용가맹점"],
+        ["금액", "금액원", "사용금액", "사용금액원", "승인금액", "승인금액원", "결제금액", "이용금액"]
+    ];
+
+    function importColumns(cells) {
+      const header = cells.map(value => String(value).normalize("NFKC").replace(/[^\p{L}\p{N}]/gu, ""));
+      return importAliases.map(names => header.findIndex(name => names.includes(name)));
+    }
+
+    function findImportHeader(matrix) {
+      return matrix.findIndex(row => importColumns(row).every(column => column >= 0));
+    }
+
+    function excelDate(value, date1904) {
+      let timestamp;
+      if (typeof value === "number" && value >= 0 && value < 2957000) {
+        const epoch = date1904 ? Date.UTC(1904, 0, 1) : Date.UTC(1899, 11, value < 60 ? 31 : 30);
+        timestamp = epoch + value * 86400000;
+      } else {
+        const iso = String(value).match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)(?:Z|[+-]\d{2}:\d{2})?$/);
+        if (!iso) return String(value);
+        timestamp = Date.parse(iso[1] + "Z");
+      }
+      if (!Number.isFinite(timestamp)) return String(value);
+      const time = new Date(Math.round(timestamp / 1000) * 1000).toISOString().slice(0, 19).replace("T", " ");
+      return time.endsWith(":00") ? time.slice(0, -3) : time;
+    }
+
+    function readImportRows(matrix, date1904 = false) {
+      const headerIndex = findImportHeader(matrix);
+      const index = headerIndex >= 0 ? headerIndex : matrix.findIndex(row => row.some(Boolean));
+      if (index === -1) throw new Error("엑셀 표를 붙여넣어 주세요.");
+      const columns = importColumns(matrix[index]);
+      const missing = importNames.filter((_, i) => columns[i] === -1);
+      if (missing.length) throw new Error("찾을 수 없는 열 · " + missing.join(", ") + ". 열 제목을 포함해 복사해 주세요.");
+
+      const rows = [];
+      for (let i = index + 1; i < matrix.length; i++) {
+        if (!matrix[i].some(value => value !== "" && value !== undefined)) continue;
+        const [rawUser, rawDate, rawMerchant, rawAmount] = columns.map(col => matrix[i][col] ?? "");
+        const [user, date, merchant] = [String(rawUser).trim(), excelDate(rawDate, date1904).trim(), String(rawMerchant).trim()];
+        const amount = readMoney(String(rawAmount));
+        if (!user || !date || !merchant || amount === null) {
+          const invalid = [user, date, merchant, amount].map((value, col) =>
+            (value === "" || value === null) ? importNames[col] : ""
+          ).filter(Boolean);
+          throw new Error((i + 1) + "번째 행의 " + invalid.join("·") + "을 확인해 주세요.");
+        }
+        const singleLine = value => value.replace(/\s+/g, " ").trim();
+        rows.push([singleLine(user), singleLine(date), singleLine(merchant), amount]);
+      }
+      if (!rows.length) throw new Error("제목 아래에 가져올 결제 내역이 없어요.");
+      return rows;
+    }
+
+    function openZip(buffer) {
+      const view = new DataView(buffer);
+      const decoder = new TextDecoder("utf-8", { fatal: true });
+      const invalid = () => new Error("엑셀 파일을 읽을 수 없어요. 암호 없이 저장한 .xlsx 파일을 선택해 주세요.");
+      const bytes = (start, size) => {
+        if (start < 0 || size < 0 || start + size > view.byteLength) throw invalid();
+        return new Uint8Array(buffer, start, size);
+      };
+      let end = view.byteLength - 22;
+      const minimum = Math.max(0, end - 65535);
+      while (end >= minimum &&
+          (view.getUint32(end, true) !== 0x06054b50 || end + 22 + view.getUint16(end + 20, true) !== view.byteLength)) end--;
+      if (end < minimum || view.getUint16(end + 4, true) || view.getUint16(end + 6, true)) throw invalid();
+
+      const count = view.getUint16(end + 10, true);
+      let offset = view.getUint32(end + 16, true);
+      const entries = new Map();
+      for (let i = 0; i < count; i++) {
+        if (offset + 46 > end || view.getUint32(offset, true) !== 0x02014b50) throw invalid();
+        const nameLength = view.getUint16(offset + 28, true);
+        const extras = view.getUint16(offset + 30, true) + view.getUint16(offset + 32, true);
+        const name = decoder.decode(bytes(offset + 46, nameLength));
+        entries.set(name, {
+          flags: view.getUint16(offset + 8, true),
+          method: view.getUint16(offset + 10, true),
+          packed: view.getUint32(offset + 20, true),
+          size: view.getUint32(offset + 24, true),
+          start: view.getUint32(offset + 42, true)
+        });
+        offset += 46 + nameLength + extras;
+      }
+
+      const read = async name => {
+        const entry = entries.get(name);
+        if (!entry || entry.flags & 1 || entry.start + 30 > end ||
+            view.getUint32(entry.start, true) !== 0x04034b50) throw invalid();
+        if (entry.size > 24 * 1024 * 1024) throw new Error("시트가 너무 커요. 필요한 결제 범위만 복사해 주세요.");
+        const start = entry.start + 30 + view.getUint16(entry.start + 26, true) + view.getUint16(entry.start + 28, true);
+        const packed = bytes(start, entry.packed);
+        if (entry.method === 0 && entry.size === packed.length) return decoder.decode(packed);
+        if (entry.method !== 8 || typeof DecompressionStream !== "function") throw invalid();
+
+        const reader = new Blob([packed]).stream().pipeThrough(new DecompressionStream("deflate-raw")).getReader();
+        const result = new Uint8Array(entry.size);
+        let position = 0;
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (position + value.length > result.length) throw invalid();
+            result.set(value, position);
+            position += value.length;
+          }
+        } catch (error) {
+          await reader.cancel().catch(() => {});
+          throw error;
+        } finally {
+          reader.releaseLock();
+        }
+        if (position !== result.length) throw invalid();
+        return decoder.decode(result);
+      };
+      return { has: name => entries.has(name), read };
+    }
+
+    async function readWorkbook(buffer) {
+      const zip = openZip(buffer);
+      const xml = async name => {
+        const doc = new DOMParser().parseFromString(await zip.read(name), "application/xml");
+        if (doc.querySelector("parsererror")) throw new Error("엑셀 시트 형식을 읽을 수 없어요.");
+        return doc;
+      };
+      const workbook = await xml("xl/workbook.xml");
+      const links = await xml("xl/_rels/workbook.xml.rels");
+      const targets = [...links.getElementsByTagNameNS("*", "Relationship")]
+        .filter(link => link.getAttribute("TargetMode") !== "External")
+        .map(link => [link.getAttribute("Id"), new URL(link.getAttribute("Target"), "https://workbook.invalid/xl/workbook.xml")]);
+      const paths = new Map(targets.filter(([, url]) => url.origin === "https://workbook.invalid")
+        .map(([id, url]) => [id, decodeURIComponent(url.pathname.slice(1))]));
+      const plainText = node => [...node.getElementsByTagNameNS("*", "t")].map(item => item.textContent).join("");
+      const strings = zip.has("xl/sharedStrings.xml")
+        ? [...(await xml("xl/sharedStrings.xml")).getElementsByTagNameNS("*", "si")].map(plainText) : [];
+      const date1904 = ["1", "true"].includes(workbook.getElementsByTagNameNS("*", "workbookPr")[0]?.getAttribute("date1904"));
+
+      for (const sheet of workbook.getElementsByTagNameNS("*", "sheet")) {
+        if (["hidden", "veryHidden"].includes(sheet.getAttribute("state"))) continue;
+        const id = [...sheet.attributes].find(attribute => attribute.localName === "id")?.value;
+        const path = paths.get(id);
+        if (!path || !zip.has(path)) continue;
+        const doc = await xml(path);
+        const matrix = [...doc.getElementsByTagNameNS("*", "row")].map(record => {
+          const values = [];
+          for (const cell of record.getElementsByTagNameNS("*", "c")) {
+            const ref = cell.getAttribute("r")?.match(/^[A-Z]{1,3}/)?.[0];
+            const next = ref
+              ? [...ref].reduce((sum, character) => sum * 26 + character.charCodeAt(0) - 64, 0) - 1
+              : values.length;
+            if (next > 16383) continue;
+            const type = cell.getAttribute("t");
+            const raw = cell.getElementsByTagNameNS("*", "v")[0]?.textContent ?? "";
+            if (type === "inlineStr") values[next] = plainText(cell);
+            else if (type === "s") values[next] = strings[Number(raw)] ?? "";
+            else if (raw && (!type || type === "n") && Number.isFinite(Number(raw))) values[next] = Number(raw);
+            else values[next] = raw;
+          }
+          return values;
+        });
+        if (findImportHeader(matrix) >= 0) {
+          return { rows: readImportRows(matrix, date1904), sheet: sheet.getAttribute("name") };
+        }
+      }
+      throw new Error("사용자, 사용일시, 사용처, 금액 열이 있는 시트를 찾지 못했어요.");
+    }
+
+    function readTextFile(buffer) {
+      const [first, second] = new Uint8Array(buffer, 0, Math.min(2, buffer.byteLength));
+      if (first === 255 && second === 254) return new TextDecoder("utf-16le").decode(buffer);
+      if (first === 254 && second === 255) return new TextDecoder("utf-16be").decode(buffer);
+      try {
+        return new TextDecoder("utf-8", { fatal: true }).decode(buffer);
+      } catch {
+        return new TextDecoder("euc-kr", { fatal: true }).decode(buffer);
+      }
+    }
+
+    const fileInput = byId("import-file");
+    const fileButton = byId("pick-import-file");
+    const fileNote = byId("file-result");
+    const importDialog = byId("import-dialog");
+    let fileRequest = 0;
+
+    function showFileResult(text, error = false) {
+      fileNote.textContent = text;
+      fileNote.hidden = !text;
+      fileNote.classList.toggle("error", error);
+    }
+
+    fileButton.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      fileInput.value = "";
+      const request = ++fileRequest;
+      const text = byId("import-text");
+      const controls = [fileButton, byId("import-submit"), byId("fill-import-example"), text];
+      controls.forEach(control => { control.disabled = true; });
+      showFileResult("파일 읽는 중…");
+      byId("import-status").textContent = "";
+      try {
+        if (file.size > 12 * 1024 * 1024) throw new Error("파일이 너무 커요. 필요한 행만 별도 파일로 저장해 주세요.");
+        const extension = file.name.split(".").at(-1).toLowerCase();
+        if (!["xlsx", "csv", "tsv"].includes(extension)) throw new Error(".xlsx, .csv 또는 .tsv 파일을 선택해 주세요.");
+        const buffer = await file.arrayBuffer();
+        const result = extension === "xlsx" ? await readWorkbook(buffer) : {
+          rows: readImportRows(parseTable(readTextFile(buffer), extension === "csv" ? "," : "\t"))
+        };
+        if (request !== fileRequest) return;
+        text.value = [importNames, ...result.rows].map(row => row.join("\t")).join("\n");
+        showFileResult(file.name + (result.sheet ? " · " + result.sheet : "") + " · " + result.rows.length + "건을 읽었어요.");
+      } catch (error) {
+        if (request === fileRequest) {
+          const message = /[가-힣]/.test(error.message) ? error.message : "파일을 읽을 수 없어요. 열 제목과 파일 형식을 확인해 주세요.";
+          showFileResult(message, true);
+        }
+      } finally {
+        controls.forEach(control => { control.disabled = false; });
+      }
+    });
+    byId("import-text").addEventListener("input", () => showFileResult(""));
+    importDialog.addEventListener("close", () => { fileRequest++; });
+
+    byId("open-import").addEventListener("click", () => {
+      byId("import-status").textContent = "";
+      if (!byId("import-text").value) showFileResult("");
+      importDialog.showModal();
+      byId("import-text").focus();
+    });
+    byId("close-import").addEventListener("click", () => byId("import-dialog").close());
+    byId("fill-import-example").addEventListener("click", () => {
+      byId("import-text").value = importExample.map(row => row.join("\t")).join("\n");
+      byId("import-status").textContent = "";
+      showFileResult("");
+      byId("import-text").focus();
+    });
+    byId("import-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const note = byId("import-status");
+      const input = byId("import-text");
+      try {
+        const rows = readImportRows(parseTable(input.value));
+        const bytes = new TextEncoder().encode(JSON.stringify(rows.map(row => JSON.stringify(row)).sort()));
+        const hash = await crypto.subtle.digest("SHA-256", bytes);
+        const fingerprint = Array.from(new Uint8Array(hash), value => value.toString(16).padStart(2, "0")).join("");
+        if (state.batches.includes(fingerprint)) throw new Error("이미 가져온 표예요. 기존 내역을 유지했어요.");
+        state.rows.unshift(...rows.map(fields => makeRow(state.next++, fields)));
+        state.batches.push(fingerprint);
+        if (state.month && !rows.some(row => usageMonth(row[1]) === state.month)) state.month = "";
+        fillMonths();
+        userFilter.value = "";
+        stageFilter.value = "";
+        fillUsers();
+        selected = rowsInMonth()[0]?.id ?? null;
+        switchView("detail");
+        save();
+        render();
+        input.value = "";
+        showFileResult("");
+        byId("import-dialog").close();
+        notify(rows.length + "건을 가져왔어요.");
+      } catch (error) {
+        note.textContent = error.message;
+        note.classList.add("error");
+      }
+    });
+
+    byId("clear-example").addEventListener("click", () => {
+      state.rows = state.rows.filter(row => !row.example);
+      for (const id of state.sampleLimits) state.limits[id] = "";
+      state.sampleLimits = [];
+      fillMonths();
+      fillUsers();
+      selected = visibleRows()[0]?.id ?? null;
+      save();
+      render();
+      notify("예시 내역과 기본 예시 잔여한도를 지웠어요.");
+    });
+
+    monthFilter.addEventListener("change", () => {
+      state.month = monthFilter.value;
+      fillUsers();
+      selected = visibleRows()[0]?.id ?? null;
+      save();
+      notify();
+      render();
+    });
+    userFilter.addEventListener("change", () => {
+      if (userFilter.value) mailUser.value = userFilter.value;
+      selected = visibleRows()[0]?.id ?? null;
+      notify();
+      render();
+    });
+    stageFilter.addEventListener("change", () => {
+      selected = visibleRows()[0]?.id ?? null;
+      notify();
+      render();
+    });
+    byId("rows").addEventListener("click", event => {
+      const button = event.target.closest("button[data-id]");
+      if (!button) return;
+      selected = Number(button.dataset.id);
+      switchView("detail");
+      notify();
+      renderRows();
+      renderDetail();
+      byId("rows").querySelector('[aria-current="true"]')?.focus();
+    });
+    for (const button of document.querySelectorAll("[data-view]")) {
+      button.addEventListener("click", () => {
+        switchView(button.dataset.view);
+        notify();
+      });
+    }
+    mailUser.addEventListener("change", () => {
+      notify();
+      renderMail();
+    });
+    byId("record-fields").addEventListener("input", event => {
+      const field = event.target;
+      const row = selectedRow();
+      if (!row || !field.dataset.field) return;
+      row[field.dataset.field] = field.value;
+      if (row.reviewed && missingReply(row).length) row.reviewed = false;
+      save();
+      notify();
+      render();
+    });
+
+    byId("mark-reviewed").addEventListener("click", () => {
+      const row = selectedRow();
+      if (!row) return;
+      if (row.reviewed) {
+        row.reviewed = false;
+        save();
+        render();
+        notify("회신 확인을 취소했어요. 입력한 내용은 유지돼요.");
+        return;
+      }
+      const missing = missingReply(row);
+      if (missing.length) {
+        notify("먼저 " + missing.join(", ") + "을 입력해 주세요.", true);
+        return;
+      }
+      row.reviewed = true;
+      save();
+      render();
+      notify("이 결제 건의 회신을 확인했어요.");
+    });
+
+    byId("clear-allocation").addEventListener("click", () => {
+      const row = selectedRow();
+      if (!row?.final) return;
+      row.final = "";
+      if (row.reviewed && missingReply(row).length) row.reviewed = false;
+      save();
+      render();
+      document.querySelector('[data-field="final"]').focus();
+      notify("최종 배정을 해제했어요. 예상 잔액을 다시 계산했어요.");
+    });
+
+    function setSent(rows, sent) {
+      const changed = rows.filter(row => row.sent !== sent && (!sent || stage(row) !== "reviewed"));
+      for (const row of changed) row.sent = sent;
+      save();
+      render();
+      notify(sent ? changed.length + "건을 회신 대기로 표시했어요." : changed.length + "건의 보냄 기록을 취소했어요.");
+    }
+    byId("mark-row-sent").addEventListener("click", () => {
+      const row = selectedRow();
+      if (row) setSent([row], !row.sent);
+    });
+    byId("mark-mail-sent").addEventListener("click", () => setSent(mailRows(), true));
+    byId("undo-mail-sent").addEventListener("click", () => setSent(mailRows(), false));
+    byId("copy-subject").addEventListener("click", async () => {
+      const field = byId("mail-subject");
+      try {
+        await navigator.clipboard.writeText(field.value);
+        notify("메일 제목을 복사했어요.");
+      } catch {
+        field.focus();
+        field.select();
+        notify("제목을 선택했어요. 복사 단축키를 눌러 주세요.");
+      }
+    });
+    byId("copy-mail").addEventListener("click", async () => {
+      const field = byId("mail-text");
+      try {
+        const data = new ClipboardItem({
+          "text/html": new Blob([mailHtml()], { type: "text/html" }),
+          "text/plain": new Blob([field.value], { type: "text/plain" })
+        });
+        await navigator.clipboard.write([data]);
+        byId("mail-fallback").hidden = true;
+        notify("메일 표를 복사했어요.");
+      } catch {
+        byId("mail-fallback").hidden = false;
+        field.focus();
+        field.select();
+        notify("이 브라우저에서 표를 복사하지 못해 텍스트를 선택했어요. 복사 단축키를 눌러 주세요.");
+      }
+    });
+
+    for (const field of fields) {
+      if (["suggested", "final"].includes(field.dataset.field)) {
+        field.replaceChildren(new Option("미배정", ""), ...accounts.map(account => new Option(account.label, account.id)));
+      }
+    }
+    buildBudgets();
+    fillMonths();
+    fillUsers();
+    selected = visibleRows()[0]?.id ?? null;
+    render();
+  })();
+  </script>
+</body>
+</html>
