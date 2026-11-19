@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>오늘 할 일 작성기</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>오늘 할 일</h1>
+      <p id="remaining" class="remaining" aria-live="polite">남은 할 일 0개</p>
+      <span id="app-version" class="app-version"></span>
+    </header>
+
+    <form id="todo-form" novalidate>
+      <label for="todo-input" class="sr-only">새 할 일</label>
+      <div class="input-row">
+        <input
+          id="todo-input"
+          type="text"
+          maxlength="100"
+          placeholder="할 일을 입력하세요"
+          autocomplete="off"
+          autofocus
+        >
+        <button id="submit-button" type="submit" class="add-button">추가</button>
+      </div>
+      <div class="schedule-row">
+        <label>마감일<input id="due-date" type="date"></label>
+        <label>반복<select id="repeat">
+          <option value="none">반복 안 함</option>
+          <option value="daily">매일</option>
+          <option value="weekly">매주</option>
+        </select></label>
+      </div>
+      <div class="form-options">
+        <label><input id="important" type="checkbox"> 중요 표시</label>
+        <button id="cancel-edit" type="button" hidden>수정 취소</button>
+      </div>
+      <p id="input-error" class="error" role="alert" aria-live="assertive"></p>
+    </form>
+
+    <ul id="todo-list" class="todo-list" aria-label="할 일 목록"></ul>
+    <p id="empty-message" class="empty-message">할 일을 추가해 보세요.</p>
+    <section class="exchange-panel" aria-labelledby="exchange-title">
+      <div class="exchange-heading">
+        <h2 id="exchange-title">오늘의 환율</h2>
+        <button id="refresh-rates" type="button">새로고침</button>
+      </div>
+      <p id="exchange-status" role="status">환율을 불러오는 중…</p>
+      <button id="load-today-rates" class="load-rates-button" type="button">오늘 환율 불러오기</button>
+      <p id="exchange-date" class="exchange-note"></p>
+      <p class="exchange-note">유럽중앙은행 기준 · 은행 고시와 다름</p>
+      <dl id="exchange-rates"></dl>
+      <div class="currency-calculator">
+        <label for="exchange-currency">계산할 통화</label>
+        <select id="exchange-currency">
+          <option value="USD">미국 달러 (USD)</option>
+          <option value="JPY">일본 엔 (JPY)</option>
+          <option value="EUR">유로 (EUR)</option>
+        </select>
+        <label for="exchange-amount">외화 금액</label>
+        <input id="exchange-amount" type="number" min="0" step="any" value="1" inputmode="decimal">
+        <output id="exchange-result" for="exchange-currency exchange-amount" aria-live="polite">기준환율을 불러오거나 입력해 주세요.</output>
+      </div>
+      <a class="exchange-source" href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter · 참고 환율</a>
+    </section>
+  </main>
+
+  <script src="popup.js"></script>
+  <script src="exchange.js"></script>
+</body>
+</html>
