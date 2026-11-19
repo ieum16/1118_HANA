@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>리트냥이 · 팀 소개</title>
+  <style>
+    :root { color-scheme: dark; --bg:#111916; --panel:#1b2821; --paper:#f8f5e5; --lime:#e6f38a; --muted:#c7d2c7; --line:#52645a; --broadcast-image:url("https://i.ytimg.com/vi/zGWhfOF1nes/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgZShlMA8=&rs=AOn4CLA4Zv1lzOQXuSBvatdTBWhI-W--mQ"); }
+    * { box-sizing:border-box; }
+    html { scroll-padding-top:6rem; }
+    body { margin:0; min-height:100vh; isolation:isolate; background:var(--bg); color:var(--paper); font:1rem/1.65 "Malgun Gothic",system-ui,sans-serif; }
+    body::before {
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background:linear-gradient(90deg,#111916f2 0%,#111916d4 46%,#11191670 100%),var(--broadcast-image) 62% center / cover no-repeat;
+    }
+    a { color:inherit; text-underline-offset:.22em; }
+    :focus-visible { outline:3px solid var(--lime); outline-offset:4px; }
+    [hidden] { display:none !important; }
+    .wrap { width:min(100% - 2rem,1080px); margin-inline:auto; }
+    .site-header { position:sticky; top:0; z-index:1; background:#111916ed; border-bottom:1px solid var(--line); }
+    .bar, .menu { display:flex; align-items:center; gap:1.25rem; }
+    .bar { min-height:4.25rem; justify-content:space-between; flex-wrap:wrap; padding-block:.65rem; }
+    .brand { font-weight:900; color:var(--lime); text-decoration:none; }
+    .menu a { color:var(--muted); text-decoration:none; }
+    .menu a:hover { text-decoration:underline; }
+    .menu-toggle { border:1px solid var(--line); border-radius:.45rem; background:var(--panel); color:var(--paper); padding:.5rem .8rem; font:inherit; cursor:pointer; }
+    .hero { display:grid; grid-template-columns:1.08fr 1fr; align-items:center; gap:clamp(1.3rem,6vw,5rem); padding-block:clamp(2.4rem,7vw,5.5rem); }
+    h1,h2,h3,p { margin:0; word-break:keep-all; overflow-wrap:anywhere; }
+    h1 { color:var(--lime); font-size:clamp(2.65rem,7vw,5.4rem); line-height:1.08; letter-spacing:-.075em; }
+    h2 { font-size:clamp(1.65rem,4vw,2.45rem); letter-spacing:-.05em; }
+    p { color:var(--muted); }
+    .hero p { margin-block:1rem 1.5rem; max-width:27rem; }
+    .button { display:inline-block; padding:.65rem 1rem; border-radius:.5rem; background:var(--lime); color:#182417; font-weight:800; text-decoration:none; }
+    .logo-frame { min-width:0; display:grid; place-items:center; background-color:#26392d70; background-image:linear-gradient(#ffffff0d 1px,transparent 1px),linear-gradient(90deg,#ffffff0d 1px,transparent 1px); background-size:28px 28px; border:1px solid var(--line); border-radius:1.1rem; padding:clamp(1rem,4vw,2.2rem); }
+    .logo-frame img { display:block; width:min(100%,300px); height:auto; border-radius:.7rem; }
+    .block { border-top:1px solid var(--line); padding-block:clamp(1.8rem,5vw,3rem); }
+    #contact { background:#111916d9; padding-inline:1.15rem; }
+    .block > :not(h2) { margin-top:1rem; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.9rem; }
+    .tile { padding:1.15rem; background:var(--panel); border:1px solid var(--line); border-radius:.75rem; }
+    .tile h3 { margin-bottom:.35rem; }
+    .tool { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:clamp(1rem,4vw,2rem); align-items:start; }
+    .tool-copy { display:grid; gap:.9rem; }
+    .tool-copy h3 { margin:0; font-size:1.35rem; }
+    .solution-summary { max-width:42rem; }
+    .solution-features { margin:0; padding:0; list-style:none; }
+    .solution-features li { display:grid; grid-template-columns:6.2rem minmax(0,1fr); gap:.5rem; padding:.5rem 0; border-bottom:1px solid var(--line); color:var(--muted); }
+    .solution-features strong { color:var(--paper); }
+    .map-meta { margin-bottom:.6rem; font-size:.9rem; font-weight:700; }
+    .controls { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; }
+    .controls label { font-weight:700; }
+    select, .reset { color:var(--paper); background:var(--bg); border:1px solid var(--line); border-radius:.4rem; padding:.45rem .65rem; font:inherit; }
+    .reset { cursor:pointer; }
+    .map-viewport { position:relative; aspect-ratio:560 / 500; overflow:hidden; border:1px solid #a6b9a7; border-radius:.6rem; background:#eae8de; cursor:grab; touch-action:none; }
+    .map-viewport[data-dragging="true"] { cursor:grabbing; }
+    .map-layer { position:absolute; inset:0; transform-origin:0 0; }
+    .map-layer canvas,.board { position:absolute; inset:0; width:100%; height:100%; }
+    .cell { position:absolute; translate:-50% -50%; width:1.65rem; height:1.65rem; display:grid; place-items:center; padding:0; border:0; border-radius:50%; background:transparent; color:#243c3a; cursor:pointer; font:800 .7rem/1 "Malgun Gothic",system-ui,sans-serif; }
+    .cell::before { content:""; position:absolute; width:.55rem; height:.55rem; background:#fff; border:2px solid #385a55; border-radius:50%; }
+    .cell[data-kind="S"],.cell[data-kind="G"],.cell[data-kind="?"],.cell[aria-current="step"] { width:2rem; height:2rem; border:2px solid white; background:#264e80; color:white; box-shadow:0 1px 4px #223e4e6b; }
+    .cell[data-kind="G"] { background:#9f4b30; }
+    .cell[data-kind="?"] { background:#684781; }
+    .cell[data-kind="S"]::before,.cell[data-kind="G"]::before,.cell[data-kind="?"]::before,.cell[aria-current="step"]::before { display:none; }
+    .cell[data-path="true"]::before { background:#2864cc; border-color:#fff; }
+    .cell[aria-current="step"] { background:#2864cc; }
+    .cell:focus-visible { outline:3px solid #102f60; outline-offset:1px; }
+    .map-controls { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem; margin:.55rem 0; }
+    .map-controls button { min-width:2.5rem; }
+    .map-scale { margin-left:auto; font-size:.875rem; color:var(--muted); }
+    .map-status { margin-top:.65rem; min-height:3.4em; }
+    .map-status[data-complete="true"] { color:var(--lime); font-weight:700; }
+    .contact { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:.3rem 1rem; margin-bottom:0; }
+    .contact dd { margin:0; overflow-wrap:anywhere; }
+    footer { border-top:1px solid var(--line); background:#111916ed; padding-block:1.2rem; color:var(--muted); font-size:.9rem; }
+    @media (max-width:850px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:639px) {
+      .hero,.grid,.tool { grid-template-columns:1fr; }
+      body::before { background-image:linear-gradient(#111916bc,#111916df),var(--broadcast-image); background-position:center,66% center; }
+      .bar { gap:.65rem; }
+      .menu { width:100%; flex-direction:column; align-items:stretch; gap:.2rem; }
+      .menu a { padding:.4rem; }
+    }
+    @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="#intro">리트냥이</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-menu" hidden>메뉴</button>
+      <nav class="menu" id="main-menu" aria-label="주 메뉴">
+        <a href="#intro">소개</a>
+        <a href="#work">하는 일</a>
+        <a href="#tools">제공 솔루션</a>
+        <a href="#contact">문의</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="hero" id="intro">
+      <div>
+        <h1>도주경로 찾기</h1>
+        <p>리트냥이는 가상 지도에서 눈에 잘 띄지 않는 길을 찾습니다. 지역마다 다른 지형과 단서를 살펴보고, 숨은 길을 거쳐 출발지에서 출구까지 이어지는 경로를 설계합니다.</p>
+        <a class="button" href="#tools">솔루션 체험하기</a>
+      </div>
+      <div class="logo-frame"><img src="images/logo.png" width="1254" height="1254" alt="연두색 고양이 얼굴과 점선으로 꾸민 리트냥이 로고"></div>
+    </section>
+    <section class="block" id="work">
+      <h2>하는 일</h2>
+      <div class="grid">
+        <article class="tile"><h3>지역별 가상 지도 설계</h3><p>광진구·송파구·강동구 이름을 붙인 세 가지 가상 지도에 서로 다른 배치와 이동 조건을 설계합니다.</p></article>
+        <article class="tile"><h3>숨은 통로 발견</h3><p>보이는 길을 따라가며 물음표로 표시된 단서를 조사하고 숨은 통로를 찾습니다.</p></article>
+        <article class="tile"><h3>경로 검증</h3><p>찾은 통로가 출발점과 출구를 연결하는지 확인하고, 막히면 이전 칸으로 되돌아갑니다.</p></article>
+      </div>
+    </section>
+    <section class="block" id="tools">
+      <h2>제공 솔루션</h2>
+      <p class="solution-summary">지역별 실습 보드에서 통로를 탐색하고, 경로가 출발지에서 출구까지 이어지는지 확인합니다.</p>
+      <div class="tile tool">
+        <div class="tool-copy">
+          <h3>가상 경로 분석기</h3>
+          <ul class="solution-features">
+            <li><strong>지도 선택</strong><span>서울의 세 자치구 이름을 붙인 가상 보드를 불러옵니다.</span></li>
+            <li><strong>경로 탐색</strong><span>이동한 칸을 지도에 표시하고, 단서 칸에 도착하면 통로를 공개합니다.</span></li>
+            <li><strong>결과 검증</strong><span>통로 발견과 출구 도착을 확인하고 이동 횟수를 표시합니다.</span></li>
+          </ul>
+          <div class="controls">
+            <label for="map-region">실습 지역</label>
+            <select id="map-region">
+              <option value="plaza">서울 광진구</option>
+              <option value="forest">서울 송파구</option>
+              <option value="harbor">서울 강동구</option>
+            </select>
+            <button type="button" class="reset" id="map-reset">처음부터</button>
+          </div>
+          <p id="map-instructions">도로로 이어진 지점을 누르세요. <strong>?</strong> 지점을 거쳐 출구에 도착하면 경로 검증이 완료됩니다. 직전 지점을 누르면 되돌아갑니다.</p>
+        </div>
+        <div>
+          <p class="map-meta" id="map-clue"></p>
+          <div class="map-viewport" id="map-viewport">
+            <div class="map-layer" id="map-layer">
+              <canvas id="map-drawing" width="1120" height="1000" aria-hidden="true"></canvas>
+              <div class="board" id="map-board" role="group" aria-label="가상 지도" aria-describedby="map-instructions"></div>
+            </div>
+          </div>
+          <div class="map-controls" role="group" aria-label="지도 확대와 이동">
+            <button type="button" class="reset" id="map-zoom-in" aria-label="지도 확대">+</button>
+            <button type="button" class="reset" id="map-zoom-out" aria-label="지도 축소">−</button>
+            <button type="button" class="reset" id="map-center">전체 보기</button>
+            <span class="map-scale" id="map-scale">100%</span>
+          </div>
+          <p class="map-status" id="map-status" role="status"></p>
+        </div>
+      </div>
+    </section>
+    <section class="block" id="contact">
+      <h2>문의</h2>
+      <dl class="contact">
+        <dt>회사</dt><dd>리트냥이</dd>
+        <dt>담당자</dt><dd>라온 · 지도 탐색팀</dd>
+        <dt>이메일</dt><dd><a href="mailto:raon.ritnyangi@example.com">raon.ritnyangi@example.com</a> <small>(예시)</small></dd>
+      </dl>
+    </section>
+  </main>
+  <footer><div class="wrap">리트냥이 · 가상 팀 홈페이지<br><a href="https://www.youtube.com/live/zGWhfOF1nes">배경 출처 · IDA입시연구소 유튜브 영상 썸네일</a></div></footer>
+  <script>
+    const toggle = document.querySelector(".menu-toggle");
+    const menu = document.querySelector("#main-menu");
+    const narrow = window.matchMedia("(max-width: 639px)");
+
+    function updateMenu(open = false) {
+      toggle.hidden = !narrow.matches;
+      toggle.setAttribute("aria-expanded", String(narrow.matches && open));
+      menu.hidden = narrow.matches && !open;
+    }
+
+    toggle.addEventListener("click", () => updateMenu(menu.hidden));
+    narrow.addEventListener("change", () => updateMenu());
+
+    for (const link of menu.querySelectorAll("a")) {
+      link.addEventListener("click", () => {
+        if (!narrow.matches) return;
+        const section = document.querySelector(link.hash);
+        section.setAttribute("tabindex", "-1");
+        section.focus({ preventScroll: true });
+        updateMenu();
+      });
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape" || !narrow.matches || menu.hidden) return;
+      updateMenu();
+      toggle.focus();
+    });
+
+    updateMenu();
+
+    const regions = {
+      plaza: {
+        clue: "광진구 · 가상 실습 지도",
+        labels: ["달빛공원", "느티나무광장", "솔빛수로"],
+        park: [330, 46, 170, 118],
+        water: "east",
+        map: ["S..###", ".#..?#", "..##.G", "#.....", "##.###", "......"],
+      },
+      forest: {
+        clue: "송파구 · 가상 실습 지도",
+        labels: ["바람정원", "온새미광장", "별빛수로"],
+        park: [30, 322, 179, 112],
+        water: "south",
+        map: ["S#....", "..##.#", "#.?.G#", "#.##.#", "#....#", "######"],
+      },
+      harbor: {
+        clue: "강동구 · 가상 실습 지도",
+        labels: ["푸른언덕공원", "노을광장", "은빛수로"],
+        park: [296, 40, 206, 123],
+        water: "west",
+        map: ["S..###", "##.###", "...?.#", ".###.#", ".....G", "######"],
+      },
+    };
+    const mapSelector = document.querySelector("#map-region");
+    const board = document.querySelector("#map-board");
+    const status = document.querySelector("#map-status");
+    const clue = document.querySelector("#map-clue");
+    const viewport = document.querySelector("#map-viewport");
+    const layer = document.querySelector("#map-layer");
+    const drawing = document.querySelector("#map-drawing").getContext("2d");
+    const scaleLabel = document.querySelector("#map-scale");
+    const zoomIn = document.querySelector("#map-zoom-in");
+    const zoomOut = document.querySelector("#map-zoom-out");
+    const tileNames = { S: "출발", G: "출구", "?": "숨은 길 단서", "#": "막힌 칸", ".": "빈 길" };
+    let tiles = [];
+    let path = [];
+    let buttons = [];
+    let finished = false;
+    let zoom = 1;
+    let offset = { x: 0, y: 0 };
+    let drag = null;
+
+    function position(tile) {
+      return { x: 56 + tile.col * 89 + Math.sin(tile.row * 1.6 + tile.col) * 13,
+        y: 51 + tile.row * 78 + Math.cos(tile.col * 1.4 + tile.row) * 12 };
+    }
+
+    function line(points, color, width) {
+      drawing.beginPath();
+      drawing.moveTo(points[0].x, points[0].y);
+      for (const point of points.slice(1)) drawing.lineTo(point.x, point.y);
+      drawing.strokeStyle = color;
+      drawing.lineWidth = width;
+      drawing.stroke();
+    }
+
+    function drawMap() {
+      const region = regions[mapSelector.value];
+      const d = drawing;
+      d.setTransform(2, 0, 0, 2, 0, 0);
+      d.lineCap = "round";
+      d.lineJoin = "round";
+      d.fillStyle = "#ece9df";
+      d.fillRect(0, 0, 560, 500);
+      const waterways = {
+        east: [{x:554,y:-25},{x:538,y:140},{x:554,y:275},{x:490,y:520}],
+        south: [{x:-25,y:452},{x:154,y:465},{x:365,y:455},{x:590,y:488}],
+        west: [{x:26,y:-25},{x:18,y:134},{x:39,y:312},{x:10,y:520}],
+      };
+      line(waterways[region.water], "#c6deda", 99);
+      line(waterways[region.water], "#9fcbe0", 69);
+      d.fillStyle = "#c7ddb5";
+      d.fillRect(...region.park);
+      for (const tile of tiles) {
+        if (tile.kind !== "#") continue;
+        const {x,y} = position(tile);
+        d.fillStyle = "#dedcd0";
+        d.fillRect(x - 24, y - 15, 48, 30);
+        d.fillStyle = "#d4d2c6";
+        d.fillRect(x - 17, y - 9, 15, 18);
+        d.fillRect(x + 2, y - 9, 15, 18);
+      }
+      const roads = [];
+      for (const [i, tile] of tiles.entries()) {
+        if (tile.kind === "#") continue;
+        const adjacent = [tile.col < 5 ? tiles[i + 1] : null, tiles[i + 6]];
+        for (const next of adjacent) {
+          if (!next || next.kind === "#") continue;
+          roads.push([position(tile), position(next)]);
+        }
+      }
+      for (const road of roads) line(road, "#ccc6b5", 20);
+      for (const road of roads) line(road, "#fffdf5", 15);
+      if (path.length > 1) line(path.map(index => position(tiles[index])), "#2864cc", 8);
+      d.font = '700 14px "Malgun Gothic", sans-serif';
+      d.fillStyle = "#49604e";
+      d.fillText(region.labels[0], region.park[0] + 12, region.park[1] + 23);
+      d.fillText(region.labels[1], 187, 480);
+      const waterLabel = {east:[474,468], south:[385,478], west:[12,478]}[region.water];
+      d.fillStyle = "#2c5870";
+      d.fillText(region.labels[2], ...waterLabel);
+      d.fillStyle = "#3b574b";
+      d.fillText("N ↑", 509, 28);
+    }
+
+    function updateView() {
+      const maxX = viewport.clientWidth * (zoom - 1);
+      const maxY = viewport.clientHeight * (zoom - 1);
+      offset.x = Math.max(-maxX, Math.min(0, offset.x));
+      offset.y = Math.max(-maxY, Math.min(0, offset.y));
+      layer.style.transform = `translate(${offset.x}px,${offset.y}px) scale(${zoom})`;
+      scaleLabel.textContent = `${Math.round(zoom * 100)}%`;
+      viewport.dataset.dragging = String(drag !== null);
+    }
+
+    function changeZoom(nextZoom) {
+      const cx = viewport.clientWidth / 2;
+      const cy = viewport.clientHeight / 2;
+      offset = { x: cx + (offset.x - cx) * nextZoom / zoom, y: cy + (offset.y - cy) * nextZoom / zoom };
+      zoom = nextZoom;
+      updateView();
+    }
+
+    zoomIn.addEventListener("click", () => changeZoom(Math.min(2.5, zoom + .25)));
+    zoomOut.addEventListener("click", () => changeZoom(Math.max(1, zoom - .25)));
+    document.querySelector("#map-center").addEventListener("click", () => changeZoom(1));
+    viewport.addEventListener("pointerdown", event => {
+      if (zoom === 1 || event.target.closest("button")) return;
+      drag = { x: event.clientX - offset.x, y: event.clientY - offset.y, id: event.pointerId };
+      viewport.setPointerCapture(event.pointerId);
+      updateView();
+    });
+    viewport.addEventListener("pointermove", event => {
+      if (!drag || event.pointerId !== drag.id) return;
+      offset = { x: event.clientX - drag.x, y: event.clientY - drag.y };
+      updateView();
+    });
+    viewport.addEventListener("lostpointercapture", () => { drag = null; updateView(); });
+    window.addEventListener("resize", updateView);
+
+    function showStatus(message) {
+      status.textContent = message;
+      status.dataset.complete = String(finished);
+    }
+
+    function updateMap() {
+      const visited = new Set(path);
+      const current = path.at(-1);
+      for (const [index, button] of buttons.entries()) {
+        const tile = tiles[index];
+        const isVisited = visited.has(index);
+        const isRevealed = isVisited && tile.kind === "?";
+        button.textContent = isRevealed ? "✓" : ({ S: "출발", G: "출구", "?": "?" }[tile.kind] ?? "");
+        button.dataset.path = String(isVisited);
+        button.setAttribute("aria-label", `${tile.row + 1}행 ${tile.col + 1}열 ${isRevealed ? "찾은 숨은 길" : tileNames[tile.kind]}${isVisited ? ", 선택한 경로" : ""}`);
+        if (index === current) button.setAttribute("aria-current", "step");
+        else button.removeAttribute("aria-current");
+      }
+      drawMap();
+    }
+
+    function moveTo(index) {
+      if (finished) return showStatus("경로를 완성했습니다. 다른 지역을 고르거나 처음부터 다시 풀어 보세요.");
+      const last = tiles[path.at(-1)];
+      const next = tiles[index];
+      const distance = Math.abs(last.row - next.row) + Math.abs(last.col - next.col);
+      const hasSecret = () => path.some((step) => tiles[step].kind === "?");
+      if (index === path.at(-2)) {
+        path.pop();
+        updateMap();
+        return showStatus("한 칸 되돌아갔습니다.");
+      }
+      if (distance !== 1 || path.includes(index)) return showStatus("현재 칸에서 상하좌우로 이어진 새 칸이나 직전 칸을 고르세요.");
+      if (next.kind === "G" && !hasSecret()) return showStatus("출구에 가기 전에 물음표 칸의 숨은 길을 찾으세요.");
+      path.push(index);
+      finished = next.kind === "G";
+      updateMap();
+      if (finished) return showStatus(`경로 완성! 숨은 길을 지나 ${path.length - 1}칸 만에 출구에 도착했어요.`);
+      if (next.kind === "?") return showStatus("숨은 길을 찾았어요. 이제 출구로 이어 보세요.");
+      showStatus(`${path.length - 1}칸 이동했어요. ${hasSecret() ? "출구를 찾아보세요." : "물음표 칸을 찾아보세요."}`);
+    }
+
+    function loadMap() {
+      const region = regions[mapSelector.value];
+      tiles = region.map.flatMap((line, row) => [...line].map((kind, col) => ({ kind, row, col })));
+      path = [tiles.findIndex((tile) => tile.kind === "S")];
+      finished = false;
+      clue.textContent = region.clue;
+      changeZoom(1);
+      buttons = tiles.map(({ kind }, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "cell";
+        button.dataset.kind = kind;
+        button.hidden = kind === "#";
+        const point = position(tiles[index]);
+        button.style.left = `${point.x / 560 * 100}%`;
+        button.style.top = `${point.y / 500 * 100}%`;
+        button.addEventListener("click", () => moveTo(index));
+        return button;
+      });
+      board.replaceChildren(...buttons);
+      updateMap();
+      showStatus("출발 칸 옆의 길을 골라 탐색을 시작하세요.");
+    }
+
+    mapSelector.addEventListener("change", loadMap);
+    document.querySelector("#map-reset").addEventListener("click", loadMap);
+    loadMap();
+  </script>
+</body>
+</html>
