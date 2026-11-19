@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Daily Task 알림</title><link rel="stylesheet" href="style.css"></head>
+<body class="alert-page">
+  <header><div class="sign"><h1>Daily Task 알림</h1></div></header>
+  <main>
+    <section class="panel stage"><div class="bubble">매일의 할 일을 확인해 주세요.</div></section>
+    <section class="panel board"><ul id="alerts"></ul><p class="hint" id="alertHint">확인 후에도 창은 직접 닫을 때까지 유지돼요.</p><p id="soundError" class="error" role="alert"></p><button id="retrySound" type="button" hidden>소리 다시 재생</button><p id="status" role="status"></p><button id="closeAlert" type="button" class="primary">창 닫기</button></section>
+  </main>
+  <script src="daily-alert.js" type="module"></script>
+</body>
+</html>

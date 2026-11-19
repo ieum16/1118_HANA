@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Soy Todo List</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><div class="sign"><h1>Soy Todo List</h1></div><button id="settings" class="settings-button" type="button">설정</button><p id="greeting" aria-live="polite">안녕하세요, 할일요정입니다!</p><p id="today"></p></header>
+  <main>
+    <section class="panel board" id="todoBoard">
+      <h2>Todo List <span id="count" class="badge">0 / 0</span></h2>
+      <div class="list-tabs" role="tablist" aria-label="할 일 보기">
+        <button id="activeTab" type="button" role="tab" aria-selected="true" aria-controls="activeTasks" tabindex="0">할 일</button>
+        <button id="historyTab" type="button" role="tab" aria-selected="false" aria-controls="taskHistory" tabindex="-1">과거 기록</button>
+      </div>
+      <div id="activeTasks" role="tabpanel" aria-labelledby="activeTab">
+      <h3 id="urgentHeading" hidden>긴급 할 일</h3><ul id="urgentList" hidden></ul>
+      <h3>Daily Task</h3>
+      <ul id="dailyTaskList"></ul><p id="dailyEmpty" class="empty" hidden>매일 반복할 일을 맨 아래에서 추가해 주세요.</p><p id="dailyStatus" role="status"></p>
+      <h3>할 일</h3>
+      <ul id="dailyList"></ul><p id="empty" class="empty">첫 번째 할 일을 적어 볼까요?</p><p id="reminderHint" class="hint"></p>
+      </div>
+      <div id="taskHistory" role="tabpanel" aria-labelledby="historyTab" hidden>
+        <p class="hint">완료한 할 일은 7일간 보관돼요. 체크를 해제하면 할 일로 돌아가요.</p>
+        <ul id="historyList"></ul><p id="historyEmpty" class="empty">최근 7일간 완료한 할 일이 없어요.</p>
+      </div>
+    </section>
+    <section class="panel board">
+      <h2>Todo 추가</h2>
+      <form id="taskForm">
+        <label for="taskText">할 일</label><input id="taskText" required maxlength="200" placeholder="오늘은 무엇을 해볼까요?" autocomplete="off">
+        <label class="urgent-toggle urgent-add"><input id="taskUrgent" type="checkbox"><span>긴급</span></label>
+        <div class="fields"><div><label for="taskDate">날짜 <span class="optional">선택</span></label><input id="taskDate" type="date"><button id="clearDate" type="button" class="clear-date">날짜 지우기</button></div><div><label for="taskTime">시간 <span class="optional">선택</span></label><input id="taskTime" placeholder="예) 8시 / 오후 8시" autocomplete="off" disabled></div></div>
+        <fieldset id="calendarChoice" hidden><legend>저장할 캘린더</legend><div class="calendar-buttons"><label><input type="radio" name="target" value="personal" checked><span>내 캘린더</span></label><label><input type="radio" name="target" value="team"><span>팀 캘린더</span></label></div><p id="connectionHint" class="hint"></p></fieldset>
+        <p id="formHint" class="hint">날짜를 비워 두면 하루 투두리스트에 추가돼요.</p>
+        <button id="addButton" class="primary" type="submit">할 일 추가</button>
+      </form>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="panel board"><h2>캘린더 일정</h2><ul id="eventList"></ul><p id="eventEmpty" class="empty">날짜를 선택하면 여기에 모여요.</p></section>
+    <section class="panel board daily-board">
+      <h2>Daily Task 추가</h2>
+      <p class="hint">매일 정해진 시간에 소리와 함께 알려드려요. 알림 창은 직접 닫을 때까지 열려 있어요.</p>
+      <form id="dailyForm">
+        <label for="dailyText">매일 할 일</label><input id="dailyText" required maxlength="200" placeholder="예) 오늘 일정 확인" autocomplete="off">
+        <div class="fields daily-fields"><div><label for="dailyTime">매일 알림 시간</label><input id="dailyTime" type="time" value="09:15" required></div><button id="dailyAdd" type="submit" class="primary">Daily Task 추가</button></div>
+      </form>
+      <p id="dailyFormStatus" role="status"></p>
+      <button id="dailyTest" type="button" class="test-sound">소리·알림 창 테스트</button>
+    </section>
+  </main>
+  <script src="todo.js" type="module"></script>
+</body>
+</html>
