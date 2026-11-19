@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>할 일 일정</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <div id="today-label" class="date-label"></div>
+    <div class="header-row"><h1>할 일 일정</h1><button id="open-puzzle" type="button">한 바퀴 퍼즐</button></div>
+    <p id="count" class="count"></p>
+  </header>
+  <main>
+    <form id="task-form">
+      <label for="task-title">할 일</label>
+      <input id="task-title" type="text" placeholder="무엇을 해야 하나요?" autocomplete="off" required>
+      <label for="due">마감일 <span>(선택)</span></label>
+      <div class="form-actions">
+        <input id="due" type="date">
+        <button id="save" class="primary" type="submit" disabled>추가</button>
+        <button id="cancel" type="button" hidden>취소</button>
+      </div>
+    </form>
+    <p id="error" role="alert" hidden></p>
+    <p><a href="exchange.html" target="_blank" rel="noopener">원화 환율 계산기 열기</a></p>
+    <nav aria-label="일정 필터">
+      <button type="button" data-filter="all" aria-pressed="true">전체</button>
+      <button type="button" data-filter="today" aria-pressed="false">오늘</button>
+      <button type="button" data-filter="upcoming" aria-pressed="false">예정</button>
+      <button type="button" data-filter="overdue" aria-pressed="false">지연</button>
+      <button type="button" data-filter="done" aria-pressed="false">완료</button>
+    </nav>
+    <ul id="tasks" aria-label="할 일 목록"></ul>
+    <p id="empty" hidden>이 목록에 표시할 할 일이 없어요.</p>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

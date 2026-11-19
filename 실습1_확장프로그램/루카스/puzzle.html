@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>한 바퀴 퍼즐</title>
+  <link rel="stylesheet" href="puzzle.css">
+</head>
+<body>
+  <main>
+    <h1>한 바퀴 퍼즐</h1>
+    <p id="rules">점 사이를 이어 갈라지지 않는 하나의 고리를 만드세요. 숫자는 그 칸을 둘러싼 선의 개수입니다. 클릭하거나 Enter를 누르면 선 → × → 빈칸 순으로 바뀝니다. 오른쪽 클릭으로 ×를 바로 표시할 수 있습니다.</p>
+    <div class="toolbar">
+      <label for="size">크기</label>
+      <select id="size"><option value="5">5 × 5</option><option value="7">7 × 7</option></select>
+      <button id="new" type="button">새 퍼즐</button>
+      <button id="reset" type="button">처음부터</button>
+    </div>
+    <div id="board" role="group" aria-label="퍼즐판" aria-describedby="rules"></div>
+    <button id="check" type="button">정답 확인</button>
+    <p id="result" role="status"></p>
+  </main>
+  <script src="puzzle-rules.js"></script>
+  <script src="puzzle.js"></script>
+</body>
+</html>
