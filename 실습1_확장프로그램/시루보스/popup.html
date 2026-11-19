@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>언니 잊지마!</title>
+  <link rel="preload" href="fonts/TimesNewJames.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="popup.css?v=1.1.1">
+  <script src="popup.js" type="module"></script>
+  <script src="fx.js" type="module"></script>
+</head>
+<body>
+  <header>
+    <div><h1>언니 잊지마!</h1></div>
+    <svg class="cat" viewBox="0 0 88 90" aria-hidden="true"><path d="M13 41 10 12 32 26Q44 20 56 26L78 12 75 42Q84 77 44 80 4 77 13 41Z" fill="#d9dbdc" stroke="#575b60" stroke-width="3" stroke-linejoin="round"/><path d="m17 23 3 16 10-8m41-8-3 16-10-8" fill="#f7f7f5"/><path d="M28 49v5m32-5v5" stroke="#42464b" stroke-width="4" stroke-linecap="round"/><path d="m40 59 4 4 4-4m-4 4q-6 9-11 1m11-1q6 9 11 1M9 56l16 3M8 65l17-1m38-5 16-3m-16 8 17 1" fill="none" stroke="#575b60" stroke-width="2" stroke-linecap="round"/></svg>
+  </header>
+  <main>
+    <form id="todo-form">
+      <label for="title">어떤 일을 기억할까요?</label>
+      <input id="title" name="title" type="text" maxlength="100" placeholder="예: 고양이 사료 사기" autocomplete="off" required>
+      <label for="deadline">언제까지 할까요?</label>
+      <input id="deadline" name="deadline" type="datetime-local" required>
+      <button class="add" type="submit" disabled>＋ 할 일 추가</button>
+    </form>
+    <p id="message" role="status" aria-live="polite"></p>
+    <section aria-labelledby="week-heading">
+      <div class="week-header"><h2 id="week-heading">일주일의 할 일</h2><button id="today" class="text-button" type="button">오늘로</button></div>
+      <div class="week-nav"><button id="previous" type="button" aria-label="이전 일주일">‹</button><p id="range"></p><button id="next" type="button" aria-label="다음 일주일">›</button></div>
+      <div id="days" class="days" role="group" aria-label="조회할 날짜"></div>
+      <div class="list-heading"><button id="all-days" class="text-button" type="button" aria-pressed="true">7일 전체</button><span id="count"></span></div>
+      <ul id="todos" aria-label="마감이 가까운 순서의 할 일"></ul>
+      <div id="empty" class="empty" hidden><span aria-hidden="true">ฅ^•ﻌ•^ฅ</span><p>아직 할 일이 없어요.</p><small>작은 할 일 하나부터 적어봐요.</small></div>
+    </section>
+
+    <section id="exchange" aria-labelledby="fx-heading">
+      <h2 id="fx-heading">환율 계산기</h2>
+      <p class="fx-note">직접 입력한 환율로 계산해요.</p>
+      <fieldset id="fx-fields" disabled>
+        <legend class="visually-hidden">환율과 환전 조건</legend>
+        <div class="fx-rates">
+          <label for="fx-rate-USD">USD <small>1달러당 원</small><input id="fx-rate-USD" type="text" inputmode="decimal" maxlength="100" placeholder="기준환율" autocomplete="off"></label>
+          <label for="fx-rate-JPY">JPY <small>100엔당 원</small><input id="fx-rate-JPY" type="text" inputmode="decimal" maxlength="100" placeholder="기준환율" autocomplete="off"></label>
+          <label for="fx-rate-EUR">EUR <small>1유로당 원</small><input id="fx-rate-EUR" type="text" inputmode="decimal" maxlength="100" placeholder="기준환율" autocomplete="off"></label>
+        </div>
+        <label for="fx-currency">계산할 통화</label>
+        <select id="fx-currency"><option value="USD">USD · 미국 달러</option><option value="JPY">JPY · 일본 엔</option><option value="EUR">EUR · 유로</option></select>
+        <label id="fx-amount-label" for="fx-amount">외화 금액 (USD)</label>
+        <input id="fx-amount" type="text" inputmode="decimal" maxlength="100" autocomplete="off">
+        <p id="fx-unit" class="fx-note"></p>
+        <div class="fx-pair">
+          <label for="fx-spread">스프레드 (%)<input id="fx-spread" type="text" inputmode="decimal" maxlength="100" autocomplete="off"></label>
+          <label for="fx-discount">우대율 (%)<input id="fx-discount" type="text" inputmode="decimal" maxlength="100" autocomplete="off"></label>
+        </div>
+        <p class="fx-note">금액·스프레드·우대율은 통화별로 기억해요.<br>살 때·팔 때에 같은 스프레드를 적용해요.</p>
+        <div class="fx-results" aria-live="polite" aria-atomic="true">
+          <p id="fx-error"></p>
+          <dl><div><dt>기준환율로 환산</dt><dd id="fx-base">—</dd></div><div><dt>외화 살 때 · 낼 원화</dt><dd id="fx-buy">—</dd></div><div><dt>외화 팔 때 · 받을 원화</dt><dd id="fx-sell">—</dd></div></dl>
+          <p id="fx-applied" class="fx-note"></p>
+        </div>
+        <details class="fx-details">
+          <summary>은행 환율표 붙여넣기</summary>
+          <p id="fx-paste-help" class="fx-note">통화·매매기준율 열 머리글과 USD·JPY·EUR 행을 함께 복사하세요. 간단히 ‘USD 1,400’처럼 한 줄에 통화와 기준환율 하나만 적어도 돼요. JPY는 기본 100엔 기준이에요.</p>
+          <label class="visually-hidden" for="fx-paste">은행 환율표</label>
+          <textarea id="fx-paste" rows="5" maxlength="20000" aria-describedby="fx-paste-help" placeholder="통화&#9;매매기준율&#10;USD&#9;1,400.00&#10;JPY(100엔)&#9;950.00&#10;EUR&#9;1,500.00"></textarea>
+          <button id="fx-import" type="button">통화별 기준환율 채우기</button>
+          <p id="fx-import-status" class="fx-note" role="status"></p>
+        </details>
+        <div class="fx-save-row"><p id="fx-status" class="fx-note" role="status"></p><button id="fx-save" class="text-button" type="button">다시 저장</button></div>
+      </fieldset>
+      <p class="fx-note">우대 적용 스프레드 = 스프레드 × (1 − 우대율 ÷ 100). 원화는 마지막에 반올림해요. 은행의 끝수 처리·별도 수수료에 따라 실제 금액은 다를 수 있어요.</p>
+    </section>
+  </main>
+  <footer>차근차근, 하나씩 해내면 돼요 🐾</footer>
+</body>
+</html>

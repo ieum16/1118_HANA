@@ -1,0 +1,90 @@
+@font-face {
+  font-family: "TimesNewJames";
+  src: url("fonts/TimesNewJames.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+* { box-sizing: border-box; }
+:root { color-scheme: light; font-family: "TimesNewJames", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; color: #35393e; background: #f6f6f3; font-size: 17px; }
+body { width: 360px; margin: 0; font-family: "TimesNewJames", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+header { padding: 25px 20px 21px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dedfda; }
+.eyebrow { margin: 0 0 8px; font-size: 12px; color: #666b70; letter-spacing: .4px; }
+h1 { margin: 0; font-size: 34px; letter-spacing: -1.5px; }
+.subtitle { margin: 8px 0 0; font-size: 13px; color: #666b70; }
+.cat { width: 79px; height: 85px; flex-shrink: 0; object-fit: contain; }
+main { padding: 20px; }
+form { padding: 18px 16px; background: #fff; border: 1px solid #e1e2de; border-radius: 18px; }
+label { display: block; font-weight: 650; margin: 0 0 9px; font-size: 17px; }
+input, button { font: inherit; }
+input { display: block; width: 100%; min-width: 0; height: 46px; padding: 10px; border: 1px solid #cdd0d1; border-radius: 9px; color: #35393e; background: #fafaf9; margin-bottom: 17px; font-size: 17px; }
+input::placeholder { color: #787c80; font-size: 15px; }
+input[type="datetime-local"] { font-size: 16px; }
+button { cursor: pointer; border: 0; border-radius: 9px; color: #42464b; background: #e8e9e7; min-height: 36px; }
+button:disabled { cursor: wait; opacity: .55; }
+button:hover:not(:disabled) { filter: brightness(.94); }
+:focus-visible { outline: 3px solid #747c86; outline-offset: 3px; }
+.add { width: 100%; background: #50565d; color: white; font-weight: 700; min-height: 46px; font-size: 18px; }
+#message { margin: 10px 0; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+#message:empty { margin: 16px 0; }
+#message.error { color: #9d3c35; }
+.week-header, .week-nav, .list-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+h2 { font-size: 20px; margin: 9px 0; letter-spacing: -.5px; }
+.text-button { padding: 3px 8px; background: transparent; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.week-nav { margin: 10px 0 12px; }
+.week-nav button { width: 36px; font-size: 26px; line-height: 1; }
+#range { margin: 0; font-size: 15px; font-weight: 650; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.day { padding: 8px 0; background: #eceeea; border: 1px solid transparent; border-radius: 12px; min-height: 63px; }
+.day small { display: block; font-size: 12px; margin-bottom: 5px; }
+.day strong { font-size: 18px; }
+.day.is-today { border-color: #8c939a; }
+.day[aria-pressed="true"] { background: #50565d; color: white; }
+.list-heading { margin: 15px 0 8px; }
+#count { font-size: 13px; color: #666b70; }
+ul { list-style: none; margin: 0; padding: 0; }
+.todo { display: flex; align-items: flex-start; gap: 10px; padding: 15px 11px; margin-bottom: 9px; border: 1px solid #dfe1dc; background: #fff; border-radius: 13px; }
+.todo label { display: flex; flex: 1; gap: 11px; align-items: flex-start; margin: 0; min-width: 0; cursor: pointer; }
+.todo input { appearance: auto; flex-shrink: 0; width: 23px; height: 23px; margin: 1px 0 0; accent-color: #626970; }
+.todo-copy { min-width: 0; flex: 1; }
+.todo-title { display: block; font-size: 18px; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+.todo time { display: block; font-size: 13px; color: #656b71; font-weight: 400; line-height: 1.6; margin-top: 5px; }
+.todo.done .todo-title { text-decoration: line-through; color: #7b8084; }
+.todo.done { background: #eef0ec; }
+.delete { flex-shrink: 0; background: transparent; padding: 0 4px; min-width: 27px; min-height: 30px; font-size: 22px; color: #72777c; }
+.empty { text-align: center; padding: 24px 0 18px; color: #676e73; }
+.empty > span { font-size: 30px; }
+.empty p { font-size: 18px; margin: 13px 0 7px; }
+.empty small { font-size: 13px; }
+[hidden] { display: none !important; }
+footer { text-align: center; padding: 0 20px 20px; font-size: 12px; color: #71777b; }
+
+/* 환율 계산기 */
+#exchange { margin-top: 22px; padding-top: 18px; border-top: 1px solid #d5d8d4; }
+#fx-fields { min-width: 0; border: 0; margin: 16px 0 0; padding: 0; }
+.fx-note { margin: 8px 0 12px; font-size: 14px; line-height: 1.6; color: #656b71; overflow-wrap: anywhere; }
+.fx-rates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.fx-rates label { min-width: 0; }
+.fx-rates small { display: block; font-size: 12px; font-weight: 400; margin: 5px 0 8px; }
+.fx-rates input { font-size: 17px; padding: 8px; }
+.fx-rates input::placeholder { font-size: 13px; }
+#exchange select, #exchange textarea { width: 100%; font: inherit; color: #35393e; background: #fff; border: 1px solid #cdd0d1; border-radius: 9px; padding: 10px; margin-bottom: 17px; }
+#exchange select { height: 46px; }
+#exchange textarea { resize: vertical; min-height: 130px; font-size: 16px; line-height: 1.5; }
+#fx-amount { margin-bottom: 5px; }
+.fx-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fx-pair input { margin: 9px 0 0; }
+.fx-results { background: #fff; border: 1px solid #dfe1dc; border-radius: 13px; padding: 14px; margin: 16px 0; }
+.fx-results dl { margin: 0; }
+.fx-results dl > div { padding: 10px 0; border-bottom: 1px solid #eceeea; }
+.fx-results dl > div:last-child { border: 0; }
+.fx-results dt { font-size: 15px; color: #656b71; }
+.fx-results dd { margin: 5px 0 0; font-size: 24px; font-weight: 700; overflow-wrap: anywhere; }
+#fx-error { font-size: 14px; margin: 0; line-height: 1.5; }
+#fx-error:empty { display: none; }
+.fx-details summary { cursor: pointer; font-size: 18px; padding: 10px 0; }
+#fx-import { width: 100%; min-height: 44px; font-size: 17px; }
+.fx-save-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fx-save-row button { flex-shrink: 0; }
+#fx-status.error { color: #9d3c35; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
