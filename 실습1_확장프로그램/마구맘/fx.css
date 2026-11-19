@@ -1,0 +1,43 @@
+.fx {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 2px dashed #beaa83;
+}
+.fx h3 { margin: 0 0 12px; font-size: 21px; }
+.fx-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.fx label { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
+.fx input, .fx select, .fx textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #897957;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+.fx select { text-overflow: ellipsis; }
+.fx-results {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff0ba;
+  font-size: 14px;
+}
+.fx-results div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 4px 0;
+}
+.fx-results dd { margin: 0; text-align: right; overflow-wrap: anywhere; }
+.fx summary { font-size: 14px; cursor: pointer; }
+.fx textarea { margin: 8px 0; min-height: 74px; resize: vertical; }
+.fx button { background: #fff; font-size: 14px; padding: 7px 10px; }
+.fx-note { margin: 6px 0; color: #534b3e; font-size: 12px; line-height: 1.5; }
+.fx-note:empty { display: none; }
