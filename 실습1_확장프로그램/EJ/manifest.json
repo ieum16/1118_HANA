@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "오늘 할 일",
+  "version": "1.1.0",
+  "description": "날짜별 할 일과 캘린더, USD·JPY 환율, 오늘의 날씨를 확인하세요.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.frankfurter.dev/*", "https://api.open-meteo.com/*"],
+  "action": {
+    "default_title": "오늘 할 일",
+    "default_popup": "popup.html"
+  }
+}
